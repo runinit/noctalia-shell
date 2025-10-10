@@ -172,10 +172,12 @@ Singleton {
           }
         }
         writeColorsToDisk(variant)
-        Logger.i("ColorScheme", "Applying color scheme:", getBasename(path))
+        if (Settings.data.general.debugMode) {
+          Logger.log("ColorScheme", "Applying color scheme:", getBasename(path))
+        }
 
         // Generate Matugen templates if any are enabled and setting allows it
-        if (Settings.data.colorSchemes.generateTemplatesForPredefined && hasEnabledTemplates()) {
+        if (Settings.data.colorSchemes.generateTemplatesForPredefined && hasEnabledMatugenTemplates()) {
           AppThemeService.generateFromPredefinedScheme(data)
         }
       } catch (e) {

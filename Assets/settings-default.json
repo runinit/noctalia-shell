@@ -73,7 +73,8 @@
     "shadowDirection": "bottom_right",
     "shadowOffsetX": 2,
     "shadowOffsetY": 3,
-    "language": ""
+    "language": "",
+    "debugMode": false
   },
   "ui": {
     "fontDefault": "Roboto",

@@ -131,6 +131,7 @@ ColumnLayout {
 
       delegate: Item {
         FileView {
+          id: schemeFileView
           path: modelData
           blockLoading: false
           onLoaded: {
