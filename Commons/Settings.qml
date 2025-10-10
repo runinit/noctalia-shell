@@ -188,6 +188,7 @@ Singleton {
       property real animationSpeed: 1.0
       property bool animationDisabled: false
       property bool compactLockScreen: false
+      property bool debugMode: false
     }
 
     // location
