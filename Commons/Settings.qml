@@ -193,6 +193,7 @@ Singleton {
       property bool compactLockScreen: false
       property bool lockOnSuspend: true
       property string language: ""
+      property bool debugMode: false
     }
 
     // location

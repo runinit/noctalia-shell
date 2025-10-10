@@ -68,7 +68,8 @@
     "animationDisabled": false,
     "compactLockScreen": false,
     "lockOnSuspend": true,
-    "language": ""
+    "language": "",
+    "debugMode": false
   },
   "location": {
     "name": "Tokyo",
