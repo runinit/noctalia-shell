@@ -22,6 +22,12 @@ Loader {
       property real cornerRadius: Style.screenRadius
       property real cornerSize: Style.screenRadius
 
+      // PERF: Cache complex margin calculation values to reduce binding evaluations
+      readonly property bool barVisibleOnThisScreen: BarService.isVisible && ((modelData && Settings.data.bar.monitors.includes(modelData.name)) || (Settings.data.bar.monitors.length === 0))
+      readonly property bool barHasBackground: Settings.data.bar.backgroundOpacity > 0
+      readonly property bool barIsFloating: Settings.data.bar.floating
+      readonly property string barPos: Settings.data.bar.position
+
       color: Color.transparent
 
       WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -36,12 +42,13 @@ Loader {
       }
 
       margins {
+        // PERF: Simplified bindings using cached properties
         // When bar is floating, corners should be at screen edges (no margins)
         // When bar is not floating, respect bar margins as before
-        top: !Settings.data.bar.floating && BarService.isVisible && ((modelData && Settings.data.bar.monitors.includes(modelData.name)) || (Settings.data.bar.monitors.length === 0)) && Settings.data.bar.position === "top" && Settings.data.bar.backgroundOpacity > 0 ? Style.barHeight : 0
-        bottom: !Settings.data.bar.floating && BarService.isVisible && ((modelData && Settings.data.bar.monitors.includes(modelData.name)) || (Settings.data.bar.monitors.length === 0)) && Settings.data.bar.position === "bottom" && Settings.data.bar.backgroundOpacity > 0 ? Style.barHeight : 0
-        left: !Settings.data.bar.floating && BarService.isVisible && ((modelData && Settings.data.bar.monitors.includes(modelData.name)) || (Settings.data.bar.monitors.length === 0)) && Settings.data.bar.position === "left" && Settings.data.bar.backgroundOpacity > 0 ? Style.barHeight : 0
-        right: !Settings.data.bar.floating && BarService.isVisible && ((modelData && Settings.data.bar.monitors.includes(modelData.name)) || (Settings.data.bar.monitors.length === 0)) && Settings.data.bar.position === "right" && Settings.data.bar.backgroundOpacity > 0 ? Style.barHeight : 0
+        top: !barIsFloating && barVisibleOnThisScreen && barPos === "top" && barHasBackground ? Style.barHeight : 0
+        bottom: !barIsFloating && barVisibleOnThisScreen && barPos === "bottom" && barHasBackground ? Style.barHeight : 0
+        left: !barIsFloating && barVisibleOnThisScreen && barPos === "left" && barHasBackground ? Style.barHeight : 0
+        right: !barIsFloating && barVisibleOnThisScreen && barPos === "right" && barHasBackground ? Style.barHeight : 0
       }
 
       mask: Region {}

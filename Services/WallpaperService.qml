@@ -27,6 +27,9 @@ Singleton {
   // Cache for current wallpapers - can be updated directly since we use signals for notifications
   property var currentWallpapers: ({})
 
+  // PERF: Cache FolderListModel instances by directory path to share between monitors
+  property var folderModelCache: ({})
+
   property bool isInitialized: false
 
   // Signals for reactive UI updates
@@ -360,14 +363,93 @@ Singleton {
     Logger.d("Wallpaper", "refreshWallpapersList")
     scanningCount = 0
 
-    // Force refresh by toggling the folder property on each FolderListModel
-    for (var i = 0; i < wallpaperScanners.count; i++) {
-      var scanner = wallpaperScanners.objectAt(i)
-      if (scanner) {
-        var currentFolder = scanner.folder
-        scanner.folder = ""
-        scanner.folder = currentFolder
+    // PERF: Force refresh on all cached FolderListModels
+    for (var directory in folderModelCache) {
+      var model = folderModelCache[directory]
+      if (model) {
+        var currentFolder = model.folder
+        model.folder = ""
+        model.folder = currentFolder
       }
+    }
+  }
+
+  // PERF: Get or create a FolderListModel for a directory
+  // This allows sharing the same model between multiple monitors using the same directory
+  function getOrCreateFolderModel(directory) {
+    if (folderModelCache[directory]) {
+      return folderModelCache[directory]
+    }
+
+    // Create new FolderListModel
+    var component = Qt.createComponent("Qt.labs.folderlistmodel", "FolderListModel")
+    if (component.status === Component.Error) {
+      Logger.error("Wallpaper", "Error creating FolderListModel:", component.errorString())
+      return null
+    }
+
+    var model = component.createObject(root, {
+                                         "folder": "file://" + directory,
+                                         "nameFilters": ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.pnm", "*.bmp"],
+                                         "showDirs": false,
+                                         "sortField": 0 // FolderListModel.Name
+                                       })
+
+    if (!model) {
+      Logger.error("Wallpaper", "Failed to create FolderListModel")
+      return null
+    }
+
+    // Cache it
+    folderModelCache[directory] = model
+
+    // Setup status handler
+    model.statusChanged.connect(function () {
+      handleFolderModelStatus(model, directory)
+    })
+
+    return model
+  }
+
+  // PERF: Handle FolderListModel status changes for all screens using this directory
+  function handleFolderModelStatus(model, directory) {
+    if (model.status === 0) {
+      // Null
+      for (var i = 0; i < Quickshell.screens.length; i++) {
+        var screenName = Quickshell.screens[i].name
+        if (root.getMonitorDirectory(screenName) === directory) {
+          root.wallpaperLists[screenName] = []
+          root.wallpaperListChanged(screenName, 0)
+        }
+      }
+    } else if (model.status === 1) {
+      // Loading
+      for (var i = 0; i < Quickshell.screens.length; i++) {
+        var screenName = Quickshell.screens[i].name
+        if (root.getMonitorDirectory(screenName) === directory) {
+          root.wallpaperLists[screenName] = []
+        }
+      }
+      scanningCount++
+    } else if (model.status === 2) {
+      // Ready
+      var files = []
+      for (var i = 0; i < model.count; i++) {
+        var filepath = directory + "/" + model.get(i, "fileName")
+        files.push(filepath)
+      }
+
+      // Update all screens using this directory
+      for (var i = 0; i < Quickshell.screens.length; i++) {
+        var screenName = Quickshell.screens[i].name
+        if (root.getMonitorDirectory(screenName) === directory) {
+          root.wallpaperLists[screenName] = files
+          root.wallpaperListChanged(screenName, files.length)
+        }
+      }
+
+      scanningCount--
+      Logger.log("Wallpaper", "List refreshed for directory", directory, "count:", files.length)
     }
   }
 
@@ -383,57 +465,29 @@ Singleton {
     triggeredOnStart: false
   }
 
-  // Instantiator (not Repeater) to create FolderListModel for each monitor
+  // PERF: Instantiator creates monitor watchers that reference shared FolderListModels
+  // Multiple monitors using the same directory will share a single FolderListModel
   Instantiator {
     id: wallpaperScanners
     model: Quickshell.screens
-    delegate: FolderListModel {
+    delegate: QtObject {
+      id: monitorWatcher
       property string screenName: modelData.name
       property string currentDirectory: root.getMonitorDirectory(screenName)
-
-      folder: "file://" + currentDirectory
-      nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.pnm", "*.bmp"]
-      showDirs: false
-      sortField: FolderListModel.Name
-
-      // Watch for directory changes via property binding
-      onCurrentDirectoryChanged: {
-        folder = "file://" + currentDirectory
-      }
+      property var folderModel: null
 
       Component.onCompleted: {
+        // Get or create the shared FolderListModel for this directory
+        folderModel = root.getOrCreateFolderModel(currentDirectory)
+
         // Connect to directory change signal
         root.wallpaperDirectoryChanged.connect(function (screen, directory) {
           if (screen === screenName) {
             currentDirectory = directory
+            // Switch to the FolderListModel for the new directory
+            folderModel = root.getOrCreateFolderModel(directory)
           }
         })
-      }
-
-      onStatusChanged: {
-        if (status === FolderListModel.Null) {
-          // Flush the list
-          root.wallpaperLists[screenName] = []
-          root.wallpaperListChanged(screenName, 0)
-        } else if (status === FolderListModel.Loading) {
-          // Flush the list
-          root.wallpaperLists[screenName] = []
-          scanningCount++
-        } else if (status === FolderListModel.Ready) {
-          var files = []
-          for (var i = 0; i < count; i++) {
-            var directory = root.getMonitorDirectory(screenName)
-            var filepath = directory + "/" + get(i, "fileName")
-            files.push(filepath)
-          }
-
-          // Update the list
-          root.wallpaperLists[screenName] = files
-
-          scanningCount--
-          Logger.d("Wallpaper", "List refreshed for", screenName, "count:", files.length)
-          root.wallpaperListChanged(screenName, files.length)
-        }
       }
     }
   }
