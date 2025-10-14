@@ -14,7 +14,7 @@ Item {
   property string text: ""
   property string suffix: ""
   property string tooltipText: ""
-  property string density: ""
+  property bool compact: false
   property bool autoHide: false
   property bool forceOpen: false
   property bool forceClose: false
@@ -43,23 +43,9 @@ Item {
   readonly property int pillOverlap: Math.round(Style.capsuleHeight * 0.5)
   readonly property int pillMaxWidth: Math.max(1, Math.round(textItem.implicitWidth + pillPaddingHorizontal * 2 + pillOverlap))
 
-  readonly property real iconSize: {
-    switch (root.density) {
-    case "compact":
-      return Math.max(1, Math.round(pillHeight * 0.65))
-    default:
-      return Math.max(1, Math.round(pillHeight * 0.48))
-    }
-  }
+  readonly property real iconSize: Math.max(1, compact ? pillHeight * 0.65 : pillHeight * 0.48)
 
-  readonly property real textSize: {
-    switch (root.density) {
-    case "compact":
-      return Math.max(1, Math.round(pillHeight * 0.45))
-    default:
-      return Math.max(1, Math.round(pillHeight * 0.33))
-    }
-  }
+  readonly property real textSize: Math.max(1, compact ? pillHeight * 0.45 : pillHeight * 0.33)
 
   width: pillHeight + Math.max(0, pill.width - pillOverlap)
   height: pillHeight
@@ -83,7 +69,7 @@ Item {
     opacity: revealed ? Style.opacityFull : Style.opacityNone
     color: Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
 
-    readonly property int halfPillHeight: Math.round(pillHeight * 0.5)
+    readonly property int halfPillHeight: pillHeight * 0.5
 
     topLeftRadius: rightOpen ? 0 : halfPillHeight
     bottomLeftRadius: rightOpen ? 0 : halfPillHeight
