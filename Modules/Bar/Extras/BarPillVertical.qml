@@ -67,6 +67,11 @@ Item {
     }
   }
 
+  // ALIGNMENT STRATEGY (Vertical Pills):
+  // - Parent widget's root Item is positioned by Bar.qml's Layout.alignment: Qt.AlignHCenter
+  // - Pill uses anchors.horizontalCenter to center within parent (correct approach)
+  // - Vertical positioning uses explicit y calculation (needed for slide animation)
+  // - Icon circle also uses anchors.horizontalCenter for consistency
   Rectangle {
     id: pill
 
