@@ -10,7 +10,7 @@ NIconButton {
 
   property ShellScreen screen
 
-  compact: Settings.data.bar.density === "compact"
+  density: Settings.data.bar.density
   baseSize: Style.capsuleHeight
   applyUiScale: false
   icon: "power"
