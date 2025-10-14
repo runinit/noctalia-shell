@@ -164,11 +164,12 @@ ColumnLayout {
       }
     }
 
-    // Content layout
+    // Content layout with proper sizing
     ColumnLayout {
       id: contentLayout
-      anchors.fill: parent
-      anchors.margins: Style.marginL
+      width: parent.width - (Style.marginL * 2)
+      x: Style.marginL
+      y: Style.marginL
       spacing: root.contentSpacing
     }
 
