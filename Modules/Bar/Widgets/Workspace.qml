@@ -278,7 +278,7 @@ Item {
     flow: isVertical ? Flow.TopToBottom : Flow.LeftToRight
 
     // Positioning
-    anchors.verticalCenter: isVertical ? workspaceBackground.verticalCenter : undefined
+    anchors.verticalCenter: !isVertical ? workspaceBackground.verticalCenter : undefined
     anchors.horizontalCenter: isVertical ? workspaceBackground.horizontalCenter : undefined
     x: isVertical ? 0 : horizontalPadding
     y: isVertical ? horizontalPadding : 0
