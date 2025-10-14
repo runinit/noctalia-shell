@@ -89,11 +89,15 @@ Item {
     applyUiScale: false
   }
 
+  // ALIGNMENT STRATEGY:
+  // - Bar.qml parent layout provides Layout.alignment (AlignVCenter for horizontal, AlignHCenter for vertical)
+  // - Root Item has implicit dimensions and NO position anchors (let parent layout handle positioning)
+  // - Rectangle uses centerIn to align within root
+  // - This ensures consistent vertical/horizontal centering regardless of bar position
   Rectangle {
     id: mediaMini
     visible: root.visible
-    anchors.left: parent.left
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.centerIn: parent
     width: (barPosition === "left" || barPosition === "right") ? Math.round(Style.baseWidgetSize * 0.8) : (widgetWidth)
     height: (barPosition === "left" || barPosition === "right") ? Math.round(Style.baseWidgetSize * 0.8) : Style.capsuleHeight
     radius: (barPosition === "left" || barPosition === "right") ? width / 2 : Style.radiusM

@@ -219,6 +219,13 @@ Item {
     }
   }
 
+  // ALIGNMENT STRATEGY:
+  // - Bar.qml parent layout provides Layout.alignment (AlignVCenter for horizontal, AlignHCenter for vertical)
+  // - Root Item has implicit dimensions and NO position anchors
+  // - Background uses centerIn to position itself relative to root
+  // - Flow layout uses ONLY vertical/horizontal center anchors (never mix with x/y positioning)
+  // - Padding is handled through the background size, not Flow positioning
+
   Rectangle {
     id: workspaceBackground
     width: isVertical ? Style.capsuleHeight : parent.width
@@ -226,8 +233,7 @@ Item {
     radius: Style.radiusM
     color: Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
 
-    anchors.horizontalCenter: parent.horizontalCenter
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.centerIn: parent
   }
 
   // Debounce timer for wheel interactions
@@ -272,16 +278,16 @@ Item {
 
   // PERF: Single Flow layout that works for both horizontal and vertical bars
   // This replaces the previous duplicate Row and Column layouts with Repeaters
+  // ALIGNMENT: Use ONLY centerIn anchor - never mix anchors with explicit x/y positioning
   Flow {
     id: pillFlow
     spacing: spacingBetweenPills
     flow: isVertical ? Flow.TopToBottom : Flow.LeftToRight
 
-    // Positioning - only set x/y for the non-anchored axis
-    anchors.verticalCenter: !isVertical ? workspaceBackground.verticalCenter : undefined
-    anchors.horizontalCenter: isVertical ? workspaceBackground.horizontalCenter : undefined
-    x: !isVertical ? horizontalPadding : undefined
-    y: isVertical ? horizontalPadding : undefined
+    // Proper alignment: use centerIn for both axes
+    // The parent RowLayout/ColumnLayout from Bar.qml handles the primary axis positioning
+    // We only need to center within our allocated space
+    anchors.centerIn: workspaceBackground
 
     Repeater {
       id: workspaceRepeater
