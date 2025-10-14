@@ -107,58 +107,46 @@ Variants {
       Image {
         id: currentWallpaper
 
-        property bool dimensionsCalculated: false
-
         source: ""
         smooth: true
         mipmap: false
         visible: false
-        cache: false
+        cache: true // Enable caching since we load at optimal size
         asynchronous: true
-        sourceSize: undefined
+        // Pre-calculate size based on screen dimensions to avoid loading full resolution
+        sourceSize: {
+          const compositorScale = CompositorService.getDisplayScale(modelData.name)
+          const screenWidth = modelData.width * compositorScale
+          const screenHeight = modelData.height * compositorScale
+          return Qt.size(screenWidth, screenHeight)
+        }
         onStatusChanged: {
           if (status === Image.Error) {
             Logger.warn("Current wallpaper failed to load:", source)
-          } else if (status === Image.Ready && !dimensionsCalculated) {
-            dimensionsCalculated = true
-            const optimalSize = calculateOptimalWallpaperSize(implicitWidth, implicitHeight)
-            if (optimalSize !== false) {
-              sourceSize = optimalSize
-            }
           }
-        }
-        onSourceChanged: {
-          dimensionsCalculated = false
-          sourceSize = undefined
         }
       }
 
       Image {
         id: nextWallpaper
 
-        property bool dimensionsCalculated: false
-
         source: ""
         smooth: true
         mipmap: false
         visible: false
-        cache: false
+        cache: true // Enable caching since we load at optimal size
         asynchronous: true
-        sourceSize: undefined
+        // Pre-calculate size based on screen dimensions to avoid loading full resolution
+        sourceSize: {
+          const compositorScale = CompositorService.getDisplayScale(modelData.name)
+          const screenWidth = modelData.width * compositorScale
+          const screenHeight = modelData.height * compositorScale
+          return Qt.size(screenWidth, screenHeight)
+        }
         onStatusChanged: {
           if (status === Image.Error) {
             Logger.warn("Next wallpaper failed to load:", source)
-          } else if (status === Image.Ready && !dimensionsCalculated) {
-            dimensionsCalculated = true
-            const optimalSize = calculateOptimalWallpaperSize(implicitWidth, implicitHeight)
-            if (optimalSize !== false) {
-              sourceSize = optimalSize
-            }
           }
-        }
-        onSourceChanged: {
-          dimensionsCalculated = false
-          sourceSize = undefined
         }
       }
 
