@@ -172,8 +172,7 @@ Item {
         }
       }
     }
-    workspaceRepeaterHorizontal.model = localWorkspaces
-    workspaceRepeaterVertical.model = localWorkspaces
+    // PERF: Single repeater now, no need to update multiple models
     updateWorkspaceFocus()
   }
 
@@ -271,21 +270,27 @@ Item {
     }
   }
 
-  // Horizontal layout for top/bottom bars
-  Row {
-    id: pillRow
+  // PERF: Single Flow layout that works for both horizontal and vertical bars
+  // This replaces the previous duplicate Row and Column layouts with Repeaters
+  Flow {
+    id: pillFlow
     spacing: spacingBetweenPills
-    anchors.verticalCenter: workspaceBackground.verticalCenter
-    x: horizontalPadding
-    visible: !isVertical
+    flow: isVertical ? Flow.TopToBottom : Flow.LeftToRight
+
+    // Positioning
+    anchors.verticalCenter: isVertical ? workspaceBackground.verticalCenter : undefined
+    anchors.horizontalCenter: isVertical ? workspaceBackground.horizontalCenter : undefined
+    x: isVertical ? 0 : horizontalPadding
+    y: isVertical ? horizontalPadding : 0
 
     Repeater {
-      id: workspaceRepeaterHorizontal
+      id: workspaceRepeater
       model: localWorkspaces
+
       Item {
         id: workspacePillContainer
-        width: root.getWorkspaceWidth(model)
-        height: Style.capsuleHeight * root.baseDimensionRatio
+        width: isVertical ? Style.capsuleHeight * root.baseDimensionRatio : root.getWorkspaceWidth(model)
+        height: isVertical ? root.getWorkspaceHeight(model) : Style.capsuleHeight * root.baseDimensionRatio
 
         Rectangle {
           id: pill
@@ -305,7 +310,7 @@ Item {
                   }
                 }
                 family: Settings.data.ui.fontFixed
-                pointSize: model.isFocused ? workspacePillContainer.height * 0.45 : workspacePillContainer.height * 0.42
+                pointSize: model.isFocused ? (isVertical ? workspacePillContainer.width : workspacePillContainer.height) * 0.45 : (isVertical ? workspacePillContainer.width : workspacePillContainer.height) * 0.42
                 applyUiScale: false
                 font.capitalization: Font.AllUppercase
                 font.weight: Style.fontWeightBold
@@ -347,6 +352,7 @@ Item {
             }
             hoverEnabled: true
           }
+
           // Material 3-inspired smooth animation for width, height, scale, color, opacity, and radius
           Behavior on width {
             NumberAnimation {
@@ -398,157 +404,13 @@ Item {
             easing.type: Easing.OutBack
           }
         }
+
         // Burst effect overlay for focused pill (smaller outline)
         Rectangle {
           id: pillBurst
           anchors.centerIn: workspacePillContainer
           width: workspacePillContainer.width + 18 * root.masterProgress * scale
           height: workspacePillContainer.height + 18 * root.masterProgress * scale
-          radius: width / 2
-          color: Color.transparent
-          border.color: root.effectColor
-          border.width: Math.max(1, Math.round((2 + 6 * (1.0 - root.masterProgress))))
-          opacity: root.effectsActive && model.isFocused ? (1.0 - root.masterProgress) * 0.7 : 0
-          visible: root.effectsActive && model.isFocused
-          z: 1
-        }
-      }
-    }
-  }
-
-  // Vertical layout for left/right bars
-  Column {
-    id: pillColumn
-    spacing: spacingBetweenPills
-    anchors.horizontalCenter: workspaceBackground.horizontalCenter
-    y: horizontalPadding
-    visible: isVertical
-
-    Repeater {
-      id: workspaceRepeaterVertical
-      model: localWorkspaces
-      Item {
-        id: workspacePillContainerVertical
-        width: Style.capsuleHeight * root.baseDimensionRatio
-        height: root.getWorkspaceHeight(model)
-
-        Rectangle {
-          id: pillVertical
-          anchors.fill: parent
-
-          Loader {
-            active: (labelMode !== "none")
-            sourceComponent: Component {
-              NText {
-                x: (pillVertical.width - width) / 2
-                y: (pillVertical.height - height) / 2 + (height - contentHeight) / 2
-                text: {
-                  if (labelMode === "name" && model.name && model.name.length > 0) {
-                    return model.name.substring(0, 2)
-                  } else {
-                    return model.idx.toString()
-                  }
-                }
-                family: Settings.data.ui.fontFixed
-                pointSize: model.isFocused ? workspacePillContainerVertical.width * 0.45 : workspacePillContainerVertical.width * 0.42
-                applyUiScale: false
-                font.capitalization: Font.AllUppercase
-                font.weight: Style.fontWeightBold
-                wrapMode: Text.Wrap
-                color: {
-                  if (model.isFocused)
-                    return Color.mOnPrimary
-                  if (model.isUrgent)
-                    return Color.mOnError
-                  if (model.isActive || model.isOccupied)
-                    return Color.mOnSecondary
-
-                  return Color.mOnSurface
-                }
-              }
-            }
-          }
-
-          radius: width * 0.5
-          color: {
-            if (model.isFocused)
-              return Color.mPrimary
-            if (model.isUrgent)
-              return Color.mError
-            if (model.isActive || model.isOccupied)
-              return Color.mSecondary
-
-            return Color.mOutline
-          }
-          scale: model.isFocused ? 1.0 : 0.9
-          z: 0
-
-          MouseArea {
-            id: pillMouseAreaVertical
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-              CompositorService.switchToWorkspace(model)
-            }
-            hoverEnabled: true
-          }
-          // Material 3-inspired smooth animation for width, height, scale, color, opacity, and radius
-          Behavior on width {
-            NumberAnimation {
-              duration: Style.animationNormal
-              easing.type: Easing.OutBack
-            }
-          }
-          Behavior on height {
-            NumberAnimation {
-              duration: Style.animationNormal
-              easing.type: Easing.OutBack
-            }
-          }
-          Behavior on scale {
-            NumberAnimation {
-              duration: Style.animationNormal
-              easing.type: Easing.OutBack
-            }
-          }
-          Behavior on color {
-            ColorAnimation {
-              duration: Style.animationFast
-              easing.type: Easing.InOutCubic
-            }
-          }
-          Behavior on opacity {
-            NumberAnimation {
-              duration: Style.animationFast
-              easing.type: Easing.InOutCubic
-            }
-          }
-          Behavior on radius {
-            NumberAnimation {
-              duration: Style.animationNormal
-              easing.type: Easing.OutBack
-            }
-          }
-        }
-
-        Behavior on width {
-          NumberAnimation {
-            duration: Style.animationNormal
-            easing.type: Easing.OutBack
-          }
-        }
-        Behavior on height {
-          NumberAnimation {
-            duration: Style.animationNormal
-            easing.type: Easing.OutBack
-          }
-        }
-        // Burst effect overlay for focused pill (smaller outline)
-        Rectangle {
-          id: pillBurstVertical
-          anchors.centerIn: workspacePillContainerVertical
-          width: workspacePillContainerVertical.width + 18 * root.masterProgress * scale
-          height: workspacePillContainerVertical.height + 18 * root.masterProgress * scale
           radius: width / 2
           color: Color.transparent
           border.color: root.effectColor
