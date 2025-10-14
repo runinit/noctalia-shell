@@ -43,6 +43,14 @@ Item {
     function clear() {
       NotificationService.clearHistory()
     }
+
+    function dismissOldest() {
+      NotificationService.dismissOldestActive()
+    }
+
+    function dismissAll() {
+      NotificationService.dismissAllActive()
+    }
   }
 
   IpcHandler {
@@ -86,6 +94,9 @@ Item {
     function decrease() {
       BrightnessService.decreaseBrightness()
     }
+    function set(percentage: real) {
+      BrightnessService.setBrightness(percentage)
+    }
   }
 
   IpcHandler {
@@ -127,6 +138,10 @@ Item {
     target: "sessionMenu"
     function toggle() {
       sessionMenuPanel.toggle()
+    }
+
+    function lockAndSuspend() {
+      CompositorService.lockAndSuspend()
     }
   }
 

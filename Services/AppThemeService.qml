@@ -92,13 +92,15 @@ Singleton {
     Logger.log("AppThemeService", "Service started")
   }
 
+  // --------------------------------------------------------------------------------
   function generate() {
     if (Settings.data.colorSchemes.useWallpaperColors) {
       // Use primary screen when called without a specific screen
       const screenName = Quickshell.screens.length > 0 ? Quickshell.screens[0].name : ""
       generateFromWallpaper(screenName)
     } else {
-      generateFromPredefinedScheme()
+      // Re-apply the scheme, this is the best way to regenerate all templates too.
+      ColorSchemeService.applyScheme(Settings.data.colorSchemes.predefinedScheme)
     }
   }
 
