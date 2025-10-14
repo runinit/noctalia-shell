@@ -41,7 +41,7 @@ Rectangle {
   readonly property real iconSize: textSize * 1.4
   readonly property real textSize: {
     var base = isVertical ? width * 0.82 : height
-    return Math.max(1, (density === "compact") ? base * 0.43 : base * 0.33)
+    return Math.max(1, compact ? base * 0.43 : base * 0.33)
   }
 
   // PERF: Cache TextMetrics values to reduce recalculations
