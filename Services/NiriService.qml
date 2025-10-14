@@ -16,6 +16,10 @@ Item {
 
   property bool overviewActive: false
 
+  // PERF: Batch window updates to reduce signal emissions during rapid changes
+  property var pendingWindowChanges: []
+  property bool hasPendingFocusChange: false
+
   // Signals that match the facade interface
   signal workspaceChanged
   signal activeWindowChanged
@@ -28,7 +32,17 @@ Item {
     updateWorkspaces()
     updateWindows()
     queryDisplayScales()
-    Logger.i("NiriService", "Initialized successfully")
+    windowBatchTimer.start()
+    Logger.log("NiriService", "Initialized successfully")
+  }
+
+  // PERF: Timer to batch window updates every 16ms (one frame at 60fps)
+  Timer {
+    id: windowBatchTimer
+    interval: 16
+    repeat: true
+    running: false
+    onTriggered: processPendingWindowChanges()
   }
 
   // Update workspaces
@@ -268,37 +282,67 @@ Item {
     activeWindowChanged()
   }
 
+  // PERF: Process all pending window changes in batch
+  function processPendingWindowChanges() {
+    if (pendingWindowChanges.length === 0 && !hasPendingFocusChange) {
+      return
+    }
+
+    try {
+      // Apply all window changes at once
+      for (var i = 0; i < pendingWindowChanges.length; i++) {
+        const change = pendingWindowChanges[i]
+        const existingIndex = windows.findIndex(w => w.id === change.id)
+
+        if (existingIndex >= 0) {
+          windows[existingIndex] = change
+        } else {
+          windows.push(change)
+        }
+      }
+
+      // Sort only once after all changes
+      if (pendingWindowChanges.length > 0) {
+        windows.sort(compareWindows)
+        windowListChanged()
+      }
+
+      // Handle focus changes if any
+      if (hasPendingFocusChange) {
+        activeWindowChanged()
+        hasPendingFocusChange = false
+      }
+
+      // Clear pending changes
+      pendingWindowChanges = []
+    } catch (e) {
+      Logger.error("NiriService", "Error processing pending window changes:", e)
+      pendingWindowChanges = []
+      hasPendingFocusChange = false
+    }
+  }
+
   // Event handlers
   function handleWindowOpenedOrChanged(eventData) {
     try {
       const windowData = eventData.window
-      const existingIndex = windows.findIndex(w => w.id === windowData.id)
       const newWindow = getWindowData(windowData)
 
-      if (existingIndex >= 0) {
-        // Update existing window
-        windows[existingIndex] = newWindow
-      } else {
-        // Add new window
-        windows.push(newWindow)
-      }
-      windows.sort(compareWindows)
+      // PERF: Queue the window change instead of applying immediately
+      pendingWindowChanges.push(newWindow)
 
-      // Update focused window index if this window is focused
+      // Mark focus change if needed
       if (newWindow.isFocused) {
         const oldFocusedIndex = focusedWindowIndex
         focusedWindowIndex = windows.findIndex(w => w.id === windowData.id)
 
-        // Only emit activeWindowChanged if the focused window actually changed
         if (oldFocusedIndex !== focusedWindowIndex) {
           if (oldFocusedIndex >= 0 && oldFocusedIndex < windows.length) {
             windows[oldFocusedIndex].isFocused = false
           }
-          activeWindowChanged()
+          hasPendingFocusChange = true
         }
       }
-
-      windowListChanged()
     } catch (e) {
       Logger.e("NiriService", "Error handling WindowOpenedOrChanged:", e)
     }

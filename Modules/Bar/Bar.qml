@@ -18,7 +18,10 @@ Variants {
 
     required property ShellScreen modelData
 
-    active: BarService.isVisible && modelData && modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
+    // PERF: Extract complex active binding to readonly property to reduce recalculations
+    readonly property bool shouldBeActive: BarService.isVisible && modelData && modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
+
+    active: shouldBeActive
 
     sourceComponent: PanelWindow {
       screen: modelData || null

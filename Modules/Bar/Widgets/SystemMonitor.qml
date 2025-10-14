@@ -44,9 +44,14 @@ Rectangle {
     return Math.max(1, (density === "compact") ? base * 0.43 : base * 0.33)
   }
 
-  readonly property int percentTextWidth: Math.ceil(percentMetrics.boundingRect.width + 3)
-  readonly property int tempTextWidth: Math.ceil(tempMetrics.boundingRect.width + 3)
-  readonly property int memTextWidth: Math.ceil(memMetrics.boundingRect.width + 3)
+  // PERF: Cache TextMetrics values to reduce recalculations
+  property int cachedPercentWidth: 0
+  property int cachedTempWidth: 0
+  property int cachedMemWidth: 0
+
+  readonly property int percentTextWidth: cachedPercentWidth
+  readonly property int tempTextWidth: cachedTempWidth
+  readonly property int memTextWidth: cachedMemWidth
 
   TextMetrics {
     id: percentMetrics
@@ -54,6 +59,11 @@ Rectangle {
     font.weight: Style.fontWeightMedium
     font.pointSize: textSize * Settings.data.ui.fontFixedScale
     text: "99%" // Use the longest possible string for measurement
+
+    // PERF: Update cache when bounding rect changes
+    onBoundingRectChanged: {
+      root.cachedPercentWidth = Math.ceil(boundingRect.width + 3)
+    }
   }
 
   TextMetrics {
@@ -62,6 +72,11 @@ Rectangle {
     font.weight: Style.fontWeightMedium
     font.pointSize: textSize * Settings.data.ui.fontFixedScale
     text: "99°" // Use the longest possible string for measurement
+
+    // PERF: Update cache when bounding rect changes
+    onBoundingRectChanged: {
+      root.cachedTempWidth = Math.ceil(boundingRect.width + 3)
+    }
   }
 
   TextMetrics {
@@ -70,6 +85,11 @@ Rectangle {
     font.weight: Style.fontWeightMedium
     font.pointSize: textSize * Settings.data.ui.fontFixedScale
     text: "99.9K" // Longest value part of network speed
+
+    // PERF: Update cache when bounding rect changes
+    onBoundingRectChanged: {
+      root.cachedMemWidth = Math.ceil(boundingRect.width + 3)
+    }
   }
 
   anchors.centerIn: parent

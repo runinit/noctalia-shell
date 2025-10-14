@@ -49,7 +49,7 @@ Variants {
       Component.onDestruction: {
         transitionAnimation.stop()
         debounceTimer.stop()
-        shaderLoader.active = false
+        // PERF: Shaders are now always loaded, just clear image sources
         currentWallpaper.source = ""
         nextWallpaper.source = ""
       }
@@ -150,33 +150,17 @@ Variants {
         }
       }
 
-      // Dynamic shader loader - only loads the active transition shader
-      Loader {
-        id: shaderLoader
+      // PERF: Keep all shaders loaded and toggle visibility instead of destroy/recreate
+      // This eliminates shader recompilation stutter during transitions
+      Item {
+        id: shaderContainer
         anchors.fill: parent
-        active: true
 
-        sourceComponent: {
-          switch (transitionType) {
-          case "wipe":
-            return wipeShaderComponent
-          case "disc":
-            return discShaderComponent
-          case "stripes":
-            return stripesShaderComponent
-          case "fade":
-          case "none":
-          default:
-            return fadeShaderComponent
-          }
-        }
-      }
-
-      // Fade or None transition shader component
-      Component {
-        id: fadeShaderComponent
+        // Fade shader (default)
         ShaderEffect {
+          id: fadeShader
           anchors.fill: parent
+          visible: transitionType === "fade" || transitionType === "none"
 
           property variant source1: currentWallpaper
           property variant source2: nextWallpaper
@@ -194,13 +178,12 @@ Variants {
 
           fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/wp_fade.frag.qsb")
         }
-      }
 
-      // Wipe transition shader component
-      Component {
-        id: wipeShaderComponent
+        // Wipe shader
         ShaderEffect {
+          id: wipeShader
           anchors.fill: parent
+          visible: transitionType === "wipe"
 
           property variant source1: currentWallpaper
           property variant source2: nextWallpaper
@@ -220,13 +203,12 @@ Variants {
 
           fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/wp_wipe.frag.qsb")
         }
-      }
 
-      // Disc reveal transition shader component
-      Component {
-        id: discShaderComponent
+        // Disc shader
         ShaderEffect {
+          id: discShader
           anchors.fill: parent
+          visible: transitionType === "disc"
 
           property variant source1: currentWallpaper
           property variant source2: nextWallpaper
@@ -248,13 +230,12 @@ Variants {
 
           fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/wp_disc.frag.qsb")
         }
-      }
 
-      // Diagonal stripes transition shader component
-      Component {
-        id: stripesShaderComponent
+        // Stripes shader
         ShaderEffect {
+          id: stripesShader
           anchors.fill: parent
+          visible: transitionType === "stripes"
 
           property variant source1: currentWallpaper
           property variant source2: nextWallpaper
