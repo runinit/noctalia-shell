@@ -23,10 +23,10 @@ Item {
   property var workspaceCache: ({})
   property var windowCache: ({})
 
-  // Debounce timer for updates
+  // Debounce timer for updates (16ms = ~60fps)
   Timer {
     id: updateTimer
-    interval: 50
+    interval: 16
     repeat: false
     onTriggered: safeUpdate()
   }
