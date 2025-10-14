@@ -21,6 +21,7 @@ Rectangle {
 
   readonly property bool isVerticalBar: Settings.data.bar.position === "left" || Settings.data.bar.position === "right"
   readonly property string density: Settings.data.bar.density
+  readonly property bool compact: Settings.data.bar.density === "compact"
   readonly property real itemSize: (density === "compact") ? Style.capsuleHeight * 0.9 : Style.capsuleHeight * 0.8
 
   property var widgetMetadata: BarWidgetRegistry.widgetMetadata[widgetId]

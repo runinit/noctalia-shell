@@ -12,7 +12,7 @@ Item {
   property string text: ""
   property string suffix: ""
   property string tooltipText: ""
-  property string density: ""
+  property bool compact: false
   property bool autoHide: false
   property bool forceOpen: false
   property bool forceClose: false
@@ -52,23 +52,9 @@ Item {
   readonly property int maxPillWidth: buttonSize
   readonly property int maxPillHeight: Math.max(1, Math.round(textItem.implicitHeight + pillPaddingVertical * 4))
 
-  readonly property real iconSize: {
-    switch (root.density) {
-    case "compact":
-      return Math.max(1, Math.round(pillHeight * 0.65))
-    default:
-      return Math.max(1, Math.round(pillHeight * 0.48))
-    }
-  }
+  readonly property real iconSize: Math.max(1, compact ? pillHeight * 0.65 : pillHeight * 0.48)
 
-  readonly property real textSize: {
-    switch (root.density) {
-    case "compact":
-      return Math.max(1, Math.round(pillHeight * 0.38))
-    default:
-      return Math.max(1, Math.round(pillHeight * 0.33))
-    }
-  }
+  readonly property real textSize: Math.max(1, compact ? pillHeight * 0.38 : pillHeight * 0.33)
 
   // For vertical bars: width is just icon size, height includes pill space
   width: buttonSize
@@ -94,7 +80,7 @@ Item {
     opacity: revealed ? Style.opacityFull : Style.opacityNone
     color: Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
 
-    readonly property int halfButtonSize: Math.round(buttonSize * 0.5)
+    readonly property int halfButtonSize: buttonSize * 0.5
 
     // Radius logic for vertical expansion - rounded on the side that connects to icon
     topLeftRadius: openUpward ? halfButtonSize : 0

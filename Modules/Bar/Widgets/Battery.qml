@@ -86,7 +86,7 @@ Item {
   BarPill {
     id: pill
 
-    density: Settings.data.bar.density
+    compact: Settings.data.bar.density === "compact"
     rightOpen: BarService.getPillDirection(root)
     icon: testMode ? BatteryService.getIcon(testPercent, testCharging, true) : BatteryService.getIcon(percent, charging, isReady)
     text: (isReady || testMode) ? Math.round(percent) : "-"

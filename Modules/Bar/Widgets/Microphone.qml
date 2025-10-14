@@ -91,7 +91,7 @@ Item {
 
     rightOpen: BarService.getPillDirection(root)
     icon: getIcon()
-    density: Settings.data.bar.density
+    compact: Settings.data.bar.density === "compact"
     autoHide: false // Important to be false so we can hover as long as we want
     text: Math.round(AudioService.inputVolume * 100)
     suffix: "%"
