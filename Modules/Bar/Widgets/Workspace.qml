@@ -35,7 +35,7 @@ Item {
   readonly property bool isVertical: barPosition === "left" || barPosition === "right"
   readonly property bool compact: Settings.data.bar.density === "compact"
   readonly property real baseDimensionRatio: {
-    const b = (density === "compact") ? 0.85 : 0.65
+    const b = compact ? 0.85 : 0.65
     if (widgetSettings.labelMode === "none") {
       return b * 0.75
     }
