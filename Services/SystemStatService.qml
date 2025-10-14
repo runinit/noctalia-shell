@@ -21,6 +21,9 @@ Singleton {
   // Configuration
   property int sleepDuration: 3000
 
+  // Consumer tracking - only run timer when widgets are active
+  property int activeConsumerCount: 0
+
   // Internal state for CPU calculation
   property var prevCpuStats: null
 
@@ -49,12 +52,12 @@ Singleton {
   }
 
   // --------------------------------------------
-  // Timer for periodic updates
+  // Timer for periodic updates - only runs when widgets are active
   Timer {
     id: updateTimer
     interval: root.sleepDuration
     repeat: true
-    running: true
+    running: activeConsumerCount > 0
     triggeredOnStart: true
     onTriggered: {
       // Trigger all direct system files reads
@@ -398,5 +401,21 @@ Singleton {
     root.intelTempFilesChecked++
     cpuTempReader.path = `${root.cpuTempHwmonPath}/temp${root.intelTempFilesChecked}_input`
     cpuTempReader.reload()
+  }
+
+  // --------------------------------------------
+  // Consumer registration for conditional timer
+  function registerConsumer() {
+    activeConsumerCount++
+    if (activeConsumerCount === 1) {
+      Logger.log("SystemStat", "First consumer registered, starting updates")
+    }
+  }
+
+  function unregisterConsumer() {
+    activeConsumerCount = Math.max(0, activeConsumerCount - 1)
+    if (activeConsumerCount === 0) {
+      Logger.log("SystemStat", "All consumers unregistered, stopping updates")
+    }
   }
 }

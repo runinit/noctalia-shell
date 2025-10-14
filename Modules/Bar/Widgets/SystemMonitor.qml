@@ -345,4 +345,12 @@ Rectangle {
       }
     }
   }
+
+  Component.onCompleted: {
+    SystemStatService.registerConsumer()
+  }
+
+  Component.onDestruction: {
+    SystemStatService.unregisterConsumer()
+  }
 }
