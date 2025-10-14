@@ -34,6 +34,54 @@ Rectangle {
     return {}
   }
 
+  // Cached filtered windows to avoid recalculating on every binding evaluation
+  property var filteredWindows: []
+  property var activeWorkspaceIds: []
+
+  function updateFilteredWindows() {
+    // Cache active workspace IDs once
+    activeWorkspaceIds = CompositorService.getActiveWorkspaces().map(ws => ws.id)
+
+    // Filter windows once
+    const allWindows = CompositorService.windows
+    const result = []
+
+    for (let i = 0; i < allWindows.count; i++) {
+      const window = allWindows.get(i)
+
+      if (widgetSettings.onlySameOutput && window.output !== screen.name) {
+        continue
+      }
+
+      if (widgetSettings.onlyActiveWorkspaces &&
+          !activeWorkspaceIds.includes(window.workspaceId)) {
+        continue
+      }
+
+      result.push(window)
+    }
+
+    filteredWindows = result
+  }
+
+  // Update filtered windows when compositor changes
+  Connections {
+    target: CompositorService
+    function onWindowListChanged() {
+      Qt.callLater(updateFilteredWindows)
+    }
+    function onWorkspaceChanged() {
+      // Only update if filtering by active workspaces
+      if (widgetSettings.onlyActiveWorkspaces) {
+        Qt.callLater(updateFilteredWindows)
+      }
+    }
+  }
+
+  Component.onCompleted: {
+    updateFilteredWindows()
+  }
+
   // Always visible when there are toplevels
   implicitWidth: isVerticalBar ? Style.capsuleHeight : Math.round(taskbarLayout.implicitWidth + Style.marginM * 2)
   implicitHeight: isVerticalBar ? Math.round(taskbarLayout.implicitHeight + Style.marginM * 2) : Style.capsuleHeight
@@ -58,13 +106,13 @@ Rectangle {
     columnSpacing: isVerticalBar ? 0 : Style.marginXXS
 
     Repeater {
-      model: CompositorService.windows
+      model: filteredWindows
       delegate: Item {
         id: taskbarItem
         required property var modelData
         property ShellScreen screen: root.screen
 
-        visible: (!widgetSettings.onlySameOutput || modelData.output == screen.name) && (!widgetSettings.onlyActiveWorkspaces || CompositorService.getActiveWorkspaces().map(ws => ws.id).includes(modelData.workspaceId))
+        visible: true // Visibility filtering already done in filteredWindows
 
         Layout.preferredWidth: root.itemSize
         Layout.preferredHeight: root.itemSize

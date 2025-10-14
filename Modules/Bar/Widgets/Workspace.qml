@@ -62,8 +62,12 @@ Item {
 
   signal workspaceChanged(int workspaceId, color accentColor)
 
-  implicitWidth: isVertical ? Style.barHeight : computeWidth()
-  implicitHeight: isVertical ? computeHeight() : Style.barHeight
+  // Cached dimensions to avoid recomputing on every property change
+  property real cachedWidth: 0
+  property real cachedHeight: 0
+
+  implicitWidth: isVertical ? Style.barHeight : cachedWidth
+  implicitHeight: isVertical ? cachedHeight : Style.barHeight
 
   function getWorkspaceWidth(ws) {
     const d = Style.capsuleHeight * root.baseDimensionRatio
@@ -77,26 +81,26 @@ Item {
     return d * factor
   }
 
-  function computeWidth() {
-    let total = 0
-    for (var i = 0; i < localWorkspaces.count; i++) {
-      const ws = localWorkspaces.get(i)
-      total += getWorkspaceWidth(ws)
-    }
-    total += Math.max(localWorkspaces.count - 1, 0) * spacingBetweenPills
-    total += horizontalPadding * 2
-    return Math.round(total)
-  }
+  function updateCachedDimensions() {
+    let newWidth = 0
+    let newHeight = 0
 
-  function computeHeight() {
-    let total = 0
     for (var i = 0; i < localWorkspaces.count; i++) {
       const ws = localWorkspaces.get(i)
-      total += getWorkspaceHeight(ws)
+      const d = Style.capsuleHeight * root.baseDimensionRatio
+      const factor = ws.isFocused ? 2.2 : 1
+
+      newWidth += d * factor
+      newHeight += d * factor
     }
-    total += Math.max(localWorkspaces.count - 1, 0) * spacingBetweenPills
-    total += horizontalPadding * 2
-    return Math.round(total)
+
+    newWidth += Math.max(localWorkspaces.count - 1, 0) * spacingBetweenPills
+    newWidth += horizontalPadding * 2
+    newHeight += Math.max(localWorkspaces.count - 1, 0) * spacingBetweenPills
+    newHeight += horizontalPadding * 2
+
+    cachedWidth = Math.round(newWidth)
+    cachedHeight = Math.round(newHeight)
   }
 
   function getFocusedLocalIndex() {
@@ -105,6 +109,21 @@ Item {
         return i
     }
     return -1
+  }
+
+  // Update cached dimensions when workspaces change
+  Connections {
+    target: localWorkspaces
+    function onCountChanged() {
+      Qt.callLater(updateCachedDimensions)
+    }
+  }
+
+  Connections {
+    target: CompositorService
+    function onWorkspaceChanged() {
+      Qt.callLater(updateCachedDimensions)
+    }
   }
 
   function switchByOffset(offset) {
@@ -123,6 +142,7 @@ Item {
 
   Component.onCompleted: {
     refreshWorkspaces()
+    updateCachedDimensions()
   }
 
   Component.onDestruction: {
