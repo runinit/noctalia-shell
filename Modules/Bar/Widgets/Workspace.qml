@@ -289,6 +289,8 @@ Item {
 
       Item {
         id: workspacePillContainer
+        required property var model
+
         width: isVertical ? Style.capsuleHeight * root.baseDimensionRatio : root.getWorkspaceWidth(model)
         height: isVertical ? root.getWorkspaceHeight(model) : Style.capsuleHeight * root.baseDimensionRatio
 
