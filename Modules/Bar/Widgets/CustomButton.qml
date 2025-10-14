@@ -48,7 +48,7 @@ Item {
     rightOpen: BarService.getPillDirection(root)
     icon: customIcon
     text: _dynamicText
-    density: Settings.data.bar.density
+    compact: Settings.data.bar.density === "compact"
     autoHide: false
     forceOpen: _dynamicText !== ""
     forceClose: false
