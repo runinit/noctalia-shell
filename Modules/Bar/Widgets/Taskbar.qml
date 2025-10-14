@@ -35,51 +35,64 @@ Rectangle {
     return {}
   }
 
-  property bool hasWindow: false
-  readonly property string hideMode: (widgetSettings.hideMode !== undefined) ? widgetSettings.hideMode : widgetMetadata.hideMode
-  readonly property bool onlySameOutput: (widgetSettings.onlySameOutput !== undefined) ? widgetSettings.onlySameOutput : widgetMetadata.onlySameOutput
-  readonly property bool onlyActiveWorkspaces: (widgetSettings.onlyActiveWorkspaces !== undefined) ? widgetSettings.onlyActiveWorkspaces : widgetMetadata.onlyActiveWorkspaces
+  // Cached filtered windows to avoid recalculating on every binding evaluation
+  property var filteredWindows: []
+  property var activeWorkspaceIds: []
 
-  function updateHasWindow() {
-    try {
-      var total = CompositorService.windows.count || 0
-      var activeIds = CompositorService.getActiveWorkspaces().map(function (ws) {
-        return ws.id
-      })
-      var found = false
-      for (var i = 0; i < total; i++) {
-        var w = CompositorService.windows.get(i)
-        if (!w)
-          continue
-        var passOutput = (!onlySameOutput) || (w.output == screen.name)
-        var passWorkspace = (!onlyActiveWorkspaces) || (activeIds.includes(w.workspaceId))
-        if (passOutput && passWorkspace) {
-          found = true
-          break
-        }
+  readonly property string hideMode: (widgetSettings.hideMode !== undefined) ? widgetSettings.hideMode : widgetMetadata.hideMode
+
+  function updateFilteredWindows() {
+    // Cache active workspace IDs once
+    activeWorkspaceIds = CompositorService.getActiveWorkspaces().map(ws => ws.id)
+
+    // Filter windows once
+    const allWindows = CompositorService.windows
+    const result = []
+
+    for (let i = 0; i < allWindows.count; i++) {
+      const window = allWindows.get(i)
+
+      if (widgetSettings.onlySameOutput && window.output !== screen.name) {
+        continue
       }
-      hasWindow = found
-    } catch (e) {
-      hasWindow = false
+
+      if (widgetSettings.onlyActiveWorkspaces &&
+          !activeWorkspaceIds.includes(window.workspaceId)) {
+        continue
+      }
+
+      result.push(window)
     }
+
+    filteredWindows = result
   }
 
+  // Update filtered windows when compositor changes
   Connections {
     target: CompositorService
     function onWindowListChanged() {
-      updateHasWindow()
+      Qt.callLater(updateFilteredWindows)
     }
     function onWorkspaceChanged() {
-      updateHasWindow()
+      // Only update if filtering by active workspaces
+      if (widgetSettings.onlyActiveWorkspaces) {
+        Qt.callLater(updateFilteredWindows)
+      }
     }
   }
 
-  Component.onCompleted: updateHasWindow()
-  onScreenChanged: updateHasWindow()
+  Component.onCompleted: {
+    updateFilteredWindows()
+  }
 
-  // "visible": Always Visible, "hidden": Hide When Empty, "transparent": Transparent When Empty
-  visible: hideMode !== "hidden" || hasWindow
-  opacity: (hideMode !== "transparent" || hasWindow) ? 1.0 : 0
+  onScreenChanged: {
+    updateFilteredWindows()
+  }
+
+  // Hide/show logic based on hideMode and filtered windows
+  visible: hideMode !== "hidden" || filteredWindows.length > 0
+  opacity: (hideMode !== "transparent" || filteredWindows.length > 0) ? 1.0 : 0
+
   Behavior on opacity {
     NumberAnimation {
       duration: Style.animationNormal
@@ -110,15 +123,13 @@ Rectangle {
     columnSpacing: isVerticalBar ? 0 : Style.marginXXS
 
     Repeater {
-      model: CompositorService.windows
+      model: filteredWindows
       delegate: Item {
         id: taskbarItem
         required property var modelData
         property ShellScreen screen: root.screen
 
-        visible: (!onlySameOutput || modelData.output == screen.name) && (!onlyActiveWorkspaces || CompositorService.getActiveWorkspaces().map(function (ws) {
-          return ws.id
-        }).includes(modelData.workspaceId))
+        visible: true // Visibility filtering already done in filteredWindows
 
         Layout.preferredWidth: root.itemSize
         Layout.preferredHeight: root.itemSize
