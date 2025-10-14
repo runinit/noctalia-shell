@@ -64,7 +64,8 @@
     "screenRadiusRatio": 1,
     "animationSpeed": 1,
     "animationDisabled": false,
-    "compactLockScreen": false
+    "compactLockScreen": false,
+    "debugMode": false
   },
   "location": {
     "name": "Tokyo",
