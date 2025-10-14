@@ -277,11 +277,11 @@ Item {
     spacing: spacingBetweenPills
     flow: isVertical ? Flow.TopToBottom : Flow.LeftToRight
 
-    // Positioning
+    // Positioning - only set x/y for the non-anchored axis
     anchors.verticalCenter: !isVertical ? workspaceBackground.verticalCenter : undefined
     anchors.horizontalCenter: isVertical ? workspaceBackground.horizontalCenter : undefined
-    x: isVertical ? 0 : horizontalPadding
-    y: isVertical ? horizontalPadding : 0
+    x: !isVertical ? horizontalPadding : undefined
+    y: isVertical ? horizontalPadding : undefined
 
     Repeater {
       id: workspaceRepeater
