@@ -147,9 +147,8 @@ Singleton {
                                      })
 
     backend.activeWindowChanged.connect(() => {
-                                          // Sync active window when it changes
-                                          // TODO: Avoid re-syncing all windows
-                                          syncWindows()
+                                          // Update only focused state without full resync
+                                          updateFocusedWindowState()
                                           // Forward the signal
                                           activeWindowChanged()
                                         })
@@ -173,23 +172,95 @@ Singleton {
   }
 
   function syncWorkspaces() {
-    workspaces.clear()
     const ws = backend.workspaces
-    for (var i = 0; i < ws.count; i++) {
+    const newCount = ws.count
+    const oldCount = workspaces.count
+
+    // Update existing entries
+    for (var i = 0; i < Math.min(newCount, oldCount); i++) {
+      const newData = ws.get(i)
+      const oldData = workspaces.get(i)
+
+      // Only update if changed (compare key properties)
+      if (!oldData || oldData.id !== newData.id ||
+          oldData.isFocused !== newData.isFocused ||
+          oldData.isActive !== newData.isActive ||
+          oldData.name !== newData.name) {
+        workspaces.set(i, newData)
+      }
+    }
+
+    // Add new entries
+    for (var i = oldCount; i < newCount; i++) {
       workspaces.append(ws.get(i))
     }
+
+    // Remove excess entries
+    for (var i = oldCount - 1; i >= newCount; i--) {
+      workspaces.remove(i)
+    }
+
     // Emit signal to notify listeners that workspace list has been updated
     workspacesChanged()
   }
 
   function syncWindows() {
-    windows.clear()
     const ws = backend.windows
-    for (var i = 0; i < ws.length; i++) {
+    const newCount = ws.length
+    const oldCount = windows.count
+
+    // Update existing entries
+    for (var i = 0; i < Math.min(newCount, oldCount); i++) {
+      const newData = ws[i]
+      const oldData = windows.get(i)
+
+      // Only update if changed (compare key properties)
+      if (!oldData || oldData.id !== newData.id ||
+          oldData.title !== newData.title ||
+          oldData.isFocused !== newData.isFocused ||
+          oldData.workspaceId !== newData.workspaceId ||
+          oldData.output !== newData.output) {
+        windows.set(i, newData)
+      }
+    }
+
+    // Add new entries
+    for (var i = oldCount; i < newCount; i++) {
       windows.append(ws[i])
     }
-    // Emit signal to notify listeners that workspace list has been updated
+
+    // Remove excess entries
+    for (var i = oldCount - 1; i >= newCount; i--) {
+      windows.remove(i)
+    }
+
+    // Emit signal to notify listeners that window list has been updated
     windowListChanged()
+  }
+
+  // Update only focused window state without full resync
+  function updateFocusedWindowState() {
+    const newFocusedIndex = backend.focusedWindowIndex
+
+    if (focusedWindowIndex !== newFocusedIndex) {
+      // Update old focused window
+      if (focusedWindowIndex >= 0 && focusedWindowIndex < windows.count) {
+        const oldWindow = windows.get(focusedWindowIndex)
+        if (oldWindow) {
+          windows.set(focusedWindowIndex, Object.assign({}, oldWindow, {isFocused: false}))
+        }
+      }
+
+      // Update new focused window
+      if (newFocusedIndex >= 0 && newFocusedIndex < windows.count) {
+        const newWindow = windows.get(newFocusedIndex)
+        if (newWindow) {
+          windows.set(newFocusedIndex, Object.assign({}, newWindow, {isFocused: true}))
+        }
+      }
+
+      focusedWindowIndex = newFocusedIndex
+    }
   }
 
   // Update display scales from backend
