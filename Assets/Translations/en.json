@@ -989,6 +989,10 @@
         "hide-unoccupied": {
           "label": "Hide unoccupied",
           "description": "Don't display workspaces without windows."
+        },
+        "show-all-displays": {
+          "label": "Show all displays",
+          "description": "Show workspaces from all displays instead of only the current display."
         }
       },
       "microphone": {
