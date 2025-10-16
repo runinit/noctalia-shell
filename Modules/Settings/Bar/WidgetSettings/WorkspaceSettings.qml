@@ -17,6 +17,7 @@ ColumnLayout {
     var settings = Object.assign({}, widgetData || {})
     settings.labelMode = labelModeCombo.currentKey
     settings.hideUnoccupied = hideUnoccupiedToggle.checked
+    settings.showAllDisplays = showAllDisplaysToggle.checked
     return settings
   }
 
@@ -46,5 +47,13 @@ ColumnLayout {
     description: I18n.tr("bar.widget-settings.workspace.hide-unoccupied.description")
     checked: widgetData.hideUnoccupied
     onToggled: checked => hideUnoccupiedToggle.checked = checked
+  }
+
+  NToggle {
+    id: showAllDisplaysToggle
+    label: I18n.tr("bar.widget-settings.workspace.show-all-displays.label")
+    description: I18n.tr("bar.widget-settings.workspace.show-all-displays.description")
+    checked: widgetData.showAllDisplays !== undefined ? widgetData.showAllDisplays : false
+    onToggled: checked => showAllDisplaysToggle.checked = checked
   }
 }

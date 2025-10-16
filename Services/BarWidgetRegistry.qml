@@ -129,7 +129,8 @@ Singleton {
                                   "Workspace": {
                                     "allowUserSettings": true,
                                     "labelMode": "index",
-                                    "hideUnoccupied": false
+                                    "hideUnoccupied": false,
+                                    "showAllDisplays": false
                                   },
                                   "Volume": {
                                     "allowUserSettings": true,
