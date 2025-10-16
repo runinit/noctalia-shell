@@ -45,6 +45,7 @@ Item {
   readonly property string labelMode: (widgetSettings.labelMode !== undefined) ? widgetSettings.labelMode : widgetMetadata.labelMode
   readonly property bool hideUnoccupied: (widgetSettings.hideUnoccupied !== undefined) ? widgetSettings.hideUnoccupied : widgetMetadata.hideUnoccupied
   readonly property int characterCount: (widgetSettings.characterCount !== undefined) ? widgetSettings.characterCount : widgetMetadata.characterCount
+  readonly property bool showAllDisplays: (widgetSettings.showAllDisplays !== undefined) ? widgetSettings.showAllDisplays : widgetMetadata.showAllDisplays
 
   property bool isDestroying: false
   property bool hovered: false
@@ -141,6 +142,7 @@ Item {
 
   onScreenChanged: refreshWorkspaces()
   onHideUnoccupiedChanged: refreshWorkspaces()
+  onShowAllDisplaysChanged: refreshWorkspaces()
 
   Connections {
     target: CompositorService
@@ -154,7 +156,8 @@ Item {
     if (screen !== null) {
       for (var i = 0; i < CompositorService.workspaces.count; i++) {
         const ws = CompositorService.workspaces.get(i)
-        if (ws.output.toLowerCase() === screen.name.toLowerCase()) {
+        // Filter by output unless showAllDisplays is enabled
+        if (showAllDisplays || ws.output.toLowerCase() === screen.name.toLowerCase()) {
           if (hideUnoccupied && !ws.isOccupied && !ws.isFocused) {
             continue
           }

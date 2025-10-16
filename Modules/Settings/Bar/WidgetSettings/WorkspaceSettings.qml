@@ -18,6 +18,7 @@ ColumnLayout {
     settings.labelMode = labelModeCombo.currentKey
     settings.hideUnoccupied = hideUnoccupiedToggle.checked
     settings.characterCount = characterCountSpinBox.value
+    settings.showAllDisplays = showAllDisplaysToggle.checked
     return settings
   }
 
@@ -65,5 +66,13 @@ ColumnLayout {
       return 2
     }
     visible: labelModeCombo.currentKey === "name"
+  }
+
+  NToggle {
+    id: showAllDisplaysToggle
+    label: I18n.tr("bar.widget-settings.workspace.show-all-displays.label")
+    description: I18n.tr("bar.widget-settings.workspace.show-all-displays.description")
+    checked: widgetData.showAllDisplays !== undefined ? widgetData.showAllDisplays : false
+    onToggled: checked => showAllDisplaysToggle.checked = checked
   }
 }

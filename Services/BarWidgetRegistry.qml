@@ -152,7 +152,8 @@ Singleton {
                                     "allowUserSettings": true,
                                     "labelMode": "index",
                                     "hideUnoccupied": false,
-                                    "characterCount": 2
+                                    "characterCount": 2,
+                                    "showAllDisplays": false
                                   },
                                   "Volume": {
                                     "allowUserSettings": true,

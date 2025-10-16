@@ -1044,6 +1044,10 @@
         "character-count": {
           "label": "Character count",
           "description": "Number of characters to display from workspace names (1-10)."
+        },
+        "show-all-displays": {
+          "label": "Show all displays",
+          "description": "Show workspaces from all displays instead of only the current display."
         }
       },
       "microphone": {
