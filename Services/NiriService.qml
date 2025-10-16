@@ -189,8 +189,10 @@ Item {
                     handleOverviewOpenedOrClosed(event.OverviewOpenedOrClosed)
                   } else if (event.OutputsChanged) {
                     queryDisplayScales()
+                    updateWorkspaces()
                   } else if (event.ConfigLoaded) {
                     queryDisplayScales()
+                    updateWorkspaces()
                   }
                 } catch (e) {
                   Logger.e("NiriService", "Error parsing event stream:", e, data)

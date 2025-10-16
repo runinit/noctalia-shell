@@ -257,6 +257,188 @@
           "label": "Storage usage"
         }
       },
+      "notification-history": {
+        "show-unread-badge": {
+          "label": "Show unread badge",
+          "description": "Display a badge showing the number of unread notifications."
+        },
+        "hide-badge-when-zero": {
+          "label": "Hide badge when zero",
+          "description": "Hide the notification badge when there are no unread notifications."
+        }
+      },
+      "battery": {
+        "display-mode": {
+          "label": "Display mode",
+          "description": "Choose how you'd like this value to appear."
+        },
+        "low-battery-threshold": {
+          "label": "Low battery warning threshold",
+          "description": "Show a warning when battery falls below this percentage."
+        }
+      },
+      "control-center": {
+        "use-distro-logo": {
+          "label": "Use distro logo instead of icon",
+          "description": "Use your distribution's logo instead of a custom icon."
+        },
+        "icon": {
+          "label": "Icon",
+          "description": "Select an icon from the library or a custom file."
+        },
+        "browse-library": "Browse Library",
+        "browse-file": "Browse File",
+        "select-custom-icon": "Select a custom icon"
+      },
+      "keyboard-layout": {
+        "display-mode": {
+          "label": "Display mode",
+          "description": "Choose how you'd like this value to appear."
+        }
+      },
+      "volume": {
+        "display-mode": {
+          "label": "Display mode",
+          "description": "Choose how you'd like this value to appear."
+        }
+      },
+      "workspace": {
+        "label-mode": {
+          "label": "Label Mode",
+          "description": "Choose how workspace labels are displayed."
+        },
+        "hide-unoccupied": {
+          "label": "Hide unoccupied",
+          "description": "Don't display workspaces without windows."
+        },
+        "character-count": {
+          "label": "Character count",
+          "description": "Number of characters to display from workspace names (1-10)."
+        },
+        "show-all-displays": {
+          "label": "Show all displays",
+          "description": "Show workspaces from all displays instead of only the current display."
+        }
+      },
+      "microphone": {
+        "display-mode": {
+          "label": "Display mode",
+          "description": "Choose how you'd like this value to appear."
+        }
+      },
+      "brightness": {
+        "display-mode": {
+          "label": "Display mode",
+          "description": "Choose how you'd like this value to appear."
+        }
+      },
+      "spacer": {
+        "width": {
+          "label": "Width",
+          "description": "Spacing width in pixels"
+        }
+      },
+      "custom-button": {
+        "icon": {
+          "label": "Icon",
+          "description": "Select an icon from the library."
+        },
+        "browse": "Browse",
+        "left-click": {
+          "label": "Left click",
+          "description": "Command to execute when the button is left-clicked."
+        },
+        "right-click": {
+          "label": "Right click",
+          "description": "Command to execute when the button is right-clicked."
+        },
+        "middle-click": {
+          "label": "Middle click",
+          "description": "Command to execute when the button is middle-clicked."
+        },
+        "dynamic-text": "Dynamic text",
+        "text-stream": {
+          "label": "Stream",
+          "description": "Streamed lines from the command will be displayed as text on the button."
+        },
+        "display-command-output": {
+          "label": "Display Command Output",
+          "description": "Enter a command to run at a regular interval. The first line of its output will be displayed as text.",
+          "stream-description": "Enter a command to run continuously."
+        },
+        "refresh-interval": {
+          "label": "Refresh interval",
+          "description": "Interval in milliseconds."
+        },
+        "collapse-condition": {
+          "label": "Collapse condition",
+          "description": "If the output text matches this value, the button will collapse."
+        }
+      },
+      "media-mini": {
+        "hide-mode": {
+          "label": "Hiding mode",
+          "description": "Controls how the widget behaves when no media is playing."
+        },
+        "show-album-art": {
+          "label": "Show album art",
+          "description": "Display the album artwork for the currently playing track."
+        },
+        "show-visualizer": {
+          "label": "Show visualizer",
+          "description": "Display an audio visualizer when music is playing."
+        },
+        "visualizer-type": {
+          "label": "Visualizer type",
+          "description": "Choose the style of audio visualizer to display."
+        },
+        "max-width": {
+          "label": "Maximum Width",
+          "description": "Sets the maximum horizontal size of the widget. The widget will shrink to fit shorter content."
+        },
+        "use-fixed-width": {
+          "label": "Use Fixed Width",
+          "description": "When enabled, the widget will always use the maximum width instead of dynamically adjusting to content."
+        },
+        "scrolling-mode": {
+          "label": "Scrolling mode",
+          "description": "Control when text scrolling is enabled for long track titles."
+        },
+        "no-active-player": "No active player"
+      },
+      "clock": {
+        "use-primary-color": {
+          "label": "Use primary color",
+          "description": "When enabled, this applies the primary color for emphasis."
+        },
+        "use-monospaced-font": {
+          "label": "Use monospaced font",
+          "description": "When enabled, the clock will use the monospaced font."
+        },
+        "use-custom-font": {
+          "label": "Use custom font",
+          "description": "Override the default font selection with a custom font for the clock."
+        },
+        "custom-font": {
+          "label": "Custom font",
+          "description": "Select a custom font for the clock display.",
+          "placeholder": "Select custom font...",
+          "search-placeholder": "Search fonts..."
+        },
+        "clock-display": {
+          "label": "Clock display",
+          "description": "Customize your clock's display by adding tokens from the list below. To use the 12-hour format, you must include the 'AP' token."
+        },
+        "horizontal-bar": {
+          "label": "Horizontal bar",
+          "description": "Tip: Use \\n to create a line break."
+        },
+        "vertical-bar": {
+          "label": "Vertical bar",
+          "description": "Use a space to separate each part onto a new line."
+        },
+        "preview": "Preview"
+      },
       "taskbar": {
         "colorize-icons": {
           "description": "Apply theme colors to taskbar icons.",
