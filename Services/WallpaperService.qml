@@ -80,6 +80,10 @@ Singleton {
   // -------------------------------------------------
   function init() {
     Logger.i("Wallpaper", "Service started")
+    Logger.i("Wallpaper", "Number of screens:", Quickshell.screens.length)
+    for (var i = 0; i < Quickshell.screens.length; i++) {
+      Logger.i("Wallpaper", "Screen", i, "name:", Quickshell.screens[i].name)
+    }
 
     translateModels()
 
@@ -93,6 +97,7 @@ Singleton {
     }
 
     isInitialized = true
+    Logger.i("Wallpaper", "Initialization complete")
   }
 
   // -------------------------------------------------
@@ -101,6 +106,11 @@ Singleton {
     if (!I18n.isLoaded) {
       Qt.callLater(translateModels)
       return
+    }
+
+    // Clear models first to prevent duplicates
+    if (fillModeModel.count > 0) {
+      return // Already initialized
     }
 
     // Populate fillModeModel with translated names
@@ -306,7 +316,7 @@ Singleton {
 
   // -------------------------------------------------------------------
   function setRandomWallpaper() {
-    Logger.d("Wallpaper", "setRandomWallpaper")
+    Logger.i("Wallpaper", "setRandomWallpaper called")
 
     if (Settings.data.wallpaper.enableMultiMonitorDirectories) {
       // Pick a random wallpaper per screen
@@ -377,14 +387,19 @@ Singleton {
   // PERF: Get or create a FolderListModel for a directory
   // This allows sharing the same model between multiple monitors using the same directory
   function getOrCreateFolderModel(directory) {
+    Logger.i("Wallpaper", "getOrCreateFolderModel called for directory:", directory)
+
     if (folderModelCache[directory]) {
+      Logger.i("Wallpaper", "Returning cached model for directory:", directory)
       return folderModelCache[directory]
     }
+
+    Logger.i("Wallpaper", "Creating new FolderListModel for directory:", directory)
 
     // Create new FolderListModel
     var component = Qt.createComponent("Qt.labs.folderlistmodel", "FolderListModel")
     if (component.status === Component.Error) {
-      Logger.error("Wallpaper", "Error creating FolderListModel:", component.errorString())
+      Logger.e("Wallpaper", "Error creating FolderListModel:", component.errorString())
       return null
     }
 
@@ -396,9 +411,11 @@ Singleton {
                                        })
 
     if (!model) {
-      Logger.error("Wallpaper", "Failed to create FolderListModel")
+      Logger.e("Wallpaper", "Failed to create FolderListModel")
       return null
     }
+
+    Logger.i("Wallpaper", "FolderListModel created successfully, initial status:", model.status)
 
     // Cache it
     folderModelCache[directory] = model
@@ -408,13 +425,23 @@ Singleton {
       handleFolderModelStatus(model, directory)
     })
 
+    // Check if model is already in a ready state (status might be set before signal connection)
+    // Call the handler manually for the initial status
+    if (model.status !== 0) {
+      Logger.i("Wallpaper", "Calling handleFolderModelStatus for initial status")
+      handleFolderModelStatus(model, directory)
+    }
+
     return model
   }
 
   // PERF: Handle FolderListModel status changes for all screens using this directory
   function handleFolderModelStatus(model, directory) {
+    Logger.i("Wallpaper", "handleFolderModelStatus called - directory:", directory, "status:", model.status, "count:", model.count)
+
     if (model.status === 0) {
       // Null
+      Logger.i("Wallpaper", "Status: Null (0) for directory:", directory)
       for (var i = 0; i < Quickshell.screens.length; i++) {
         var screenName = Quickshell.screens[i].name
         if (root.getMonitorDirectory(screenName) === directory) {
@@ -422,8 +449,9 @@ Singleton {
           root.wallpaperListChanged(screenName, 0)
         }
       }
-    } else if (model.status === 1) {
+    } else if (model.status === 2) {
       // Loading
+      Logger.i("Wallpaper", "Status: Loading (2) for directory:", directory)
       for (var i = 0; i < Quickshell.screens.length; i++) {
         var screenName = Quickshell.screens[i].name
         if (root.getMonitorDirectory(screenName) === directory) {
@@ -431,8 +459,9 @@ Singleton {
         }
       }
       scanningCount++
-    } else if (model.status === 2) {
+    } else if (model.status === 1) {
       // Ready
+      Logger.i("Wallpaper", "Status: Ready (1) for directory:", directory, "with", model.count, "files")
       var files = []
       for (var i = 0; i < model.count; i++) {
         var filepath = directory + "/" + model.get(i, "fileName")
@@ -449,7 +478,7 @@ Singleton {
       }
 
       scanningCount--
-      Logger.log("Wallpaper", "List refreshed for directory", directory, "count:", files.length)
+      Logger.i("Wallpaper", "List refreshed for directory", directory, "count:", files.length)
     }
   }
 
@@ -470,6 +499,18 @@ Singleton {
   Instantiator {
     id: wallpaperScanners
     model: Quickshell.screens
+
+    onObjectAdded: function(index, object) {
+      Logger.d("Wallpaper", "Instantiator: object added at index:", index)
+    }
+
+    onObjectRemoved: function(index, object) {
+      Logger.d("Wallpaper", "Instantiator: object removed at index:", index)
+    }
+
+    Component.onCompleted: {
+      Logger.i("Wallpaper", "Instantiator completed, count:", count)
+    }
     delegate: QtObject {
       id: monitorWatcher
       property string screenName: modelData.name
@@ -477,12 +518,21 @@ Singleton {
       property var folderModel: null
 
       Component.onCompleted: {
+        Logger.i("Wallpaper", "Monitor watcher created for screen:", screenName, "directory:", currentDirectory)
+
         // Get or create the shared FolderListModel for this directory
         folderModel = root.getOrCreateFolderModel(currentDirectory)
+
+        if (folderModel) {
+          Logger.i("Wallpaper", "FolderModel assigned to screen:", screenName)
+        } else {
+          Logger.e("Wallpaper", "Failed to get FolderModel for screen:", screenName)
+        }
 
         // Connect to directory change signal
         root.wallpaperDirectoryChanged.connect(function (screen, directory) {
           if (screen === screenName) {
+            Logger.d("Wallpaper", "Directory changed for screen:", screenName, "new directory:", directory)
             currentDirectory = directory
             // Switch to the FolderListModel for the new directory
             folderModel = root.getOrCreateFolderModel(directory)

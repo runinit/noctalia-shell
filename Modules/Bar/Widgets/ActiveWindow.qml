@@ -121,9 +121,9 @@ Item {
     id: windowActiveRect
     visible: root.visible
     anchors.centerIn: parent
-    width: (barPosition === "left" || barPosition === "right") ? Math.round(Style.baseWidgetSize * 0.8) : (widgetWidth)
-    height: (barPosition === "left" || barPosition === "right") ? Math.round(Style.baseWidgetSize * 0.8) : Style.capsuleHeight
-    radius: (barPosition === "left" || barPosition === "right") ? width / 2 : Style.radiusM
+    width: isVerticalBar ? Math.round(Style.baseWidgetSize * 0.8) : (widgetWidth)
+    height: isVerticalBar ? Math.round(Style.baseWidgetSize * 0.8) : Style.capsuleHeight
+    radius: isVerticalBar ? width / 2 : Style.radiusM
     color: Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
 
     Item {

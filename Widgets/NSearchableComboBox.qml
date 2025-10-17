@@ -231,9 +231,10 @@ RowLayout {
                 RowLayout {
                   spacing: Style.marginS
                   Layout.alignment: Qt.AlignRight
+                  visible: typeof badgeLocations !== 'undefined' && badgeLocations && badgeLocations.length > 0
 
                   Repeater {
-                    model: badgeLocations
+                    model: typeof badgeLocations !== 'undefined' ? badgeLocations : []
 
                     delegate: NBox {
                       width: Style.baseWidgetSize * 0.7
