@@ -173,7 +173,7 @@ Singleton {
         }
         writeColorsToDisk(variant)
         if (Settings.data.general.debugMode) {
-          Logger.log("ColorScheme", "Applying color scheme:", getBasename(path))
+          Logger.d("ColorScheme", "Applying color scheme:", getBasename(path))
         }
 
         // Generate Matugen templates if any are enabled and setting allows it

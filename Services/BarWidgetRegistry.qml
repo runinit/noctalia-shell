@@ -20,6 +20,7 @@ Singleton {
                            "CustomButton": customButtonComponent,
                            "DarkMode": darkModeComponent,
                            "KeepAwake": keepAwakeComponent,
+                           "KeyboardIndicator": keyboardIndicatorComponent,
                            "KeyboardLayout": keyboardLayoutComponent,
                            "LockKeys": lockKeysComponent,
                            "MediaMini": mediaMiniComponent,
@@ -94,6 +95,10 @@ Singleton {
                                     "textIntervalMs": 3000,
                                     "textCollapse": "",
                                     "parseJson": false
+                                  },
+                                  "KeyboardIndicator": {
+                                    "allowUserSettings": true,
+                                    "displayMode": "auto"
                                   },
                                   "KeyboardLayout": {
                                     "allowUserSettings": true,
@@ -199,6 +204,9 @@ Singleton {
   }
   property Component darkModeComponent: Component {
     DarkMode {}
+  }
+  property Component keyboardIndicatorComponent: Component {
+    KeyboardIndicator {}
   }
   property Component keyboardLayoutComponent: Component {
     KeyboardLayout {}

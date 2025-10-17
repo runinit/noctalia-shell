@@ -342,6 +342,77 @@
       "title": "Bluetooth"
     }
   },
+  "tooltips": {
+    "refresh": "Refresh",
+    "close": "Close",
+    "up": "Up",
+    "home": "Home",
+    "refresh-wallpaper-list": "Refresh wallpaper list",
+    "refresh-devices": "Refresh devices",
+    "forget-network": "Forget network",
+    "clear-history": "Clear history",
+    "delete-notification": "Delete notification",
+    "previous-month": "Previous month",
+    "next-month": "Next month",
+    "add-widget": "Add widget",
+    "widget-settings": "Widget settings",
+    "remove-widget": "Remove widget",
+    "move-to-left-section": "Move to left section",
+    "move-to-center-section": "Move to center section",
+    "move-to-right-section": "Move to right section",
+    "open-settings": "Open settings",
+    "session-menu": "Session Menu",
+    "cancel-timer": "Cancel timer",
+    "start-screen-recording": "Start screen recording",
+    "stop-screen-recording": "Stop screen recording",
+    "screen-recorder-not-installed": "Screen recorder is not installed",
+    "keep-awake": "Keep awake",
+    "enable-keep-awake": "Enable keep awake",
+    "disable-keep-awake": "Disable keep awake",
+    "wallpaper-selector": "Left click: Open wallpaper selector.\nRight click: Set random wallpaper.",
+    "do-not-disturb-enabled": "'Do not disturb' enabled",
+    "do-not-disturb-disabled": "'Do not disturb' disabled",
+    "connect-disconnect-devices": "Left click to connect. Right click to forget.",
+    "set-power-profile": "Set \"{profile}\" power profile",
+    "switch-to-light-mode": "Switch to light mode",
+    "switch-to-dark-mode": "Switch to dark mode",
+    "night-light-disabled": "Night light is disabled.\nLeft click to cycle mode.\nRight click to access settings.",
+    "night-light-enabled": "Night light is enabled.\nLeft click to cycle mode.\nRight click to access settings.",
+    "night-light-forced": "Night light is forced.\nLeft click to cycle mode.\nRight click to access settings.",
+    "night-light-not-installed": "Night light is not available.\nwlsunset is not installed.",
+    "click-to-start-recording": "Click to start recording",
+    "click-to-stop-recording": "Click to stop recording",
+    "open-control-center": "Open control center",
+    "volume-at": "Volume at {volume}%\nLeft click to toggle mute. Right click for settings.\nScroll to modify volume.",
+    "microphone-volume-at": "Microphone volume at {volume}%\nLeft click to toggle mute. Right click for settings.\nScroll to modify volume.",
+    "manage-wifi": "Manage Wi-Fi",
+    "bluetooth-devices": "Bluetooth devices",
+    "open-notification-history-enable-dnd": "Open notification history\nRight-click to enable \"Do not disturb\".",
+    "open-notification-history-disable-dnd": "Open notification history\nRight-click to disable \"Do not disturb\".",
+    "open-wallpaper-selector": "Open wallpaper selector",
+    "previous-media": "Previous media",
+    "pause": "Pause",
+    "play": "Play",
+    "next-media": "Next media",
+    "power-profile": "'{profile}' power profile",
+    "keyboard-layout": "{layout} keyboard layout",
+    "caps-lock": "Caps Lock",
+    "num-lock": "Num Lock",
+    "scroll-lock": "Scroll Lock"
+  },
+  "keyboardIndicator": {
+    "title": "Keyboard Indicators",
+    "capsLock": "Caps Lock",
+    "numLock": "Num Lock",
+    "scrollLock": "Scroll Lock",
+    "active": "Active indicators",
+    "none-active": "No keyboard indicators active",
+    "unavailable": "Keyboard indicator detection unavailable",
+    "xdotool-required": "xdotool is required to toggle keyboard indicators"
+  },
+  "clock": {
+    "tooltip": "Open calendar"
+  },
   "calendar": {
     "panel": {
       "week": "Week"
@@ -618,6 +689,24 @@
       },
       "tooltip": {
         "action": "Click to manage Wi-Fi connections"
+      }
+    },
+    "capsLock": {
+      "tooltip": {
+        "action": "Click to toggle Caps Lock",
+        "unavailable": "Caps Lock toggle unavailable"
+      }
+    },
+    "numLock": {
+      "tooltip": {
+        "action": "Click to toggle Num Lock",
+        "unavailable": "Num Lock toggle unavailable"
+      }
+    },
+    "scrollLock": {
+      "tooltip": {
+        "action": "Click to toggle Scroll Lock",
+        "unavailable": "Scroll Lock toggle unavailable"
       }
     }
   },
@@ -1735,6 +1824,18 @@
     "battery": {
       "low": "Low battery",
       "low-desc": "Battery is at {percent}%. Please connect the charger."
+    },
+    "capsLock": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "numLock": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "scrollLock": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
     },
     "battery-manager": {
       "initial-setup": "Initial setup required",
