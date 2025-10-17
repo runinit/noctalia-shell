@@ -15,9 +15,7 @@ Singleton {
   readonly property var terminalPaths: ({
                                           "foot": "~/.config/foot/themes/noctalia",
                                           "ghostty": "~/.config/ghostty/themes/noctalia",
-                                          "kitty": "~/.config/kitty/themes/noctalia.conf",
-                                          "alacritty": "~/.config/alacritty/themes/noctalia.toml",
-                                          "wezterm": "~/.config/wezterm/colors/Noctalia.toml"
+                                          "kitty": "~/.config/kitty/themes/noctalia.conf"
                                         })
 
   readonly property var schemeNameMap: ({
@@ -111,20 +109,6 @@ Singleton {
                                                             "path": "~/.local/share/vicinae/themes/matugen.toml"
                                                           }],
                                                         "postProcess": () => `cp -n ${Quickshell.shellDir}/Assets/noctalia.svg ~/.local/share/vicinae/themes/noctalia.svg && ${colorsApplyScript} vicinae\n`
-                                                      },
-                                                      "walker": {
-                                                        "input": "walker.css",
-                                                        "outputs": [{
-                                                            "path": "~/.config/walker/themes/noctalia/style.css"
-                                                          }],
-                                                        "postProcess": () => `${colorsApplyScript} walker\n`,
-                                                        "strict": true
-                                                      },
-                                                      "code": {
-                                                        "input": "code.json",
-                                                        "outputs": [{
-                                                            "path": "~/.vscode/extensions/hyprluna.hyprluna-theme-1.0.2/themes/hyprluna.json"
-                                                          }]
                                                       }
                                                     })
 
@@ -220,7 +204,9 @@ Singleton {
     }
 
     const colors = schemeData[mode]
-    let script = processAllTemplates(colors, mode)
+
+    const matugenColors = generatePalette(colors.mPrimary, colors.mSecondary, colors.mTertiary, colors.mError, colors.mSurface, isDarkMode)
+    let script = processAllTemplates(matugenColors, mode)
 
     // Add user templates if enabled
     script += buildUserTemplateCommandForPredefined(schemeData, mode)
@@ -229,7 +215,7 @@ Singleton {
     generateProcess.running = true
   }
 
-  function generatePalette(colors, isDarkMode, isStrict) {
+  function generatePalette(primaryColor, secondaryColor, tertiaryColor, errorColor, backgroundColor, outlineColor, isDarkMode) {
     const c = hex => ({
                         "default": {
                           "hex": hex,
@@ -238,59 +224,60 @@ Singleton {
                       })
 
     // Generate container colors
-    const primaryContainer = ColorsConvert.generateContainerColor(colors.mPrimary, isDarkMode)
-    const secondaryContainer = ColorsConvert.generateContainerColor(colors.mSecondary, isDarkMode)
-    const tertiaryContainer = ColorsConvert.generateContainerColor(colors.mTertiary, isDarkMode)
+    const primaryContainer = ColorsConvert.generateContainerColor(primaryColor, isDarkMode)
+    const secondaryContainer = ColorsConvert.generateContainerColor(secondaryColor, isDarkMode)
+    const tertiaryContainer = ColorsConvert.generateContainerColor(tertiaryColor, isDarkMode)
 
-    // Generate "on" colors
-    const onPrimary = ColorsConvert.generateOnColor(colors.mPrimary, isDarkMode)
-    const onSecondary = ColorsConvert.generateOnColor(colors.mSecondary, isDarkMode)
-    const onTertiary = ColorsConvert.generateOnColor(colors.mTertiary, isDarkMode)
+    // Generate "on" colors (for text/icons)
+    const onPrimary = ColorsConvert.generateOnColor(primaryColor, isDarkMode)
+    const onSecondary = ColorsConvert.generateOnColor(secondaryColor, isDarkMode)
+    const onTertiary = ColorsConvert.generateOnColor(tertiaryColor, isDarkMode)
+    const onBackground = ColorsConvert.generateOnColor(backgroundColor, isDarkMode)
 
     const onPrimaryContainer = ColorsConvert.generateOnColor(primaryContainer, isDarkMode)
     const onSecondaryContainer = ColorsConvert.generateOnColor(secondaryContainer, isDarkMode)
     const onTertiaryContainer = ColorsConvert.generateOnColor(tertiaryContainer, isDarkMode)
 
     // Generate error colors (standard red-based)
-    const errorContainer = ColorsConvert.generateContainerColor(colors.mError, isDarkMode)
-    const onError = ColorsConvert.generateOnColor(colors.mError, isDarkMode)
+    const errorContainer = ColorsConvert.generateContainerColor(errorColor, isDarkMode)
+    const onError = ColorsConvert.generateOnColor(errorColor, isDarkMode)
     const onErrorContainer = ColorsConvert.generateOnColor(errorContainer, isDarkMode)
 
     // Surface is same as background in Material Design 3
-    const surface = colors.mSurface
-    const onSurface = isStrict ? colors.mOnSurface : ColorsConvert.generateOnColor(colors.mSurface, isDarkMode)
+    const surface = backgroundColor
+    const onSurface = onBackground
 
     // Generate surface variant (slightly different tone)
-    const surfaceVariant = isStrict ? colors.mSurfaceVariant : ColorsConvert.adjustLightness(colors.mSurface, isDarkMode ? 5 : -3)
-    const onSurfaceVariant = isStrict ? colors.mOnSurfaceVariant : ColorsConvert.generateOnColor(surfaceVariant, isDarkMode)
+    const surfaceVariant = ColorsConvert.adjustLightness(backgroundColor, isDarkMode ? 5 : -3)
+    const onSurfaceVariant = ColorsConvert.generateOnColor(surfaceVariant, isDarkMode)
 
     // Generate surface containers (progressive elevation)
-    const surfaceContainerLowest = ColorsConvert.generateSurfaceVariant(surface, 0, isDarkMode)
-    const surfaceContainerLow = ColorsConvert.generateSurfaceVariant(surface, 1, isDarkMode)
-    const surfaceContainer = ColorsConvert.generateSurfaceVariant(surface, 2, isDarkMode)
-    const surfaceContainerHigh = ColorsConvert.generateSurfaceVariant(surface, 3, isDarkMode)
-    const surfaceContainerHighest = ColorsConvert.generateSurfaceVariant(surface, 4, isDarkMode)
+    const surfaceContainerLowest = ColorsConvert.generateSurfaceVariant(backgroundColor, 0, isDarkMode)
+    const surfaceContainerLow = ColorsConvert.generateSurfaceVariant(backgroundColor, 1, isDarkMode)
+    const surfaceContainer = ColorsConvert.generateSurfaceVariant(backgroundColor, 2, isDarkMode)
+    const surfaceContainerHigh = ColorsConvert.generateSurfaceVariant(backgroundColor, 3, isDarkMode)
+    const surfaceContainerHighest = ColorsConvert.generateSurfaceVariant(backgroundColor, 4, isDarkMode)
 
     // Generate outline colors (for borders/dividers)
-    const outline = isStrict ? colors.mOutline : ColorsConvert.adjustLightnessAndSaturation(colors.mOnSurface, isDarkMode ? -30 : 30, isDarkMode ? -30 : 30)
-    const outlineVariant = ColorsConvert.adjustLightness(outline, isDarkMode ? -20 : 20)
+    const outline = isDarkMode ? "#938f99" : "#79747e"
+    const outlineVariant = ColorsConvert.adjustLightness(outline, isDarkMode ? -10 : 10)
 
-    // Shadow is always pitch black
+    // Shadow is always very dark
     const shadow = "#000000"
 
     // Generate "fixed" colors for Material Design 3
     // These remain consistent across light/dark themes
-    const primaryFixed = isDarkMode ? ColorsConvert.adjustLightness(colors.mPrimary, 30) : ColorsConvert.adjustLightness(colors.mPrimary, -10)
+    const primaryFixed = isDarkMode ? ColorsConvert.adjustLightness(primaryColor, 30) : ColorsConvert.adjustLightness(primaryColor, -10)
     const primaryFixedDim = ColorsConvert.adjustLightness(primaryFixed, isDarkMode ? -10 : -5)
     const onPrimaryFixed = ColorsConvert.generateOnColor(primaryFixed, !isDarkMode)
     const onPrimaryFixedVariant = ColorsConvert.adjustLightness(onPrimaryFixed, isDarkMode ? 10 : -10)
 
-    const secondaryFixed = isDarkMode ? ColorsConvert.adjustLightness(colors.mSecondary, 30) : ColorsConvert.adjustLightness(colors.mSecondary, -10)
+    const secondaryFixed = isDarkMode ? ColorsConvert.adjustLightness(secondaryColor, 30) : ColorsConvert.adjustLightness(secondaryColor, -10)
     const secondaryFixedDim = ColorsConvert.adjustLightness(secondaryFixed, isDarkMode ? -10 : -5)
     const onSecondaryFixed = ColorsConvert.generateOnColor(secondaryFixed, !isDarkMode)
     const onSecondaryFixedVariant = ColorsConvert.adjustLightness(onSecondaryFixed, isDarkMode ? 10 : -10)
 
-    const tertiaryFixed = isDarkMode ? ColorsConvert.adjustLightness(colors.mTertiary, 30) : ColorsConvert.adjustLightness(colors.mTertiary, -10)
+    const tertiaryFixed = isDarkMode ? ColorsConvert.adjustLightness(tertiaryColor, 30) : ColorsConvert.adjustLightness(tertiaryColor, -10)
     const tertiaryFixedDim = ColorsConvert.adjustLightness(tertiaryFixed, isDarkMode ? -10 : -5)
     const onTertiaryFixed = ColorsConvert.generateOnColor(tertiaryFixed, !isDarkMode)
     const onTertiaryFixedVariant = ColorsConvert.adjustLightness(onTertiaryFixed, isDarkMode ? 10 : -10)
@@ -302,14 +289,14 @@ Singleton {
     // Generate inverse colors for high contrast scenarios
     const inverseSurface = ColorsConvert.generateOnColor(surface, !isDarkMode)
     const inverseOnSurface = surface
-    const inversePrimary = isDarkMode ? ColorsConvert.adjustLightness(colors.mPrimary, -30) : ColorsConvert.adjustLightness(colors.mPrimary, 30)
+    const inversePrimary = isDarkMode ? ColorsConvert.adjustLightness(primaryColor, -30) : ColorsConvert.adjustLightness(primaryColor, 30)
 
     // Additional utility colors
     const scrim = "#000000"
-    const surfaceTint = colors.mPrimary
+    const surfaceTint = primaryColor
 
     return {
-      "primary": c(colors.mPrimary),
+      "primary": c(primaryColor),
       "on_primary": c(onPrimary),
       "primary_container": c(primaryContainer),
       "on_primary_container": c(onPrimaryContainer),
@@ -317,7 +304,7 @@ Singleton {
       "primary_fixed_dim": c(primaryFixedDim),
       "on_primary_fixed": c(onPrimaryFixed),
       "on_primary_fixed_variant": c(onPrimaryFixedVariant),
-      "secondary": c(colors.mSecondary),
+      "secondary": c(secondaryColor),
       "on_secondary": c(onSecondary),
       "secondary_container": c(secondaryContainer),
       "on_secondary_container": c(onSecondaryContainer),
@@ -325,7 +312,7 @@ Singleton {
       "secondary_fixed_dim": c(secondaryFixedDim),
       "on_secondary_fixed": c(onSecondaryFixed),
       "on_secondary_fixed_variant": c(onSecondaryFixedVariant),
-      "tertiary": c(colors.mTertiary),
+      "tertiary": c(tertiaryColor),
       "on_tertiary": c(onTertiary),
       "tertiary_container": c(tertiaryContainer),
       "on_tertiary_container": c(onTertiaryContainer),
@@ -333,12 +320,12 @@ Singleton {
       "tertiary_fixed_dim": c(tertiaryFixedDim),
       "on_tertiary_fixed": c(onTertiaryFixed),
       "on_tertiary_fixed_variant": c(onTertiaryFixedVariant),
-      "error": c(colors.mError),
+      "error": c(errorColor),
       "on_error": c(onError),
       "error_container": c(errorContainer),
       "on_error_container": c(onErrorContainer),
-      "background": c(surface),
-      "on_background": c(onSurface),
+      "background": c(backgroundColor),
+      "on_background": c(onBackground),
       "surface": c(surface),
       "on_surface": c(onSurface),
       "surface_dim": c(surfaceDim),
@@ -360,7 +347,6 @@ Singleton {
       "scrim": c(scrim)
     }
   }
-
   function processAllTemplates(colors, mode) {
     let script = ""
     const homeDir = Quickshell.env("HOME")
@@ -379,10 +365,7 @@ Singleton {
     const templatePath = `${Quickshell.shellDir}/Assets/MatugenTemplates/${config.input}`
     let script = ""
 
-    const palette = generatePalette(colors, Settings.data.colorSchemes.darkMode, config.strict || false)
-
     config.outputs.forEach(output => {
-
                              const outputPath = output.path.replace("~", homeDir)
                              const outputDir = outputPath.substring(0, outputPath.lastIndexOf('/'))
 
@@ -392,14 +375,14 @@ Singleton {
                                script += `if [ -d "${baseConfigDir}" ]; then\n`
                                script += `  mkdir -p ${outputDir}\n`
                                script += `  cp '${templatePath}' '${outputPath}'\n`
-                               script += `  ${replaceColorsInFile(outputPath, palette, Settings.data.colorSchemes.darkMode)}\n`
+                               script += `  ${replaceColorsInFile(outputPath, colors)}\n`
                                script += `else\n`
                                script += `  echo "Discord client ${appName} not found at ${baseConfigDir}, skipping theme generation"\n`
                                script += `fi\n`
                              } else {
                                script += `mkdir -p ${outputDir}\n`
                                script += `cp '${templatePath}' '${outputPath}'\n`
-                               script += replaceColorsInFile(outputPath, palette, Settings.data.colorSchemes.darkMode)
+                               script += replaceColorsInFile(outputPath, colors)
                              }
                            })
 
@@ -410,7 +393,7 @@ Singleton {
     return script
   }
 
-  function replaceColorsInFile(filePath, colors, isDarkMode) {
+  function replaceColorsInFile(filePath, colors) {
     // This handle both ".hex" and ".hex_stripped" the EXACT same way. Our predefined color schemes are
     // always RRGGBB without alpha so this is fine and keeps compatibility with matugen.
     let script = ""
@@ -419,12 +402,6 @@ Singleton {
                                   const escapedColor = colorValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
                                   script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.hex\\(_stripped\\)\\?}}/${escapedColor}/g' '${filePath}'\n`
                                 })
-
-    // Replace non-color placeholders
-    const mode = isDarkMode ? "dark" : "light"
-    script += `sed -i 's/{{mode}}/${mode}/g' '${filePath}'\n`
-    script += `sed -i 's/{{image}}//g' '${filePath}'\n`  // Empty for predefined schemes
-
     return script
   }
 
@@ -457,12 +434,7 @@ Singleton {
     const mode = Settings.data.colorSchemes.darkMode ? 'dark' : 'light'
 
     colorScheme = schemeNameMap[colorScheme] || colorScheme
-    let extension = ""
-    if (terminal === 'kitty') {
-      extension = ".conf"
-    } else if (terminal === 'wezterm') {
-      extension = ".toml"
-    }
+    const extension = terminal === 'kitty' ? ".conf" : ""
 
     return `${Quickshell.shellDir}/Assets/ColorScheme/${colorScheme}/terminal/${terminal}/${colorScheme}-${mode}${extension}`
   }
@@ -494,7 +466,7 @@ Singleton {
     const colors = schemeData[mode]
 
     // Generate the matugen palette JSON
-    const palette = generatePalette(colors, isDarkMode, false)
+    const matugenColors = generatePalette(colors.mPrimary, colors.mSecondary, colors.mTertiary, colors.mError, colors.mSurface, isDarkMode)
 
     // Create a temporary JSON file with the color palette
     const tempJsonPath = Settings.cacheDir + "predefined-colors.json"
@@ -507,7 +479,7 @@ Singleton {
     // Write the color palette to a temp JSON file
     script += `  cat > '${tempJsonPathEsc}' << 'EOF'\n`
     script += JSON.stringify({
-                               "colors": palette
+                               "colors": matugenColors
                              }, null, 2) + "\n"
     script += "EOF\n"
 
@@ -529,22 +501,6 @@ Singleton {
     id: generateProcess
     workingDirectory: Quickshell.shellDir
     running: false
-
-    onExited: function (exitCode) {
-      if (exitCode !== 0) {
-        // Capture error output from stderr first, then stdout, or use fallback message
-        const errorMsg = (stderr.text && stderr.text.trim() !== "") ? stderr.text.trim() : ((stdout.text && stdout.text.trim() !== "") ? stdout.text.trim() : I18n.tr("toast.matugen.failed-general"))
-        Logger.e("AppThemeService", "Matugen process failed with exit code:", exitCode)
-        if (stderr.text && stderr.text.trim() !== "") {
-          Logger.e("AppThemeService", "Matugen stderr:", stderr.text)
-        }
-        if (stdout.text && stdout.text.trim() !== "") {
-          Logger.e("AppThemeService", "Matugen stdout:", stdout.text)
-        }
-        ToastService.showError(I18n.tr("toast.matugen.failed"), errorMsg, 6000)
-      }
-    }
-
     stdout: StdioCollector {
       onStreamFinished: {
         if (this.text) {
