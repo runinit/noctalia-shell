@@ -278,19 +278,61 @@ Singleton {
     // Shadow is always pitch black
     const shadow = "#000000"
 
+    // Generate "fixed" colors for Material Design 3
+    // These remain consistent across light/dark themes
+    const primaryFixed = isDarkMode ? ColorsConvert.adjustLightness(primaryColor, 30) : ColorsConvert.adjustLightness(primaryColor, -10)
+    const primaryFixedDim = ColorsConvert.adjustLightness(primaryFixed, isDarkMode ? -10 : -5)
+    const onPrimaryFixed = ColorsConvert.generateOnColor(primaryFixed, !isDarkMode)
+    const onPrimaryFixedVariant = ColorsConvert.adjustLightness(onPrimaryFixed, isDarkMode ? 10 : -10)
+
+    const secondaryFixed = isDarkMode ? ColorsConvert.adjustLightness(secondaryColor, 30) : ColorsConvert.adjustLightness(secondaryColor, -10)
+    const secondaryFixedDim = ColorsConvert.adjustLightness(secondaryFixed, isDarkMode ? -10 : -5)
+    const onSecondaryFixed = ColorsConvert.generateOnColor(secondaryFixed, !isDarkMode)
+    const onSecondaryFixedVariant = ColorsConvert.adjustLightness(onSecondaryFixed, isDarkMode ? 10 : -10)
+
+    const tertiaryFixed = isDarkMode ? ColorsConvert.adjustLightness(tertiaryColor, 30) : ColorsConvert.adjustLightness(tertiaryColor, -10)
+    const tertiaryFixedDim = ColorsConvert.adjustLightness(tertiaryFixed, isDarkMode ? -10 : -5)
+    const onTertiaryFixed = ColorsConvert.generateOnColor(tertiaryFixed, !isDarkMode)
+    const onTertiaryFixedVariant = ColorsConvert.adjustLightness(onTertiaryFixed, isDarkMode ? 10 : -10)
+
+    // Generate additional surface variants
+    const surfaceDim = ColorsConvert.adjustLightness(surface, isDarkMode ? -8 : -5)
+    const surfaceBright = ColorsConvert.adjustLightness(surface, isDarkMode ? 8 : 5)
+
+    // Generate inverse colors for high contrast scenarios
+    const inverseSurface = ColorsConvert.generateOnColor(surface, !isDarkMode)
+    const inverseOnSurface = surface
+    const inversePrimary = isDarkMode ? ColorsConvert.adjustLightness(primaryColor, -30) : ColorsConvert.adjustLightness(primaryColor, 30)
+
+    // Additional utility colors
+    const scrim = "#000000"
+    const surfaceTint = primaryColor
+
     return {
       "primary": c(colors.mPrimary),
       "on_primary": c(onPrimary),
       "primary_container": c(primaryContainer),
       "on_primary_container": c(onPrimaryContainer),
+      "primary_fixed": c(primaryFixed),
+      "primary_fixed_dim": c(primaryFixedDim),
+      "on_primary_fixed": c(onPrimaryFixed),
+      "on_primary_fixed_variant": c(onPrimaryFixedVariant),
       "secondary": c(colors.mSecondary),
       "on_secondary": c(onSecondary),
       "secondary_container": c(secondaryContainer),
       "on_secondary_container": c(onSecondaryContainer),
+      "secondary_fixed": c(secondaryFixed),
+      "secondary_fixed_dim": c(secondaryFixedDim),
+      "on_secondary_fixed": c(onSecondaryFixed),
+      "on_secondary_fixed_variant": c(onSecondaryFixedVariant),
       "tertiary": c(colors.mTertiary),
       "on_tertiary": c(onTertiary),
       "tertiary_container": c(tertiaryContainer),
       "on_tertiary_container": c(onTertiaryContainer),
+      "tertiary_fixed": c(tertiaryFixed),
+      "tertiary_fixed_dim": c(tertiaryFixedDim),
+      "on_tertiary_fixed": c(onTertiaryFixed),
+      "on_tertiary_fixed_variant": c(onTertiaryFixedVariant),
       "error": c(colors.mError),
       "on_error": c(onError),
       "error_container": c(errorContainer),
@@ -299,6 +341,8 @@ Singleton {
       "on_background": c(onSurface),
       "surface": c(surface),
       "on_surface": c(onSurface),
+      "surface_dim": c(surfaceDim),
+      "surface_bright": c(surfaceBright),
       "surface_variant": c(surfaceVariant),
       "on_surface_variant": c(onSurfaceVariant),
       "surface_container_lowest": c(surfaceContainerLowest),
@@ -306,9 +350,14 @@ Singleton {
       "surface_container": c(surfaceContainer),
       "surface_container_high": c(surfaceContainerHigh),
       "surface_container_highest": c(surfaceContainerHighest),
+      "surface_tint": c(surfaceTint),
+      "inverse_surface": c(inverseSurface),
+      "inverse_on_surface": c(inverseOnSurface),
+      "inverse_primary": c(inversePrimary),
       "outline": c(outline),
       "outline_variant": c(outlineVariant),
-      "shadow": c(shadow)
+      "shadow": c(shadow),
+      "scrim": c(scrim)
     }
   }
 
