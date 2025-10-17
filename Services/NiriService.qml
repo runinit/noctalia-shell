@@ -33,7 +33,7 @@ Item {
     updateWindows()
     queryDisplayScales()
     windowBatchTimer.start()
-    Logger.log("NiriService", "Initialized successfully")
+    Logger.i("NiriService", "Initialized successfully")
   }
 
   // PERF: Timer to batch window updates every 16ms (one frame at 60fps)

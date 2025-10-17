@@ -114,7 +114,7 @@ Singleton {
     }
 
     if (Settings.data.general.debugMode) {
-      Logger.log("AppThemeService", "Generating from wallpaper on screen:", screenName)
+      Logger.d("AppThemeService", "Generating from wallpaper on screen:", screenName)
     }
 
     const wp = WallpaperService.getWallpaper(screenName).replace(/'/g, "'\\''")
@@ -152,7 +152,7 @@ Singleton {
   // --------------------------------------------------------------------------------
   function generateFromPredefinedScheme(schemeData) {
     if (Settings.data.general.debugMode) {
-      Logger.log("AppThemeService", "Generating templates from predefined color scheme")
+      Logger.d("AppThemeService", "Generating templates from predefined color scheme")
     }
 
     // Early return if no scheme data provided
@@ -178,7 +178,7 @@ Singleton {
     const script = processAllTemplates(matugenColors, mode)
 
     if (Settings.data.general.debugMode) {
-      Logger.log("AppThemeService", "Generated script length:", script.length, "chars")
+      Logger.d("AppThemeService", "Generated script length:", script.length, "chars")
     }
 
     if (script.trim().length > 0) {
@@ -381,7 +381,7 @@ Singleton {
     }
 
     if (Settings.data.general.debugMode) {
-      Logger.log("AppThemeService", "Processing user templates from", getUserConfigPath())
+      Logger.d("AppThemeService", "Processing user templates from", getUserConfigPath())
     }
 
     const userConfigPath = getUserConfigPath()
@@ -539,7 +539,7 @@ fi
     stdout: StdioCollector {
       onStreamFinished: {
         if (Settings.data.general.debugMode && this.text && this.text.trim().length > 0) {
-          Logger.log("AppThemeService", "GenerateProcess stdout:", this.text)
+          Logger.d("AppThemeService", "GenerateProcess stdout:", this.text)
         }
       }
     }
@@ -556,7 +556,7 @@ fi
       if (code !== 0) {
         Logger.error("AppThemeService", "GenerateProcess exited with code:", code)
       } else if (Settings.data.general.debugMode) {
-        Logger.log("AppThemeService", "Template generation completed successfully")
+        Logger.d("AppThemeService", "Template generation completed successfully")
       }
     }
   }

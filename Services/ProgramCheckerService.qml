@@ -19,6 +19,7 @@ Singleton {
   property bool gpuScreenRecorderAvailable: false
   property bool wlsunsetAvailable: false
   property bool app2unitAvailable: false
+  property bool xdotoolAvailable: false
 
   // Discord client auto-detection
   property var availableDiscordClients: []
@@ -88,7 +89,8 @@ Singleton {
                                             "fuzzelAvailable": ["which", "fuzzel"],
                                             "app2unitAvailable": ["which", "app2unit"],
                                             "gpuScreenRecorderAvailable": ["sh", "-c", "command -v gpu-screen-recorder >/dev/null 2>&1 || (command -v flatpak >/dev/null 2>&1 && flatpak list --app | grep -q 'com.dec05eba.gpu_screen_recorder')"],
-                                            "wlsunsetAvailable": ["which", "wlsunset"]
+                                            "wlsunsetAvailable": ["which", "wlsunset"],
+                                            "xdotoolAvailable": ["which", "xdotool"]
                                           })
 
   // Internal tracking

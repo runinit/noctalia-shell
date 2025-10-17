@@ -408,14 +408,14 @@ Singleton {
   function registerConsumer() {
     activeConsumerCount++
     if (activeConsumerCount === 1) {
-      Logger.log("SystemStat", "First consumer registered, starting updates")
+      Logger.d("SystemStat", "First consumer registered, starting updates")
     }
   }
 
   function unregisterConsumer() {
     activeConsumerCount = Math.max(0, activeConsumerCount - 1)
     if (activeConsumerCount === 0) {
-      Logger.log("SystemStat", "All consumers unregistered, stopping updates")
+      Logger.d("SystemStat", "All consumers unregistered, stopping updates")
     }
   }
 }
