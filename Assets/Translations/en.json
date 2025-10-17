@@ -1312,7 +1312,20 @@
     "play": "Play",
     "next-media": "Next media",
     "power-profile": "'{profile}' power profile",
-    "keyboard-layout": "{layout} keyboard layout"
+    "keyboard-layout": "{layout} keyboard layout",
+    "caps-lock": "Caps Lock",
+    "num-lock": "Num Lock",
+    "scroll-lock": "Scroll Lock"
+  },
+  "keyboardIndicator": {
+    "title": "Keyboard Indicators",
+    "capsLock": "Caps Lock",
+    "numLock": "Num Lock",
+    "scrollLock": "Scroll Lock",
+    "active": "Active indicators",
+    "none-active": "No keyboard indicators active",
+    "unavailable": "Keyboard indicator detection unavailable",
+    "xdotool-required": "xdotool is required to toggle keyboard indicators"
   },
   "clock": {
     "tooltip": "Open calendar"
@@ -1583,6 +1596,24 @@
       "tooltip": {
         "action": "Click to toggle keep awake mode"
       }
+    },
+    "capsLock": {
+      "tooltip": {
+        "action": "Click to toggle Caps Lock",
+        "unavailable": "Caps Lock toggle unavailable"
+      }
+    },
+    "numLock": {
+      "tooltip": {
+        "action": "Click to toggle Num Lock",
+        "unavailable": "Num Lock toggle unavailable"
+      }
+    },
+    "scrollLock": {
+      "tooltip": {
+        "action": "Click to toggle Scroll Lock",
+        "unavailable": "Scroll Lock toggle unavailable"
+      }
     }
   },
   "toast": {
@@ -1652,6 +1683,18 @@
     "battery": {
       "low": "Low battery",
       "low-desc": "Battery is at {percent}%. Please connect the charger."
+    },
+    "capsLock": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "numLock": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "scrollLock": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
     },
     "battery-manager": {
       "title": "Battery threshold",
