@@ -37,6 +37,7 @@ NPanel {
     Location,
     Network,
     Notifications,
+    Power,
     ScreenRecorder,
     UserInterface,
     Wallpaper
@@ -123,6 +124,10 @@ NPanel {
     id: lockScreenTab
     LockScreenTab {}
   }
+  Component {
+    id: powerTab
+    PowerTab {}
+  }
 
   // Order *DOES* matter
   function updateTabsModel() {
@@ -186,6 +191,11 @@ NPanel {
                      "label": "settings.network.title",
                      "icon": "settings-network",
                      "source": networkTab
+                   }, {
+                     "id": SettingsPanel.Tab.Power,
+                     "label": "settings.power.title",
+                     "icon": "battery-charging",
+                     "source": powerTab
                    }, {
                      "id": SettingsPanel.Tab.Location,
                      "label": "settings.location.title",
