@@ -208,7 +208,7 @@ function generateContainerColor(baseColor, isDarkMode) {
 function generateSurfaceVariant(backgroundColor, step, isDarkMode) {
   const rgb = hexToRgb(backgroundColor);
   const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-  
+
   if (isDarkMode) {
     // In dark mode, variants get progressively lighter
     hsl.l = Math.min(100, hsl.l + (step * 3));
@@ -216,7 +216,149 @@ function generateSurfaceVariant(backgroundColor, step, isDarkMode) {
     // In light mode, variants get progressively darker
     hsl.l = Math.max(0, hsl.l - (step * 2));
   }
-  
+
   const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
   return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
+}
+
+// ============================================================================
+// MATUGEN FORMAT GENERATORS
+// ============================================================================
+
+/**
+ * Convert hex to RGB string format: "rgb(255, 87, 51)"
+ */
+function toRgbString(hex) {
+  const rgb = hexToRgb(hex);
+  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+}
+
+/**
+ * Convert hex to RGBA string format: "rgba(255, 87, 51, 1.0)"
+ */
+function toRgbaString(hex, alpha) {
+  if (alpha === undefined || alpha === null) {
+    alpha = 1.0;
+  }
+  const rgb = hexToRgb(hex);
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+}
+
+/**
+ * Convert hex to HSL string format: "hsl(12, 100%, 60%)"
+ */
+function toHslString(hex) {
+  const hsl = hexToHSL(hex);
+  return `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`;
+}
+
+/**
+ * Convert hex to HSLA string format: "hsla(12, 100%, 60%, 1.0)"
+ */
+function toHslaString(hex, alpha) {
+  if (alpha === undefined || alpha === null) {
+    alpha = 1.0;
+  }
+  const hsl = hexToHSL(hex);
+  return `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${alpha})`;
+}
+
+// ============================================================================
+// COMPONENT EXTRACTORS
+// ============================================================================
+
+function getRed(hex) {
+  return hexToRgb(hex).r;
+}
+
+function getGreen(hex) {
+  return hexToRgb(hex).g;
+}
+
+function getBlue(hex) {
+  return hexToRgb(hex).b;
+}
+
+function getHue(hex) {
+  return Math.round(hexToHSL(hex).h);
+}
+
+function getSaturation(hex) {
+  return Math.round(hexToHSL(hex).s);
+}
+
+function getLightness(hex) {
+  return Math.round(hexToHSL(hex).l);
+}
+
+// ============================================================================
+// MATUGEN FILTERS
+// ============================================================================
+
+/**
+ * Set alpha/transparency (returns object with hex and alpha for RGBA conversion)
+ */
+function setAlpha(hex, alpha) {
+  return {
+    hex: hex,
+    alpha: parseFloat(alpha)
+  };
+}
+
+/**
+ * Set hue (rotate hue by degrees, -180 to 180)
+ */
+function setHue(hex, degrees) {
+  const rgb = hexToRgb(hex);
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  // Normalize hue to 0-360 range
+  hsl.h = (hsl.h + parseFloat(degrees) + 360) % 360;
+  const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+  return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
+}
+
+/**
+ * Set lightness (adjust lightness by amount)
+ */
+function setLightness(hex, amount) {
+  return adjustLightness(hex, parseFloat(amount));
+}
+
+/**
+ * Auto lightness - automatically adjusts between light-to-dark or dark-to-light
+ */
+function autoLightness(hex, amount, isDarkMode) {
+  const isLight = isLightColor(hex);
+  // In dark mode: light colors get lighter, dark colors get darker
+  // In light mode: opposite
+  const direction = isDarkMode ? (isLight ? 1 : -1) : (isLight ? -1 : 1);
+  return adjustLightness(hex, parseFloat(amount) * direction);
+}
+
+/**
+ * Convert color to grayscale (remove all saturation)
+ */
+function grayscale(hex) {
+  return adjustSaturation(hex, -100);
+}
+
+/**
+ * Invert color (RGB inversion)
+ */
+function invert(hex) {
+  const rgb = hexToRgb(hex);
+  return rgbToHex(255 - rgb.r, 255 - rgb.g, 255 - rgb.b);
+}
+
+// ============================================================================
+// STRING FILTERS
+// ============================================================================
+
+/**
+ * Convert snake_case to camelCase
+ */
+function toCamelCase(str) {
+  return String(str).replace(/_([a-z])/g, function(_, letter) {
+    return letter.toUpperCase();
+  });
 }
