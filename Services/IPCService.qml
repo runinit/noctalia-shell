@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.Commons
 import qs.Services
 
@@ -28,10 +27,7 @@ Item {
   IpcHandler {
     target: "settings"
     function toggle() {
-      root.withTargetScreen(screen => {
-                              var settingsPanel = PanelService.getPanel("settingsPanel", screen)
-                              settingsPanel?.toggle()
-                            })
+      settingsPanel.toggle()
     }
   }
 
@@ -39,10 +35,7 @@ Item {
     target: "notifications"
     function toggleHistory() {
       // Will attempt to open the panel next to the bar button if any.
-      root.withTargetScreen(screen => {
-                              var notificationHistoryPanel = PanelService.getPanel("notificationHistoryPanel", screen)
-                              notificationHistoryPanel.toggle(null, "NotificationHistory")
-                            })
+      notificationHistoryPanel.toggle(null, "NotificationHistory")
     }
     function toggleDND() {
       Settings.data.notifications.doNotDisturb = !Settings.data.notifications.doNotDisturb
@@ -70,24 +63,15 @@ Item {
   IpcHandler {
     target: "launcher"
     function toggle() {
-      root.withTargetScreen(screen => {
-                              var launcherPanel = PanelService.getPanel("launcherPanel", screen)
-                              launcherPanel?.toggle()
-                            })
+      launcherPanel.toggle()
     }
     function clipboard() {
-      root.withTargetScreen(screen => {
-                              var launcherPanel = PanelService.getPanel("launcherPanel", screen)
-                              launcherPanel?.setSearchText(">clip ")
-                              launcherPanel?.toggle()
-                            })
+      launcherPanel.setSearchText(">clip ")
+      launcherPanel.toggle()
     }
     function calculator() {
-      root.withTargetScreen(screen => {
-                              var launcherPanel = PanelService.getPanel("launcherPanel", screen)
-                              launcherPanel?.setSearchText(">calc ")
-                              launcherPanel?.toggle()
-                            })
+      launcherPanel.setSearchText(">calc ")
+      launcherPanel.toggle()
     }
   }
 
@@ -146,13 +130,6 @@ Item {
   }
 
   IpcHandler {
-    target: "colorScheme"
-    function set(schemeName: string) {
-      ColorSchemeService.setPredefinedScheme(schemeName)
-    }
-  }
-
-  IpcHandler {
     target: "volume"
     function increase() {
       AudioService.increaseVolume()
@@ -177,10 +154,7 @@ Item {
   IpcHandler {
     target: "sessionMenu"
     function toggle() {
-      root.withTargetScreen(screen => {
-                              var sessionMenuPanel = PanelService.getPanel("sessionMenuPanel", screen)
-                              sessionMenuPanel?.toggle()
-                            })
+      sessionMenuPanel.toggle()
     }
 
     function lockAndSuspend() {
@@ -191,15 +165,8 @@ Item {
   IpcHandler {
     target: "controlCenter"
     function toggle() {
-      root.withTargetScreen(screen => {
-                              var controlCenterPanel = PanelService.getPanel("controlCenterPanel", screen)
-                              if (Settings.data.controlCenter.position === "close_to_bar_button") {
-                                // Will attempt to open the panel next to the bar button if any.
-                                controlCenterPanel?.toggle(null, "ControlCenter")
-                              } else {
-                                controlCenterPanel?.toggle()
-                              }
-                            })
+      // Will attempt to open the panel next to the bar button if any.
+      controlCenterPanel.toggle(null, "ControlCenter")
     }
   }
 
@@ -208,10 +175,7 @@ Item {
     target: "wallpaper"
     function toggle() {
       if (Settings.data.wallpaper.enabled) {
-        root.withTargetScreen(screen => {
-                                var wallpaperPanel = PanelService.getPanel("wallpaperPanel", screen)
-                                wallpaperPanel?.toggle()
-                              })
+        wallpaperPanel.toggle()
       }
     }
 
@@ -260,7 +224,6 @@ Item {
       }
     }
   }
-
   IpcHandler {
     target: "powerProfile"
     function cycle() {
@@ -281,7 +244,6 @@ Item {
       }
     }
   }
-
   IpcHandler {
     target: "media"
     function playPause() {
@@ -327,67 +289,61 @@ Item {
     }
   }
 
-  // Queue an IPC panel operation - will execute when screen is detected
-  function withTargetScreen(callback) {
-    if (pendingCallback) {
-      Logger.w("IPC", "Another IPC call is pending, ignoring new call")
-      return
-    }
+  IpcHandler {
+    target: "spotlight"
 
-    // Single monitor setup can execute immediately
-    if (Quickshell.screens.length === 1) {
-      callback(Quickshell.screens[0])
-    } else {
-      // Multi-monitors setup needs to start async detection
-      detectedScreen = null
-      pendingCallback = callback
-      screenDetectorLoader.active = true
-    }
-  }
-
-
-  /**
-   * For IPC calls on multi-monitors setup that will open panels on screen,
-   * we need to open a QS PanelWindow and wait for it's "screen" property to stabilize.
-  */
-  property ShellScreen detectedScreen: null
-  property var pendingCallback: null
-
-  Timer {
-    id: screenDetectorDebounce
-    running: false
-    interval: 20
-    onTriggered: {
-      Logger.d("IPC", "Screen debounced to:", detectedScreen?.name || "null")
-
-      // Execute pending callback if any
-      if (pendingCallback) {
-        Logger.d("IPC", "Executing pending IPC callback on screen:", detectedScreen.name)
-        pendingCallback(detectedScreen)
-        pendingCallback = null
+    function open() {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel && !panel.visible) {
+        panel.open()
       }
-
-      // Clean up
-      screenDetectorLoader.active = false
+      return "SPOTLIGHT_OPEN_SUCCESS"
     }
-  }
 
-  // Invisible dummy PanelWindow to detect which screen should receive IPC calls
-  Loader {
-    id: screenDetectorLoader
-    active: false
-
-    sourceComponent: PanelWindow {
-      implicitWidth: 0
-      implicitHeight: 0
-      color: Color.transparent
-      WlrLayershell.exclusionMode: ExclusionMode.Ignore
-      mask: Region {}
-
-      onScreenChanged: {
-        detectedScreen = screen
-        screenDetectorDebounce.restart()
+    function close() {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel && panel.visible) {
+        panel.close()
       }
+      return "SPOTLIGHT_CLOSE_SUCCESS"
+    }
+
+    function toggle() {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel) {
+        panel.toggle()
+      }
+      return "SPOTLIGHT_TOGGLE_SUCCESS"
+    }
+
+    function openQuery(query: string) {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel) {
+        // Set search query before opening
+        if (panel.setSearchQuery) {
+          panel.setSearchQuery(query)
+        }
+        if (!panel.visible) {
+          panel.open()
+        }
+      }
+      return "SPOTLIGHT_OPEN_QUERY_SUCCESS"
+    }
+
+    function toggleQuery(query: string) {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel) {
+        if (panel.visible) {
+          panel.close()
+        } else {
+          // Set search query before opening
+          if (panel.setSearchQuery) {
+            panel.setSearchQuery(query)
+          }
+          panel.open()
+        }
+      }
+      return "SPOTLIGHT_TOGGLE_QUERY_SUCCESS"
     }
   }
 }
