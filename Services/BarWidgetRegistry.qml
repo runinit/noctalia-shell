@@ -11,6 +11,7 @@ Singleton {
   // Widget registry object mapping widget names to components
   property var widgets: ({
                            "ActiveWindow": activeWindowComponent,
+                           "AppMenu": appMenuComponent,
                            "Battery": batteryComponent,
                            "Bluetooth": bluetoothComponent,
                            "Brightness": brightnessComponent,
@@ -49,6 +50,12 @@ Singleton {
                                     "maxWidth": 145,
                                     "useFixedWidth": false,
                                     "colorizeIcons": false
+                                  },
+                                  "AppMenu": {
+                                    "allowUserSettings": true,
+                                    "iconMode": "apps",
+                                    "icon": "view-app-grid",
+                                    "customIconPath": ""
                                   },
                                   "Battery": {
                                     "allowUserSettings": true,
@@ -164,6 +171,9 @@ Singleton {
   // Component definitions - these are loaded once at startup
   property Component activeWindowComponent: Component {
     ActiveWindow {}
+  }
+  property Component appMenuComponent: Component {
+    AppMenu {}
   }
   property Component batteryComponent: Component {
     Battery {}
