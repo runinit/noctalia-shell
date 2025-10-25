@@ -24,84 +24,48 @@ ColumnLayout {
     description: I18n.tr("settings.power.ac.section.description")
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.monitor-timeout.label")
-      description: I18n.tr("settings.power.monitor-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 3600
-      stepSize: 60
-      value: Settings.data.power.acMonitorTimeout
-      text: formatTimeout(Settings.data.power.acMonitorTimeout)
-      onMoved: (newValue) => Settings.data.power.acMonitorTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.monitor-timeout.label")
+    description: I18n.tr("settings.power.monitor-timeout.description")
+    from: 0
+    to: 3600
+    stepSize: 60
+    value: Settings.data.power.acMonitorTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.acMonitorTimeout = value
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.lock-timeout.label")
-      description: I18n.tr("settings.power.lock-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 3600
-      stepSize: 60
-      value: Settings.data.power.acLockTimeout
-      text: formatTimeout(Settings.data.power.acLockTimeout)
-      onMoved: (newValue) => Settings.data.power.acLockTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.lock-timeout.label")
+    description: I18n.tr("settings.power.lock-timeout.description")
+    from: 0
+    to: 3600
+    stepSize: 60
+    value: Settings.data.power.acLockTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.acLockTimeout = value
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.suspend-timeout.label")
-      description: I18n.tr("settings.power.suspend-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 7200
-      stepSize: 300
-      value: Settings.data.power.acSuspendTimeout
-      text: formatTimeout(Settings.data.power.acSuspendTimeout)
-      onMoved: (newValue) => Settings.data.power.acSuspendTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.suspend-timeout.label")
+    description: I18n.tr("settings.power.suspend-timeout.description")
+    from: 0
+    to: 7200
+    stepSize: 300
+    value: Settings.data.power.acSuspendTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.acSuspendTimeout = value
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.hibernate-timeout.label")
-      description: I18n.tr("settings.power.hibernate-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 14400
-      stepSize: 600
-      value: Settings.data.power.acHibernateTimeout
-      text: formatTimeout(Settings.data.power.acHibernateTimeout)
-      onMoved: (newValue) => Settings.data.power.acHibernateTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.hibernate-timeout.label")
+    description: I18n.tr("settings.power.hibernate-timeout.description")
+    from: 0
+    to: 14400
+    stepSize: 600
+    value: Settings.data.power.acHibernateTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.acHibernateTimeout = value
   }
 
   // Battery Power Section
@@ -110,84 +74,48 @@ ColumnLayout {
     description: I18n.tr("settings.power.battery.section.description")
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.monitor-timeout.label")
-      description: I18n.tr("settings.power.monitor-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 1800
-      stepSize: 60
-      value: Settings.data.power.batteryMonitorTimeout
-      text: formatTimeout(Settings.data.power.batteryMonitorTimeout)
-      onMoved: (newValue) => Settings.data.power.batteryMonitorTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.monitor-timeout.label")
+    description: I18n.tr("settings.power.monitor-timeout.description")
+    from: 0
+    to: 1800
+    stepSize: 60
+    value: Settings.data.power.batteryMonitorTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.batteryMonitorTimeout = value
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.lock-timeout.label")
-      description: I18n.tr("settings.power.lock-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 1800
-      stepSize: 60
-      value: Settings.data.power.batteryLockTimeout
-      text: formatTimeout(Settings.data.power.batteryLockTimeout)
-      onMoved: (newValue) => Settings.data.power.batteryLockTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.lock-timeout.label")
+    description: I18n.tr("settings.power.lock-timeout.description")
+    from: 0
+    to: 1800
+    stepSize: 60
+    value: Settings.data.power.batteryLockTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.batteryLockTimeout = value
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.suspend-timeout.label")
-      description: I18n.tr("settings.power.suspend-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 3600
-      stepSize: 300
-      value: Settings.data.power.batterySuspendTimeout
-      text: formatTimeout(Settings.data.power.batterySuspendTimeout)
-      onMoved: (newValue) => Settings.data.power.batterySuspendTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.suspend-timeout.label")
+    description: I18n.tr("settings.power.suspend-timeout.description")
+    from: 0
+    to: 3600
+    stepSize: 300
+    value: Settings.data.power.batterySuspendTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.batterySuspendTimeout = value
   }
 
-  ColumnLayout {
-    spacing: Style.marginXS
-    Layout.fillWidth: true
-
-    NLabel {
-      label: I18n.tr("settings.power.hibernate-timeout.label")
-      description: I18n.tr("settings.power.hibernate-timeout.description")
-    }
-
-    NValueSlider {
-      Layout.fillWidth: true
-      from: 0
-      to: 7200
-      stepSize: 600
-      value: Settings.data.power.batteryHibernateTimeout
-      text: formatTimeout(Settings.data.power.batteryHibernateTimeout)
-      onMoved: (newValue) => Settings.data.power.batteryHibernateTimeout = newValue
-    }
+  NSlider {
+    label: I18n.tr("settings.power.hibernate-timeout.label")
+    description: I18n.tr("settings.power.hibernate-timeout.description")
+    from: 0
+    to: 7200
+    stepSize: 600
+    value: Settings.data.power.batteryHibernateTimeout
+    formatValue: (val) => formatTimeout(val)
+    onMoved: Settings.data.power.batteryHibernateTimeout = value
   }
 
   // Options Section
@@ -239,13 +167,13 @@ ColumnLayout {
       spacing: Style.marginS
 
       NText {
-        text: I18n.tr("settings.power.status.current-power-state") + " " + (BatteryService.batteryAvailable && !BatteryService.isPluggedIn ? I18n.tr("settings.power.status.battery") : I18n.tr("settings.power.status.ac-power"))
+        text: I18n.tr("Current power state: ") + (BatteryService.batteryAvailable && !BatteryService.isPluggedIn ? "Battery" : "AC Power")
         font.weight: Font.Medium
         color: Color.mOnSurfaceVariant
       }
 
       NText {
-        text: I18n.tr("settings.power.status.idle-monitoring") + " " + (IdleService && IdleService.monitorTimeout > 0 ? I18n.tr("settings.power.status.enabled") : I18n.tr("settings.power.status.disabled"))
+        text: I18n.tr("Idle monitoring: ") + (IdleService && IdleService.monitorTimeout > 0 ? "Enabled" : "Disabled")
         font.pixelSize: Style.fontSizeS
         color: Color.mOnSurfaceVariant
         opacity: 0.8
