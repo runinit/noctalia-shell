@@ -9,19 +9,39 @@
 // Qt & Quickshell Core
 import QtQuick
 import Quickshell
+import Quickshell.Io
+import Quickshell.Services.Pipewire
+import Quickshell.Widgets
 
 // Commons & Services
 import qs.Commons
 import qs.Services
+import qs.Widgets
 
-// Modules
+// Core Modules
 import qs.Modules.Background
 import qs.Modules.Dock
-import qs.Modules.MainScreen
 import qs.Modules.LockScreen
+import qs.Modules.SessionMenu
+
+// Bar & Bar Components
+import qs.Modules.Bar
+import qs.Modules.Bar.Extras
+import qs.Modules.Bar.Bluetooth
+import qs.Modules.Bar.Battery
+import qs.Modules.Bar.Calendar
+import qs.Modules.Bar.WiFi
+
+// Panels & UI Components
+import qs.Modules.ControlCenter
+import qs.Modules.Launcher
 import qs.Modules.Notification
 import qs.Modules.OSD
+import qs.Modules.Settings
+import qs.Modules.Spotlight
 import qs.Modules.Toast
+import qs.Modules.Wallpaper
+import qs.Modules.SetupWizard
 
 ShellRoot {
   id: shellRoot
@@ -54,6 +74,7 @@ ShellRoot {
       settingsLoaded = true
     }
   }
+
   Loader {
     active: i18nLoaded && settingsLoaded
 
@@ -73,15 +94,21 @@ ShellRoot {
         BatteryService.init()
         IdleInhibitorService.init()
         PowerProfileService.init()
-        DistroService.init()
+        SessionService.init()
+        AppSearchService.init()
+        AppUsageHistoryData.init()
+        IdleService.init()
       }
 
-      Overview {}
       Background {}
+      Overview {}
+      ScreenCorners {}
+      Bar {}
       Dock {}
-      ToastOverlay {}
-      OSD {}
-      Notification {}
+
+      Notification {
+        id: notification
+      }
 
       LockScreen {
         id: lockScreen
@@ -91,16 +118,90 @@ ShellRoot {
         }
       }
 
-      // IPCService is treated as a service but it's actually an
-      // Item that needs to exists in the shell.
+      ToastOverlay {}
+      OSD {}
+
+      // IPCService is treated as a service
+      // but it's actually an Item that needs to exists in the shell.
       IPCService {}
 
-      // MainScreen for each screen (manages bar + all panels)
-      MainScreens {}
+      // ------------------------------
+      // All the NPanels
+      Launcher {
+        id: launcherPanel
+        objectName: "launcherPanel"
+      }
+
+      ControlCenterPanel {
+        id: controlCenterPanel
+        objectName: "controlCenterPanel"
+      }
+
+      CalendarPanel {
+        id: calendarPanel
+        objectName: "calendarPanel"
+      }
+
+      SettingsPanel {
+        id: settingsPanel
+        objectName: "settingsPanel"
+      }
+
+      DirectWidgetSettingsPanel {
+        id: directWidgetSettingsPanel
+        objectName: "directWidgetSettingsPanel"
+      }
+
+      NotificationHistoryPanel {
+        id: notificationHistoryPanel
+        objectName: "notificationHistoryPanel"
+      }
+
+      SessionMenu {
+        id: sessionMenuPanel
+        objectName: "sessionMenuPanel"
+      }
+
+      WiFiPanel {
+        id: wifiPanel
+        objectName: "wifiPanel"
+      }
+
+      BluetoothPanel {
+        id: bluetoothPanel
+        objectName: "bluetoothPanel"
+      }
+
+      WallpaperPanel {
+        id: wallpaperPanel
+        objectName: "wallpaperPanel"
+      }
+      BatteryPanel {
+        id: batteryPanel
+        objectName: "batteryPanel"
+      }
+
+      SpotlightModal {
+        id: spotlightModal
+        objectName: "spotlightModal"
+      }
     }
   }
 
-  // Setup Wizard - Auto Kick start
+  // ------------------------------
+  // Setup Wizard
+  Loader {
+    id: setupWizardLoader
+    active: false
+    asynchronous: true
+    sourceComponent: SetupWizard {}
+    onLoaded: {
+      if (setupWizardLoader.item && setupWizardLoader.item.open) {
+        setupWizardLoader.item.open()
+      }
+    }
+  }
+
   Connections {
     target: Settings
     function onSettingsLoaded() {
@@ -125,21 +226,7 @@ ShellRoot {
     }
 
     if (Settings.data.settingsVersion >= Settings.settingsVersion) {
-      // Open Setup Wizard as a panel in the same windowing system as Settings/ControlCenter
-      if (Quickshell.screens.length > 0) {
-        var targetScreen = Quickshell.screens[0]
-        var setupPanel = PanelService.getPanel("setupWizardPanel", targetScreen)
-        if (setupPanel) {
-          setupPanel.open()
-        } else {
-          // If not yet loaded, ensure it loads and try again shortly
-          Qt.callLater(() => {
-                         var sp = PanelService.getPanel("setupWizardPanel", targetScreen)
-                         if (sp)
-                         sp.open()
-                       })
-        }
-      }
+      setupWizardLoader.active = true
     } else {
       Settings.data.setupCompleted = true
     }

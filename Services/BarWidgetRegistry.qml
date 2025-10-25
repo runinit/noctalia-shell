@@ -11,18 +11,17 @@ Singleton {
   // Widget registry object mapping widget names to components
   property var widgets: ({
                            "ActiveWindow": activeWindowComponent,
-                           "AudioVisualizer": audioVisualizerComponent,
+                           "AppMenu": appMenuComponent,
                            "Battery": batteryComponent,
                            "Bluetooth": bluetoothComponent,
                            "Brightness": brightnessComponent,
                            "Clock": clockComponent,
                            "ControlCenter": controlCenterComponent,
                            "CustomButton": customButtonComponent,
-                           "DarkMode": darkModeComponent,
+                           "DarkMode": darkMode,
                            "KeepAwake": keepAwakeComponent,
                            "KeyboardIndicator": keyboardIndicatorComponent,
                            "KeyboardLayout": keyboardLayoutComponent,
-                           "LockKeys": lockKeysComponent,
                            "MediaMini": mediaMiniComponent,
                            "Microphone": microphoneComponent,
                            "NightLight": nightLightComponent,
@@ -46,16 +45,17 @@ Singleton {
                                     "allowUserSettings": true,
                                     "showIcon": true,
                                     "hideMode": "hidden",
-                                    "scrollingMode": "hover",
+                                    "scrollingMode"// "visible", "hidden", "transparent"
+                                    : "hover",
                                     "maxWidth": 145,
                                     "useFixedWidth": false,
                                     "colorizeIcons": false
                                   },
-                                  "AudioVisualizer": {
+                                  "AppMenu": {
                                     "allowUserSettings": true,
-                                    "width": 200,
-                                    "colorName": "primary",
-                                    "hideWhenIdle": false
+                                    "iconMode": "apps",
+                                    "icon": "view-app-grid",
+                                    "customIconPath": ""
                                   },
                                   "Battery": {
                                     "allowUserSettings": true,
@@ -93,8 +93,7 @@ Singleton {
                                     "textCommand": "",
                                     "textStream": false,
                                     "textIntervalMs": 3000,
-                                    "textCollapse": "",
-                                    "parseJson": false
+                                    "textCollapse": ""
                                   },
                                   "KeyboardIndicator": {
                                     "allowUserSettings": true,
@@ -104,22 +103,13 @@ Singleton {
                                     "allowUserSettings": true,
                                     "displayMode": "onhover"
                                   },
-                                  "LockKeys": {
-                                    "allowUserSettings": true,
-                                    "showCapsLock": true,
-                                    "showNumLock": true,
-                                    "showScrollLock": true,
-                                    "capsLockIcon": "letter-c",
-                                    "numLockIcon": "letter-n",
-                                    "scrollLockIcon": "letter-s"
-                                  },
                                   "MediaMini": {
                                     "allowUserSettings": true,
                                     "hideMode": "hidden",
-                                    "scrollingMode": "hover",
+                                    "scrollingMode"// "visible", "hidden", "transparent"
+                                    : "hover",
                                     "maxWidth": 145,
                                     "useFixedWidth": false,
-                                    "hideWhenIdle": false,
                                     "showAlbumArt": false,
                                     "showVisualizer": false,
                                     "visualizerType": "linear"
@@ -139,7 +129,6 @@ Singleton {
                                   },
                                   "SystemMonitor": {
                                     "allowUserSettings": true,
-                                    "usePrimaryColor": true,
                                     "showCpuUsage": true,
                                     "showCpuTemp": true,
                                     "showMemoryUsage": true,
@@ -160,9 +149,7 @@ Singleton {
                                   "Tray": {
                                     "allowUserSettings": true,
                                     "blacklist": [],
-                                    "colorizeIcons": false,
-                                    "favorites": [],
-                                    "drawerEnabled": true
+                                    "colorizeIcons": false
                                   },
                                   "WiFi": {
                                     "allowUserSettings": true,
@@ -185,8 +172,8 @@ Singleton {
   property Component activeWindowComponent: Component {
     ActiveWindow {}
   }
-  property Component audioVisualizerComponent: Component {
-    AudioVisualizer {}
+  property Component appMenuComponent: Component {
+    AppMenu {}
   }
   property Component batteryComponent: Component {
     Battery {}
@@ -203,7 +190,7 @@ Singleton {
   property Component customButtonComponent: Component {
     CustomButton {}
   }
-  property Component darkModeComponent: Component {
+  property Component darkMode: Component {
     DarkMode {}
   }
   property Component keyboardIndicatorComponent: Component {
@@ -214,9 +201,6 @@ Singleton {
   }
   property Component keepAwakeComponent: Component {
     KeepAwake {}
-  }
-  property Component lockKeysComponent: Component {
-    LockKeys {}
   }
   property Component mediaMiniComponent: Component {
     MediaMini {}
