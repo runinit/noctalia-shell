@@ -49,6 +49,7 @@ SmartPanel {
     Location,
     Network,
     Notifications,
+    Power,
     ScreenRecorder,
     UserInterface,
     Wallpaper
@@ -135,6 +136,10 @@ SmartPanel {
     id: lockScreenTab
     LockScreenTab {}
   }
+  Component {
+    id: powerTab
+    PowerTab {}
+  }
 
   // Order *DOES* matter
   function updateTabsModel() {
@@ -198,6 +203,11 @@ SmartPanel {
                      "label": "settings.network.title",
                      "icon": "settings-network",
                      "source": networkTab
+                   }, {
+                     "id": SettingsPanel.Tab.Power,
+                     "label": "settings.power.title",
+                     "icon": "battery-charging",
+                     "source": powerTab
                    }, {
                      "id": SettingsPanel.Tab.Location,
                      "label": "settings.location.title",
