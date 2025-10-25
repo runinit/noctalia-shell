@@ -34,6 +34,7 @@ Singleton {
   property var categorizedApps: ({})
 
   signal applicationsLoaded()
+  signal applicationsChanged()
 
   function init() {
     Logger.d("AppSearchService", "Service started")
@@ -61,6 +62,7 @@ Singleton {
 
     loaded = true
     applicationsLoaded()
+    applicationsChanged()
   }
 
   // Enrich app with additional search-friendly properties
@@ -92,14 +94,13 @@ Singleton {
       }
     }
 
-    // Create enriched app object (QML doesn't support spread operator)
-    const enriched = Object.assign({}, app)
-    enriched.executableName = executableName
-    enriched.primaryCategory = primaryCategory
-    enriched.categoryName = categoryMap[primaryCategory] || I18n.tr("category.other")
-    enriched.searchableText = `${app.name} ${app.comment || ''} ${app.genericName || ''} ${executableName}`.toLowerCase()
-
-    return enriched
+    return {
+      ...app,
+      executableName: executableName,
+      primaryCategory: primaryCategory,
+      categoryName: categoryMap[primaryCategory] || I18n.tr("category.other"),
+      searchableText: `${app.name} ${app.comment || ''} ${app.genericName || ''} ${executableName}`.toLowerCase()
+    }
   }
 
   // Organize apps by category

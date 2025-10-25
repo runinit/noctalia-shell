@@ -9,14 +9,17 @@ import qs.Services
 Singleton {
   id: root
 
-  // Monitor instances (created dynamically in init)
+  // Monitor instances (created dynamically to allow re-arming)
   property var monitorOffMonitor: null
   property var lockMonitor: null
   property var suspendMonitor: null
   property var hibernateMonitor: null
 
+  // Enable gate - used to force re-creation when timeouts change
+  property bool _enableGate: true
+
   // Power state detection
-  readonly property bool isOnBattery: (BatteryService.batteryAvailable || false) && !(BatteryService.isPluggedIn || false)
+  readonly property bool isOnBattery: BatteryService.batteryAvailable && !BatteryService.isPluggedIn
 
   // Dynamic timeout selection based on power state
   readonly property int monitorTimeout: {
@@ -50,115 +53,30 @@ Singleton {
   readonly property bool respectInhibitors: Settings.data.power ? (Settings.data.power.respectInhibitors !== false) : true
   readonly property bool lockBeforeSuspend: Settings.data.power ? (Settings.data.power.lockBeforeSuspend !== false) : true
 
+  Component.onCompleted: {
+    createMonitors()
+  }
+
   function init() {
-    try {
-      Logger.d("IdleService", "Idle service initializing...")
-
-      // Create monitors dynamically after Settings is guaranteed to be loaded
-      createMonitors()
-      logConfiguration()
-
-      Logger.d("IdleService", "Idle service started successfully")
-    } catch (e) {
-      Logger.e("IdleService", "Failed to initialize:", e, e.stack)
-    }
+    Logger.d("IdleService", "Service started")
+    logConfiguration()
   }
 
+  function logConfiguration() {
+    const state = isOnBattery ? "battery" : "AC"
+    Logger.d("IdleService", `Power state: ${state}`)
+    Logger.d("IdleService", `Monitor timeout: ${monitorTimeout}s`)
+    Logger.d("IdleService", `Lock timeout: ${lockTimeout}s`)
+    Logger.d("IdleService", `Suspend timeout: ${suspendTimeout}s`)
+    Logger.d("IdleService", `Hibernate timeout: ${hibernateTimeout}s`)
+    Logger.d("IdleService", `Respect inhibitors: ${respectInhibitors}`)
+  }
+
+  // Create all idle monitors
   function createMonitors() {
-    Logger.d("IdleService", "Creating monitors - monitorTimeout: " + monitorTimeout + "s, lockTimeout: " + lockTimeout + "s")
+    Logger.d("IdleService", "Creating idle monitors")
 
-    // Monitor off monitor
-    if (monitorTimeout > 0) {
-      Logger.d("IdleService", "Creating monitor off monitor with timeout: " + monitorTimeout + "s")
-      monitorOffMonitor = Qt.createQmlObject(`
-        import Quickshell.Wayland
-        IdleMonitor {
-          enabled: true
-          respectInhibitors: ${respectInhibitors}
-          timeout: ${monitorTimeout}
-        }
-      `, root, "monitorOffMonitor")
-
-      monitorOffMonitor.isIdleChanged.connect(() => {
-        if (monitorOffMonitor.isIdle) {
-          Logger.d("IdleService", "Monitor off triggered (idle for " + monitorOffMonitor.timeout + "s)")
-          requestMonitorOff()
-        }
-      })
-    } else {
-      Logger.d("IdleService", "Skipping monitor off monitor (timeout is 0)")
-    }
-
-    // Lock monitor
-    if (lockTimeout > 0) {
-      Logger.d("IdleService", "Creating lock monitor with timeout: " + lockTimeout + "s")
-      lockMonitor = Qt.createQmlObject(`
-        import Quickshell.Wayland
-        IdleMonitor {
-          enabled: true
-          respectInhibitors: ${respectInhibitors}
-          timeout: ${lockTimeout}
-        }
-      `, root, "lockMonitor")
-
-      lockMonitor.isIdleChanged.connect(() => {
-        if (lockMonitor.isIdle) {
-          Logger.d("IdleService", "Lock triggered (idle for " + lockMonitor.timeout + "s)")
-          requestLock()
-        }
-      })
-    } else {
-      Logger.d("IdleService", "Skipping lock monitor (timeout is 0)")
-    }
-
-    // Suspend monitor
-    if (suspendTimeout > 0) {
-      Logger.d("IdleService", "Creating suspend monitor with timeout: " + suspendTimeout + "s")
-      suspendMonitor = Qt.createQmlObject(`
-        import Quickshell.Wayland
-        IdleMonitor {
-          enabled: true
-          respectInhibitors: ${respectInhibitors}
-          timeout: ${suspendTimeout}
-        }
-      `, root, "suspendMonitor")
-
-      suspendMonitor.isIdleChanged.connect(() => {
-        if (suspendMonitor.isIdle) {
-          Logger.d("IdleService", "Suspend triggered (idle for " + suspendMonitor.timeout + "s)")
-          requestSuspend()
-        }
-      })
-    } else {
-      Logger.d("IdleService", "Skipping suspend monitor (timeout is 0)")
-    }
-
-    // Hibernate monitor
-    if (hibernateTimeout > 0) {
-      Logger.d("IdleService", "Creating hibernate monitor with timeout: " + hibernateTimeout + "s")
-      hibernateMonitor = Qt.createQmlObject(`
-        import Quickshell.Wayland
-        IdleMonitor {
-          enabled: true
-          respectInhibitors: ${respectInhibitors}
-          timeout: ${hibernateTimeout}
-        }
-      `, root, "hibernateMonitor")
-
-      hibernateMonitor.isIdleChanged.connect(() => {
-        if (hibernateMonitor.isIdle) {
-          Logger.d("IdleService", "Hibernate triggered (idle for " + hibernateMonitor.timeout + "s)")
-          requestHibernate()
-        }
-      })
-    } else {
-      Logger.d("IdleService", "Skipping hibernate monitor (timeout is 0)")
-    }
-
-    Logger.d("IdleService", "Monitor creation complete")
-  }
-
-  function destroyMonitors() {
+    // Clean up existing monitors
     if (monitorOffMonitor) {
       monitorOffMonitor.destroy()
       monitorOffMonitor = null
@@ -175,57 +93,99 @@ Singleton {
       hibernateMonitor.destroy()
       hibernateMonitor = null
     }
+
+    // Create monitors dynamically
+    try {
+      monitorOffMonitor = createIdleMonitor("MonitorOff", monitorTimeout, requestMonitorOff)
+      lockMonitor = createIdleMonitor("Lock", lockTimeout, requestLock)
+      suspendMonitor = createIdleMonitor("Suspend", suspendTimeout, requestSuspend)
+      hibernateMonitor = createIdleMonitor("Hibernate", hibernateTimeout, requestHibernate)
+
+      Logger.d("IdleService", "Idle monitors created successfully")
+    } catch (e) {
+      Logger.e("IdleService", "Failed to create idle monitors:", e)
+    }
   }
 
-  function logConfiguration() {
-    const state = isOnBattery ? "battery" : "AC"
-    Logger.d("IdleService", `Power state: ${state}`)
-    Logger.d("IdleService", `Monitor timeout: ${monitorTimeout}s (enabled: ${monitorOffMonitor !== null})`)
-    Logger.d("IdleService", `Lock timeout: ${lockTimeout}s (enabled: ${lockMonitor !== null})`)
-    Logger.d("IdleService", `Suspend timeout: ${suspendTimeout}s (enabled: ${suspendMonitor !== null})`)
-    Logger.d("IdleService", `Hibernate timeout: ${hibernateTimeout}s (enabled: ${hibernateMonitor !== null})`)
-    Logger.d("IdleService", `Respect inhibitors: ${respectInhibitors}`)
+  // Create a single idle monitor
+  function createIdleMonitor(name, timeout, callback) {
+    const qmlString = `
+      import QtQuick
+      import Quickshell.Wayland
+
+      IdleMonitor {
+        id: monitor
+        enabled: false
+        respectInhibitors: ${respectInhibitors}
+        timeout: 0
+
+        onIsIdleChanged: {
+          if (isIdle) {
+            // Callback will be connected externally
+          }
+        }
+      }
+    `
+
+    const monitor = Qt.createQmlObject(qmlString, root, `IdleService.${name}Monitor`)
+
+    // Connect callback
+    monitor.isIdleChanged.connect(() => {
+      if (monitor.isIdle) {
+        Logger.d("IdleService", `${name} monitor triggered (idle for ${monitor.timeout}s)`)
+        callback()
+      }
+    })
+
+    // Configure monitor
+    updateMonitor(monitor, timeout)
+
+    return monitor
   }
 
-  // Watch for power state changes - recreate monitors with new timeouts
+  // Update a monitor's configuration
+  function updateMonitor(monitor, timeout) {
+    if (!monitor) return
+
+    // Disable monitor if timeout is 0 (Never)
+    if (timeout === 0) {
+      monitor.enabled = false
+      monitor.timeout = 0
+      return
+    }
+
+    // Update timeout and enable
+    monitor.timeout = timeout
+    monitor.enabled = _enableGate
+  }
+
+  // Re-arm monitors when settings change
+  function rearmMonitors() {
+    Logger.d("IdleService", "Re-arming monitors due to settings change")
+
+    // Toggle enable gate to force re-arm
+    _enableGate = false
+    Qt.callLater(() => {
+      _enableGate = true
+
+      // Update each monitor
+      updateMonitor(monitorOffMonitor, monitorTimeout)
+      updateMonitor(lockMonitor, lockTimeout)
+      updateMonitor(suspendMonitor, suspendTimeout)
+      updateMonitor(hibernateMonitor, hibernateTimeout)
+
+      logConfiguration()
+    })
+  }
+
+  // Watch for timeout changes
+  onMonitorTimeoutChanged: rearmMonitors()
+  onLockTimeoutChanged: rearmMonitors()
+  onSuspendTimeoutChanged: rearmMonitors()
+  onHibernateTimeoutChanged: rearmMonitors()
   onIsOnBatteryChanged: {
     Logger.d("IdleService", `Power state changed to: ${isOnBattery ? "battery" : "AC"}`)
-    destroyMonitors()
-    createMonitors()
-    logConfiguration()
-  }
-
-  // Watch for timeout changes in settings - recreate monitors
-  onMonitorTimeoutChanged: {
-    if (monitorOffMonitor !== null || monitorTimeout > 0) {
-      Logger.d("IdleService", "Monitor timeout changed, recreating monitors")
-      destroyMonitors()
-      createMonitors()
-    }
-  }
-
-  onLockTimeoutChanged: {
-    if (lockMonitor !== null || lockTimeout > 0) {
-      Logger.d("IdleService", "Lock timeout changed, recreating monitors")
-      destroyMonitors()
-      createMonitors()
-    }
-  }
-
-  onSuspendTimeoutChanged: {
-    if (suspendMonitor !== null || suspendTimeout > 0) {
-      Logger.d("IdleService", "Suspend timeout changed, recreating monitors")
-      destroyMonitors()
-      createMonitors()
-    }
-  }
-
-  onHibernateTimeoutChanged: {
-    if (hibernateMonitor !== null || hibernateTimeout > 0) {
-      Logger.d("IdleService", "Hibernate timeout changed, recreating monitors")
-      destroyMonitors()
-      createMonitors()
-    }
+    rearmMonitors()
   }
 
   // Action handlers
@@ -242,16 +202,10 @@ Singleton {
   function requestLock() {
     Logger.d("IdleService", "Locking session")
 
-    // Use noctalia's built-in lock screen
-    if (typeof PanelService !== 'undefined' && PanelService.lockScreen) {
-      if (!PanelService.lockScreen.active) {
-        PanelService.lockScreen.active = true
-      }
+    if (typeof SessionService !== 'undefined') {
+      SessionService.lock()
     } else {
-      Logger.w("IdleService", "PanelService.lockScreen not available, falling back to SessionService")
-      if (typeof SessionService !== 'undefined') {
-        SessionService.lock()
-      }
+      Logger.w("IdleService", "SessionService not available")
     }
   }
 
