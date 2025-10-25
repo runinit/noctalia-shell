@@ -2024,4 +2024,34 @@
       "title": "WLAN"
     }
   }
+  },
+  "category": {
+    "all": "All",
+    "development": "Development",
+    "graphics": "Graphics",
+    "media": "Media",
+    "network": "Network",
+    "productivity": "Productivity",
+    "science": "Science",
+    "settings": "Settings",
+    "system": "System",
+    "utilities": "Utilities",
+    "games": "Games",
+    "education": "Education",
+    "other": "Other"
+  },
+  "app-menu": {
+    "title": "Applications",
+    "list-view": "List view",
+    "grid-view": "Grid view"
+  },
+  "app-launcher": {
+    "search-placeholder": "Search applications..."
+  },
+  "spotlight": {
+    "title": "Spotlight",
+    "list-view": "List view",
+    "grid-view": "Grid view",
+    "keyboard-hint": "↑↓ Navigate • Enter Launch • Esc Close"
+  }
 }
