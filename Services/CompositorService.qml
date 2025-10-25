@@ -354,4 +354,71 @@ Singleton {
     // Queue suspend to the next event loop cycle to allow lock UI to render
     Qt.callLater(suspend)
   }
+
+  // Monitor power control
+  function powerOffMonitors() {
+    Logger.d("CompositorService", "Turning off monitors")
+
+    if (isHyprland) {
+      try {
+        Quickshell.execDetached(["hyprctl", "dispatch", "dpms", "off"])
+        return true
+      } catch (e) {
+        Logger.e("CompositorService", "Hyprland dpms off failed:", e)
+        return false
+      }
+    } else if (isNiri) {
+      try {
+        Quickshell.execDetached(["niri", "msg", "action", "power-off-monitors"])
+        return true
+      } catch (e) {
+        Logger.e("CompositorService", "Niri power-off-monitors failed:", e)
+        return false
+      }
+    } else if (isSway) {
+      try {
+        Quickshell.execDetached(["swaymsg", "output * dpms off"])
+        return true
+      } catch (e) {
+        Logger.e("CompositorService", "Sway dpms off failed:", e)
+        return false
+      }
+    }
+
+    Logger.w("CompositorService", "Monitor power control not supported for current compositor")
+    return false
+  }
+
+  function powerOnMonitors() {
+    Logger.d("CompositorService", "Turning on monitors")
+
+    if (isHyprland) {
+      try {
+        Quickshell.execDetached(["hyprctl", "dispatch", "dpms", "on"])
+        return true
+      } catch (e) {
+        Logger.e("CompositorService", "Hyprland dpms on failed:", e)
+        return false
+      }
+    } else if (isNiri) {
+      try {
+        Quickshell.execDetached(["niri", "msg", "action", "power-on-monitors"])
+        return true
+      } catch (e) {
+        Logger.e("CompositorService", "Niri power-on-monitors failed:", e)
+        return false
+      }
+    } else if (isSway) {
+      try {
+        Quickshell.execDetached(["swaymsg", "output * dpms on"])
+        return true
+      } catch (e) {
+        Logger.e("CompositorService", "Sway dpms on failed:", e)
+        return false
+      }
+    }
+
+    Logger.w("CompositorService", "Monitor power control not supported for current compositor")
+    return false
+  }
 }

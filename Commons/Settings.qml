@@ -437,6 +437,38 @@ Singleton {
     property JsonObject battery: JsonObject {
       property int chargingMode: 0
     }
+
+    // power management / idle monitoring
+    property JsonObject power: JsonObject {
+      // AC power timeouts (seconds, 0 = Never)
+      property int acMonitorTimeout: 600      // 10 minutes
+      property int acLockTimeout: 900         // 15 minutes
+      property int acSuspendTimeout: 1800     // 30 minutes
+      property int acHibernateTimeout: 0      // Never
+
+      // Battery timeouts (more aggressive)
+      property int batteryMonitorTimeout: 300 // 5 minutes
+      property int batteryLockTimeout: 600    // 10 minutes
+      property int batterySuspendTimeout: 900 // 15 minutes
+      property int batteryHibernateTimeout: 0 // Never
+
+      // Options
+      property bool lockBeforeSuspend: true
+      property bool respectInhibitors: true
+      property bool loginctlLockIntegration: false
+    }
+
+    // app menu
+    property JsonObject appMenu: JsonObject {
+      property string viewMode: "list"        // "list" or "grid"
+      property bool showCategories: true
+    }
+
+    // spotlight launcher
+    property JsonObject spotlight: JsonObject {
+      property string viewMode: "list"        // "list" or "grid"
+      property bool showCategories: false
+    }
   }
 
   // -----------------------------------------------------
