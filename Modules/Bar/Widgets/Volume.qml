@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import qs.Commons
-import qs.Modules.Panels.Settings
+import qs.Modules.Settings
 import qs.Services
 import qs.Widgets
 import qs.Modules.Bar.Extras
@@ -90,13 +90,13 @@ Item {
       }
     }
     onClicked: {
-      PanelService.getPanel("audioPanel", screen)?.toggle(this)
-    }
-    onRightClicked: {
       AudioService.setOutputMuted(!AudioService.muted)
     }
+    onRightClicked: {
+      PanelService.getPanel("audioPanel")?.toggle(this)
+    }
     onMiddleClicked: {
-      Quickshell.execDetached(["sh", "-c", "pwvucontrol || pavucontrol"])
+      Quickshell.execDetached(["pwvucontrol"])
     }
   }
 }
