@@ -288,4 +288,62 @@ Item {
       MediaService.seekByRatio(positionVal)
     }
   }
+
+  IpcHandler {
+    target: "spotlight"
+
+    function open() {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel && !panel.visible) {
+        panel.open()
+      }
+      return "SPOTLIGHT_OPEN_SUCCESS"
+    }
+
+    function close() {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel && panel.visible) {
+        panel.close()
+      }
+      return "SPOTLIGHT_CLOSE_SUCCESS"
+    }
+
+    function toggle() {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel) {
+        panel.toggle()
+      }
+      return "SPOTLIGHT_TOGGLE_SUCCESS"
+    }
+
+    function openQuery(query: string) {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel) {
+        // Set search query before opening
+        if (panel.setSearchQuery) {
+          panel.setSearchQuery(query)
+        }
+        if (!panel.visible) {
+          panel.open()
+        }
+      }
+      return "SPOTLIGHT_OPEN_QUERY_SUCCESS"
+    }
+
+    function toggleQuery(query: string) {
+      const panel = PanelService.getPanel("spotlightPanel")
+      if (panel) {
+        if (panel.visible) {
+          panel.close()
+        } else {
+          // Set search query before opening
+          if (panel.setSearchQuery) {
+            panel.setSearchQuery(query)
+          }
+          panel.open()
+        }
+      }
+      return "SPOTLIGHT_TOGGLE_QUERY_SUCCESS"
+    }
+  }
 }

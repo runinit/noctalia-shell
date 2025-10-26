@@ -112,6 +112,78 @@ Singleton {
                                                       }
                                                     })
 
+  // ============================================================================
+  // SEMANTIC PALETTE MAPPINGS
+  // Full palettes for themes with semantic/named colors
+  // ============================================================================
+  readonly property var semanticPaletteMaps: ({
+                                                "rosepine": {
+                                                  "palette": {
+                                                    "base": "#191724",
+                                                    "surface": "#1f1d2e",
+                                                    "overlay": "#26233a",
+                                                    "muted": "#6e6a86",
+                                                    "subtle": "#908caa",
+                                                    "text": "#e0def4",
+                                                    "love": "#eb6f92",
+                                                    "gold": "#f6c177",
+                                                    "rose": "#ebbcba",
+                                                    "pine": "#31748f",
+                                                    "foam": "#9ccfd8",
+                                                    "iris": "#c4a7e7",
+                                                    "highlight_low": "#21202e",
+                                                    "highlight_med": "#403d52",
+                                                    "highlight_high": "#524f67"
+                                                  }
+                                                },
+                                                "catppuccin": {
+                                                  "palette": {
+                                                    "rosewater": "#f5e0dc",
+                                                    "flamingo": "#f2cdcd",
+                                                    "pink": "#f5bde6",
+                                                    "mauve": "#cba6f7",
+                                                    "red": "#f38ba8",
+                                                    "maroon": "#eba0ac",
+                                                    "peach": "#fab387",
+                                                    "yellow": "#f9e2af",
+                                                    "green": "#a6e3a1",
+                                                    "teal": "#94e2d5",
+                                                    "sky": "#89dceb",
+                                                    "sapphire": "#74c7ec",
+                                                    "blue": "#89b4fa",
+                                                    "lavender": "#b4befe",
+                                                    "text": "#cdd6f4",
+                                                    "base": "#1e1e2e"
+                                                  }
+                                                },
+                                                "nord": {
+                                                  "palette": {
+                                                    "nord0": "#2e3440",
+                                                    "nord1": "#3b4252",
+                                                    "nord2": "#434c5e",
+                                                    "nord3": "#4c566a",
+                                                    "nord4": "#d8dee9",
+                                                    "nord5": "#e5e9f0",
+                                                    "nord6": "#eceff4",
+                                                    "nord7": "#8fbcbb",
+                                                    "nord8": "#88c0d0",
+                                                    "nord9": "#81a1c1",
+                                                    "nord10": "#5e81ac",
+                                                    "nord11": "#bf616a",
+                                                    "nord12": "#d08770",
+                                                    "nord13": "#ebcb8b",
+                                                    "nord14": "#a3be8c",
+                                                    "nord15": "#b48ead"
+                                                  }
+                                                }
+                                              })
+
+  // Get semantic palette for a theme (if available)
+  function getSemanticPalette(schemeName) {
+    const normalizedName = String(schemeName).toLowerCase().replace(/[\s\-()]/g, "")
+    return semanticPaletteMaps[normalizedName] || null
+  }
+
   Connections {
     target: WallpaperService
     function onWallpaperChanged(screenName, path) {
@@ -219,6 +291,45 @@ Singleton {
     const colors = schemeData[mode]
 
     const matugenColors = generatePalette(colors.mPrimary, colors.mSecondary, colors.mTertiary, colors.mError, colors.mSurface, isDarkMode)
+
+    // Add semantic palette colors if available
+    const schemeName = Settings.data.colorSchemes.predefinedScheme
+    const semanticPalette = getSemanticPalette(schemeName)
+
+    if (semanticPalette && semanticPalette.palette) {
+      // Create custom namespace with all original palette colors
+      matugenColors.custom = {}
+
+      Object.keys(semanticPalette.palette).forEach(colorName => {
+        const colorHex = semanticPalette.palette[colorName]
+        // Use the same createColorObject function to generate all 11 formats
+        const hsl = hexToHSL(colorHex)
+        const rgb = ColorsConvert.hexToRgb(colorHex)
+
+        matugenColors.custom[colorName] = {
+          "default": {
+            "hex": colorHex,
+            "hex_stripped": colorHex.replace(/^#/, ""),
+            "rgb": ColorsConvert.toRgbString(colorHex),
+            "rgba": ColorsConvert.toRgbaString(colorHex, 1.0),
+            "red": String(rgb.r),
+            "green": String(rgb.g),
+            "blue": String(rgb.b),
+            "alpha": "1.0",
+            "hsl": ColorsConvert.toHslString(colorHex),
+            "hsla": ColorsConvert.toHslaString(colorHex, 1.0),
+            "hue": String(Math.round(hsl.h)),
+            "saturation": String(Math.round(hsl.s)),
+            "lightness": String(Math.round(hsl.l))
+          }
+        }
+      })
+
+      if (Settings.data.general.debugMode) {
+        Logger.d("AppThemeService", `Added semantic palette: ${schemeName} with ${Object.keys(matugenColors.custom).length} colors`)
+      }
+    }
+
     const script = processAllTemplates(matugenColors, mode)
 
     if (Settings.data.general.debugMode) {
@@ -268,18 +379,40 @@ Singleton {
   }
 
   function generatePalette(primaryColor, secondaryColor, tertiaryColor, errorColor, backgroundColor, outlineColor, isDarkMode) {
-    const c = hex => {
+    // Create comprehensive color object with all 11 matugen formats
+    const createColorObject = (hex, alpha) => {
+      if (alpha === undefined || alpha === null) {
+        alpha = 1.0
+      }
       const hsl = hexToHSL(hex)
+      const rgb = ColorsConvert.hexToRgb(hex)
+
       return {
         "default": {
+          // Hex formats
           "hex": hex,
           "hex_stripped": hex.replace(/^#/, ""),
-          "hue": String(hsl.h),
-          "saturation": String(hsl.s),
-          "lightness": String(hsl.l)
+
+          // RGB formats
+          "rgb": ColorsConvert.toRgbString(hex),
+          "rgba": ColorsConvert.toRgbaString(hex, alpha),
+          "red": String(rgb.r),
+          "green": String(rgb.g),
+          "blue": String(rgb.b),
+          "alpha": String(alpha),
+
+          // HSL formats
+          "hsl": ColorsConvert.toHslString(hex),
+          "hsla": ColorsConvert.toHslaString(hex, alpha),
+          "hue": String(Math.round(hsl.h)),
+          "saturation": String(Math.round(hsl.s)),
+          "lightness": String(Math.round(hsl.l))
         }
       }
     }
+
+    // Convenience alias for backward compatibility
+    const c = createColorObject
 
     // Generate container colors
     const primaryContainer = ColorsConvert.generateContainerColor(primaryColor, isDarkMode)
@@ -456,24 +589,54 @@ Singleton {
   }
 
   function replaceColorsInFile(filePath, colors) {
-    // This handle both ".hex" and ".hex_stripped" the EXACT same way. Our predefined color schemes are
-    // always RRGGBB without alpha so this is fine and keeps compatibility with matugen.
+    // Replace color placeholders with all 11 matugen formats
     let script = ""
-    Object.keys(colors).forEach(colorKey => {
-                                  const colorData = colors[colorKey].default
-                                  const escapedHex = colorData.hex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-                                  const escapedHexStripped = colorData.hex_stripped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-                                  const hue = colorData.hue
-                                  const saturation = colorData.saturation
-                                  const lightness = colorData.lightness
 
-                                  // Replace hex, hex_stripped, and HSL component patterns
-                                  script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.hex}}/${escapedHex}/g' '${filePath}'\n`
-                                  script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.hex_stripped}}/${escapedHexStripped}/g' '${filePath}'\n`
-                                  script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.hue}}/${hue}/g' '${filePath}'\n`
-                                  script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.saturation}}/${saturation}/g' '${filePath}'\n`
-                                  script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.lightness}}/${lightness}/g' '${filePath}'\n`
-                                })
+    // Helper to escape strings for sed regex
+    const escapeForSed = (str) => String(str).replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&')
+
+    // Process standard MD3 colors (primary, secondary, tertiary, etc.)
+    Object.keys(colors).forEach(colorKey => {
+      // Skip custom namespace - it's processed separately
+      if (colorKey === "custom") return
+
+      const colorData = colors[colorKey].default
+
+      // All 11 matugen formats
+      const formats = [
+        "hex", "hex_stripped", "rgb", "rgba", "hsl", "hsla",
+        "red", "green", "blue", "alpha",
+        "hue", "saturation", "lightness"
+      ]
+
+      formats.forEach(format => {
+        if (colorData[format] !== undefined) {
+          const value = escapeForSed(colorData[format])
+          script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.${format}}}/${value}/g' '${filePath}'\n`
+        }
+      })
+    })
+
+    // Process custom semantic colors (e.g., {{colors.custom.pine.default.hex}})
+    if (colors.custom) {
+      Object.keys(colors.custom).forEach(colorName => {
+        const colorData = colors.custom[colorName].default
+
+        const formats = [
+          "hex", "hex_stripped", "rgb", "rgba", "hsl", "hsla",
+          "red", "green", "blue", "alpha",
+          "hue", "saturation", "lightness"
+        ]
+
+        formats.forEach(format => {
+          if (colorData[format] !== undefined) {
+            const value = escapeForSed(colorData[format])
+            script += `sed -i 's/{{colors\\.custom\\.${colorName}\\.default\\.${format}}}/${value}/g' '${filePath}'\n`
+          }
+        })
+      })
+    }
+
     return script
   }
 

@@ -704,6 +704,55 @@
         }
       }
     },
+    "power": {
+      "title": "Power",
+      "ac": {
+        "section": {
+          "label": "AC Power",
+          "description": "Idle timeouts when plugged into AC power."
+        }
+      },
+      "battery": {
+        "section": {
+          "label": "Battery",
+          "description": "Idle timeouts when running on battery power."
+        }
+      },
+      "monitor-timeout": {
+        "label": "Turn off monitors",
+        "description": "Time before turning off monitors when idle."
+      },
+      "lock-timeout": {
+        "label": "Lock screen",
+        "description": "Time before locking the screen when idle."
+      },
+      "suspend-timeout": {
+        "label": "Suspend system",
+        "description": "Time before suspending the system when idle."
+      },
+      "hibernate-timeout": {
+        "label": "Hibernate system",
+        "description": "Time before hibernating the system when idle."
+      },
+      "options": {
+        "section": {
+          "label": "Options",
+          "description": "Additional power management options."
+        }
+      },
+      "lock-before-suspend": {
+        "label": "Lock before suspend",
+        "description": "Automatically lock the screen before system suspends."
+      },
+      "respect-inhibitors": {
+        "label": "Respect idle inhibitors",
+        "description": "Honor applications that prevent idle actions (e.g., media players)."
+      },
+      "loginctl-lock": {
+        "label": "loginctl lock integration",
+        "description": "Integrate with systemd-logind for lock screen events."
+      }
+    },
     "about": {
       "title": "About",
       "noctalia": {
@@ -1007,6 +1056,22 @@
           "description": "Show a warning when battery falls below this percentage."
         }
       },
+      "app-menu": {
+        "icon-mode": {
+          "label": "Icon mode",
+          "description": "Choose what icon to display on the launcher button.",
+          "apps": "Apps icon",
+          "distro": "Distro logo",
+          "custom": "Custom icon"
+        },
+        "icon-preview": {
+          "label": "Icon preview"
+        },
+        "browse-library": "Browse icon library",
+        "browse-file": "Browse for file",
+        "select-custom-icon": "Select custom icon",
+        "reset-to-default": "Reset to default"
+      },
       "control-center": {
         "use-distro-logo": {
           "label": "Use distro logo instead of icon",
@@ -1304,6 +1369,7 @@
     "click-to-start-recording": "Click to start recording",
     "click-to-stop-recording": "Click to stop recording",
     "open-control-center": "Open control center",
+    "open-app-menu": "Open app menu",
     "volume-at": "Volume at {volume}%\nLeft click to toggle mute. Right click for settings.\nScroll to modify volume.",
     "microphone-volume-at": "Microphone volume at {volume}%\nLeft click to toggle mute. Right click for settings.\nScroll to modify volume.",
     "manage-wifi": "Manage Wi-Fi",
@@ -1786,5 +1852,34 @@
     "welcome": {
       "note": "Just a few basics to get you started - full options are in Settings"
     }
+  },
+  "category": {
+    "all": "All",
+    "development": "Development",
+    "graphics": "Graphics",
+    "media": "Media",
+    "network": "Network",
+    "productivity": "Productivity",
+    "science": "Science",
+    "settings": "Settings",
+    "system": "System",
+    "utilities": "Utilities",
+    "games": "Games",
+    "education": "Education",
+    "other": "Other"
+  },
+  "app-menu": {
+    "title": "Applications",
+    "list-view": "List view",
+    "grid-view": "Grid view"
+  },
+  "app-launcher": {
+    "search-placeholder": "Search applications..."
+  },
+  "spotlight": {
+    "title": "Spotlight",
+    "list-view": "List view",
+    "grid-view": "Grid view",
+    "keyboard-hint": "↑↓ Navigate • Enter Launch • Esc Close"
   }
 }

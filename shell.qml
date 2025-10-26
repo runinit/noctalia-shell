@@ -38,6 +38,7 @@ import qs.Modules.Launcher
 import qs.Modules.Notification
 import qs.Modules.OSD
 import qs.Modules.Settings
+import qs.Modules.Spotlight
 import qs.Modules.Toast
 import qs.Modules.Wallpaper
 import qs.Modules.SetupWizard
@@ -93,6 +94,10 @@ ShellRoot {
         BatteryService.init()
         IdleInhibitorService.init()
         PowerProfileService.init()
+        SessionService.init()
+        AppSearchService.init()
+        AppUsageHistoryData.init()
+        IdleService.init()
       }
 
       Background {}
@@ -174,6 +179,11 @@ ShellRoot {
       BatteryPanel {
         id: batteryPanel
         objectName: "batteryPanel"
+      }
+
+      SpotlightModal {
+        id: spotlightModal
+        objectName: "spotlightModal"
       }
     }
   }
