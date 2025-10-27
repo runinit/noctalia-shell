@@ -23,10 +23,10 @@ Item {
   // Grid columns (for grid mode)
   property int gridColumns: 4
 
-  // Icon size range
-  property int minIconSize: 32
-  property int maxIconSize: 64
-  property int defaultIconSize: 48
+  // Icon size range - increased for better visibility
+  property int minIconSize: 40
+  property int maxIconSize: 72
+  property int defaultIconSize: 56
 
   // Signals
   signal appLaunched(string appKey)
@@ -35,7 +35,7 @@ Item {
   // Search state
   property string searchQuery: ""
   property var searchResults: []
-  property int selectedIndex: 0
+  property int selectedIndex: -1
 
   // Focus handling
   property alias searchFieldFocus: searchField.focus
@@ -46,7 +46,7 @@ Item {
 
   function clearSearch() {
     searchQuery = ""
-    selectedIndex = 0
+    selectedIndex = -1
   }
 
   // Search function using two-stage algorithm
@@ -244,12 +244,12 @@ Item {
   // Watch for search changes
   onSearchQueryChanged: {
     performSearch(searchQuery)
-    selectedIndex = 0
+    selectedIndex = -1
   }
 
   onSelectedCategoryChanged: {
     performSearch(searchQuery)
-    selectedIndex = 0
+    selectedIndex = -1
   }
 
   Component.onCompleted: {
@@ -262,77 +262,129 @@ Item {
     anchors.fill: parent
     spacing: Style.marginM
 
-    // Search field
-    NTextInput {
-      id: searchField
+    // Search and categories in a single card for better Material 3 cohesion
+    NBox {
       Layout.fillWidth: true
-      Layout.preferredHeight: Style.baseWidgetSize
-      placeholderText: I18n.tr("app-launcher.search-placeholder")
-      text: searchQuery
+      implicitHeight: searchAndCategoriesColumn.implicitHeight + Style.marginM * 2
 
-      onTextChanged: {
-        searchQuery = text
-      }
+      ColumnLayout {
+        id: searchAndCategoriesColumn
+        anchors.fill: parent
+        anchors.margins: Style.marginM
+        spacing: Style.marginL
 
-      Keys.onPressed: (event) => {
-        if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && event.modifiers & Qt.ControlModifier)) {
-          navigateDown()
-          event.accepted = true
-        } else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && event.modifiers & Qt.ControlModifier)) {
-          navigateUp()
-          event.accepted = true
-        } else if (event.key === Qt.Key_Left || (event.key === Qt.Key_H && event.modifiers & Qt.ControlModifier)) {
-          navigateLeft()
-          event.accepted = true
-        } else if (event.key === Qt.Key_Right || (event.key === Qt.Key_L && event.modifiers & Qt.ControlModifier)) {
-          navigateRight()
-          event.accepted = true
-        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-          activateSelected()
-          event.accepted = true
-        } else if (event.key === Qt.Key_Escape) {
-          closed()
-          event.accepted = true
-        } else if (event.key === Qt.Key_Tab) {
-          if (event.modifiers & Qt.ShiftModifier) {
-            navigateUp()
-          } else {
-            navigateDown()
+        // Search field
+        NTextInput {
+          id: searchField
+          Layout.fillWidth: true
+          Layout.preferredHeight: Style.baseWidgetSize
+          placeholderText: I18n.tr("app-launcher.search-placeholder")
+          text: searchQuery
+
+          onTextChanged: {
+            searchQuery = text
           }
-          event.accepted = true
+
+          Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && event.modifiers & Qt.ControlModifier)) {
+              navigateDown()
+              event.accepted = true
+            } else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && event.modifiers & Qt.ControlModifier)) {
+              navigateUp()
+              event.accepted = true
+            } else if (event.key === Qt.Key_Left || (event.key === Qt.Key_H && event.modifiers & Qt.ControlModifier)) {
+              navigateLeft()
+              event.accepted = true
+            } else if (event.key === Qt.Key_Right || (event.key === Qt.Key_L && event.modifiers & Qt.ControlModifier)) {
+              navigateRight()
+              event.accepted = true
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+              activateSelected()
+              event.accepted = true
+            } else if (event.key === Qt.Key_Escape) {
+              closed()
+              event.accepted = true
+            } else if (event.key === Qt.Key_Tab) {
+              if (event.modifiers & Qt.ShiftModifier) {
+                navigateUp()
+              } else {
+                navigateDown()
+              }
+              event.accepted = true
+            }
+          }
+        }
+
+        // Category selector
+        Flow {
+          id: categoryFlow
+          Layout.fillWidth: true
+          visible: showCategories
+          spacing: Style.marginS
+
+          Repeater {
+            model: AppSearchService.getCategories()
+
+            Rectangle {
+              width: categoryText.implicitWidth + Style.marginM * 2
+              height: Style.baseWidgetSize * 0.7
+              radius: Style.radiusS
+
+              property bool isSelected: selectedCategory === modelData.name
+              property bool hovered: false
+
+              color: isSelected ? Color.mPrimary : (hovered ? Color.mTertiary : Color.transparent)
+
+              Behavior on color {
+                ColorAnimation {
+                  duration: Style.animationFast
+                }
+              }
+
+              NText {
+                id: categoryText
+                anchors.centerIn: parent
+                text: modelData.displayName
+                pointSize: Style.fontSizeS
+                font.weight: Style.fontWeightMedium
+                color: parent.isSelected ? Color.mOnPrimary : (parent.hovered ? Color.mOnTertiary : Color.mOnSurface)
+
+                Behavior on color {
+                  ColorAnimation {
+                    duration: Style.animationFast
+                  }
+                }
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onEntered: parent.hovered = true
+                onExited: parent.hovered = false
+                onClicked: selectedCategory = modelData.name
+              }
+            }
+          }
         }
       }
     }
 
-    // Category selector (optional)
-    Flow {
-      Layout.fillWidth: true
-      spacing: Style.marginS
-      visible: showCategories
-
-      Repeater {
-        model: AppSearchService.getCategories()
-
-        NButton {
-          text: modelData.displayName
-          baseSize: Style.baseWidgetSize * 0.8
-          backgroundColor: selectedCategory === modelData.name ? Color.mPrimary : Color.mSurfaceVariant
-          textColor: selectedCategory === modelData.name ? Color.mOnPrimary : Color.mOnSurfaceVariant
-          onClicked: selectedCategory = modelData.name
-        }
-      }
-    }
-
-    // Results area
-    Item {
+    // Results area in a card
+    NBox {
       Layout.fillWidth: true
       Layout.fillHeight: true
+
+      Item {
+        anchors.fill: parent
+        anchors.margins: Style.marginM
 
       // List view
       NListView {
         id: listView
         anchors.fill: parent
         visible: viewMode === "list"
+        clip: true
 
         model: searchResults
 
@@ -350,15 +402,41 @@ Item {
           background: Rectangle {
             color: parent.highlighted ? Color.mSecondaryContainer : (parent.hovered ? Color.mSurfaceVariant : Color.transparent)
             radius: Style.radiusM
+
+            // Material 3 selection border similar to settings panels
+            border.color: parent.highlighted ? Color.mPrimary : (parent.hovered ? Color.mTertiary : Color.transparent)
+            border.width: parent.highlighted ? Style.borderM : (parent.hovered ? Style.borderS : 0)
+
+            Behavior on color {
+              ColorAnimation {
+                duration: Style.animationFast
+              }
+            }
+
+            Behavior on border.color {
+              ColorAnimation {
+                duration: Style.animationFast
+              }
+            }
+
+            Behavior on border.width {
+              NumberAnimation {
+                duration: Style.animationFast
+              }
+            }
           }
 
           contentItem: RowLayout {
             spacing: Style.marginM
 
-            NIcon {
+            Image {
               Layout.preferredWidth: 40
               Layout.preferredHeight: 40
-              icon: modelData.icon || "application-x-executable"
+              source: "image://icon/" + (modelData.icon || "application-x-executable")
+              sourceSize.width: 40
+              sourceSize.height: 40
+              smooth: true
+              asynchronous: true
             }
 
             ColumnLayout {
@@ -390,15 +468,16 @@ Item {
         id: gridView
         anchors.fill: parent
         visible: viewMode === "grid"
+        clip: true
 
         cellWidth: width / gridColumns
-        cellHeight: cellWidth * 1.2
+        cellHeight: cellWidth * 1.05  // Tighter aspect ratio
 
         model: searchResults
 
         delegate: QQC2.ItemDelegate {
-          width: gridView.cellWidth - Style.marginS
-          height: gridView.cellHeight - Style.marginS
+          width: gridView.cellWidth - Style.marginXS  // Tighter spacing
+          height: gridView.cellHeight - Style.marginXS
 
           highlighted: index === selectedIndex
 
@@ -410,24 +489,51 @@ Item {
           background: Rectangle {
             color: parent.highlighted ? Color.mSecondaryContainer : (parent.hovered ? Color.mSurfaceVariant : Color.transparent)
             radius: Style.radiusM
+
+            // Material 3 selection border similar to settings panels
+            border.color: parent.highlighted ? Color.mPrimary : (parent.hovered ? Color.mTertiary : Color.transparent)
+            border.width: parent.highlighted ? Style.borderM : (parent.hovered ? Style.borderS : 0)
+
+            Behavior on color {
+              ColorAnimation {
+                duration: Style.animationFast
+              }
+            }
+
+            Behavior on border.color {
+              ColorAnimation {
+                duration: Style.animationFast
+              }
+            }
+
+            Behavior on border.width {
+              NumberAnimation {
+                duration: Style.animationFast
+              }
+            }
           }
 
           contentItem: ColumnLayout {
             anchors.centerIn: parent
-            spacing: Style.marginS
+            spacing: Style.marginXS  // Tighter spacing
 
-            NIcon {
+            Image {
               Layout.alignment: Qt.AlignHCenter
               Layout.preferredWidth: defaultIconSize
               Layout.preferredHeight: defaultIconSize
-              icon: modelData.icon || "application-x-executable"
+              source: "image://icon/" + (modelData.icon || "application-x-executable")
+              sourceSize.width: defaultIconSize
+              sourceSize.height: defaultIconSize
+              smooth: true
+              asynchronous: true
             }
 
             NText {
               Layout.alignment: Qt.AlignHCenter
-              Layout.preferredWidth: parent.width - Style.marginM * 2
+              Layout.preferredWidth: parent.width - Style.marginS * 2
               text: modelData.name || "Unknown"
-              font.pixelSize: Style.fontSizeS
+              font.pixelSize: Style.fontSizeL  // Larger text for better readability
+              font.weight: Style.fontWeightMedium
               color: Color.mOnSurface
               elide: Text.ElideRight
               horizontalAlignment: Text.AlignHCenter
@@ -436,6 +542,7 @@ Item {
             }
           }
         }
+      }
       }
     }
   }

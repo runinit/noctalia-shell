@@ -26,12 +26,18 @@ NPanel {
       AppSearchService.refresh()
     }
     // Focus search field
-    Qt.callLater(() => appLauncher.focusSearch())
+    Qt.callLater(() => {
+      if (appLauncher) {
+        appLauncher.focusSearch()
+      }
+    })
   }
 
   onClosed: {
     // Clear search when closing
-    appLauncher.clearSearch()
+    if (appLauncher) {
+      appLauncher.clearSearch()
+    }
   }
 
   panelContent: Item {

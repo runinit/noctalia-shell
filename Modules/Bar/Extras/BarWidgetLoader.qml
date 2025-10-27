@@ -60,7 +60,7 @@ Item {
         item.onLoaded()
       }
 
-      //Logger.i("BarWidgetLoader", "Loaded", widgetId, "on screen", item.screen.name)
+      Logger.i("BarWidgetLoader", "Loaded", widgetId, "on screen", item.screen ? item.screen.name : "no-screen")
     }
 
     Component.onDestruction: {
