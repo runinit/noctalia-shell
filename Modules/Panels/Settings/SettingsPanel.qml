@@ -136,11 +136,10 @@ SmartPanel {
     id: lockScreenTab
     LockScreenTab {}
   }
-  // PowerTab disabled - has syntax errors
-  // Component {
-  //   id: powerTab
-  //   PowerTab {}
-  // }
+  Component {
+    id: powerTab
+    PowerTab {}
+  }
 
   // Order *DOES* matter
   function updateTabsModel() {
@@ -204,15 +203,12 @@ SmartPanel {
                      "label": "settings.network.title",
                      "icon": "settings-network",
                      "source": networkTab
-                   },
-                  // PowerTab disabled
-                  // {
-                  //   "id": SettingsPanel.Tab.Power,
-                  //   "label": "settings.power.title",
-                  //   "icon": "battery-charging",
-                  //   "source": powerTab
-                  // },
-                  {
+                   }, {
+                     "id": SettingsPanel.Tab.Power,
+                     "label": "settings.power.title",
+                     "icon": "battery-charging",
+                     "source": powerTab
+                   }, {
                      "id": SettingsPanel.Tab.Location,
                      "label": "settings.location.title",
                      "icon": "settings-location",
