@@ -376,6 +376,10 @@ SmartPanel {
       try {
         var screenName = targetScreen.name
         wallpapersList = WallpaperService.getWallpapersList(screenName)
+        Logger.i("WallpaperPanel", "Got", wallpapersList.length, "wallpapers for screen", screenName)
+        if (wallpapersList.length > 0) {
+          Logger.d("WallpaperPanel", "First 5 wallpapers:", wallpapersList.slice(0, 5))
+        }
       } catch (e) {
         Logger.warn("WallpaperPanel", "Dangling screen object in refreshWallpaperScreenData")
         return
