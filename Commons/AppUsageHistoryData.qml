@@ -5,7 +5,7 @@ import Quickshell.Io
 import qs.Commons
 import qs.Services
 
-Singleton {
+Item {
   id: root
 
   // Usage data structure:
@@ -144,11 +144,16 @@ Singleton {
   function getMostUsedApps(limit = 10) {
     if (!usageAdapter.history) return []
 
-    const apps = Object.keys(usageAdapter.history).map(key => ({
-      appKey: key,
-      ...usageAdapter.history[key],
-      score: getUsageScore(key)
-    }))
+    const apps = Object.keys(usageAdapter.history).map(key => {
+      const data = usageAdapter.history[key]
+      return {
+        appKey: key,
+        count: data.count,
+        lastLaunch: data.lastLaunch,
+        launches: data.launches,
+        score: getUsageScore(key)
+      }
+    })
 
     apps.sort((a, b) => b.score - a.score)
     return apps.slice(0, limit).map(app => app.appKey)
@@ -158,10 +163,15 @@ Singleton {
   function getRecentlyUsedApps(limit = 10) {
     if (!usageAdapter.history) return []
 
-    const apps = Object.keys(usageAdapter.history).map(key => ({
-      appKey: key,
-      ...usageAdapter.history[key]
-    }))
+    const apps = Object.keys(usageAdapter.history).map(key => {
+      const data = usageAdapter.history[key]
+      return {
+        appKey: key,
+        count: data.count,
+        lastLaunch: data.lastLaunch,
+        launches: data.launches
+      }
+    })
 
     apps.sort((a, b) => b.lastLaunch - a.lastLaunch)
     return apps.slice(0, limit).map(app => app.appKey)

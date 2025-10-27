@@ -18,6 +18,8 @@ Item {
   property bool forceClose: false
   property bool oppositeDirection: false
   property bool hovered: false
+  property bool compact: false
+  property bool rightOpen: false
 
   readonly property string barPosition: Settings.data.bar.position
   readonly property bool isVerticalBar: barPosition === "left" || barPosition === "right"

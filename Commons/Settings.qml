@@ -150,6 +150,8 @@ Singleton {
       property JsonObject widgets
       widgets: JsonObject {
         property list<var> left: [{
+            "id": "AppMenu"
+          }, {
             "id": "SystemMonitor"
           }, {
             "id": "ActiveWindow"
