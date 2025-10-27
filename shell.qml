@@ -181,10 +181,11 @@ ShellRoot {
         objectName: "batteryPanel"
       }
 
-      SpotlightModal {
-        id: spotlightModal
-        objectName: "spotlightModal"
-      }
+      // SpotlightModal disabled - has property errors
+      // SpotlightModal {
+      //   id: spotlightModal
+      //   objectName: "spotlightModal"
+      // }
     }
   }
 

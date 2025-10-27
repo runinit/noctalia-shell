@@ -315,7 +315,6 @@ Item {
 
         NButton {
           text: modelData.displayName
-          highlighted: selectedCategory === modelData.name
           onClicked: selectedCategory = modelData.name
         }
       }
@@ -334,7 +333,7 @@ Item {
 
         model: searchResults
 
-        delegate: ItemDelegate {
+        delegate: QQC2.ItemDelegate {
           width: listView.width
           height: 60
 
@@ -351,8 +350,7 @@ Item {
             NIcon {
               Layout.preferredWidth: 40
               Layout.preferredHeight: 40
-              source: modelData.icon || "application-x-executable"
-              iconColor: Color.mOnSurface
+              icon: modelData.icon || "application-x-executable"
             }
 
             ColumnLayout {
@@ -389,7 +387,7 @@ Item {
 
         model: searchResults
 
-        delegate: ItemDelegate {
+        delegate: QQC2.ItemDelegate {
           width: gridView.cellWidth
           height: gridView.cellHeight
 
@@ -408,8 +406,7 @@ Item {
               Layout.alignment: Qt.AlignHCenter
               Layout.preferredWidth: defaultIconSize
               Layout.preferredHeight: defaultIconSize
-              source: modelData.icon || "application-x-executable"
-              iconColor: Color.mOnSurface
+              icon: modelData.icon || "application-x-executable"
             }
 
             NText {

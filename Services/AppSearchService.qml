@@ -34,7 +34,6 @@ Singleton {
   property var categorizedApps: ({})
 
   signal applicationsLoaded()
-  signal applicationsChanged()
 
   function init() {
     Logger.d("AppSearchService", "Service started")
@@ -94,13 +93,25 @@ Singleton {
       }
     }
 
-    return {
-      ...app,
+    // Manually construct enriched app object (QML doesn't support spread operator)
+    const enriched = {
+      id: app.id,
+      name: app.name,
+      comment: app.comment,
+      genericName: app.genericName,
+      icon: app.icon,
+      command: app.command,
+      exec: app.exec,
+      categories: app.categories,
+      noDisplay: app.noDisplay,
+      runInTerminal: app.runInTerminal,
+      execute: app.execute,
       executableName: executableName,
       primaryCategory: primaryCategory,
       categoryName: categoryMap[primaryCategory] || I18n.tr("category.other"),
       searchableText: `${app.name} ${app.comment || ''} ${app.genericName || ''} ${executableName}`.toLowerCase()
     }
+    return enriched
   }
 
   // Organize apps by category

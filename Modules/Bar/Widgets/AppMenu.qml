@@ -108,9 +108,10 @@ NIconButton {
         const panelComponent = Qt.createComponent("../AppMenu/AppMenuPopout.qml")
         if (panelComponent.status === Component.Ready) {
           const panel = panelComponent.createObject(root, {
-            screen: root.screen
+            screen: root.screen,
+            objectName: "appMenuPanel"
           })
-          PanelService.registerPanel("appMenuPanel", panel)
+          PanelService.registerPanel(panel)
           Logger.d("AppMenu", "Registered appMenuPanel")
         } else {
           Logger.e("AppMenu", "Failed to create AppMenuPopout:", panelComponent.errorString())

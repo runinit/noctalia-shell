@@ -14,7 +14,7 @@ Singleton {
   readonly property alias data: adapter
   property bool isLoaded: false
   property bool directoriesCreated: false
-  property int settingsVersion: 20
+  property int settingsVersion: 16
   property bool isDebug: Quickshell.env("NOCTALIA_DEBUG") === "1"
 
   // Define our app directories
@@ -54,9 +54,8 @@ Singleton {
     // This should only be activated once when the settings structure has changed
     // Then it should be commented out again, regular users don't need to generate
     // default settings on every start
-    if (isDebug) {
-      generateDefaultSettings()
-    }
+    // TODO: automate this someday!
+    // generateDefaultSettings()
 
     // Patch-in the local default, resolved to user's home
     adapter.general.avatarImage = defaultAvatar
@@ -147,17 +146,11 @@ Singleton {
       property real marginVertical: 0.25
       property real marginHorizontal: 0.25
 
-      // Bar outer corners (inverted/concave corners at bar edges when not floating)
-      property bool outerCorners: true
-
-      // Reserves space with compositor
-      property bool exclusive: true
-
       // Widget configuration for modular bar system
       property JsonObject widgets
       widgets: JsonObject {
         property list<var> left: [{
-            "id": "ControlCenter"
+            "id": "AppMenu"
           }, {
             "id": "SystemMonitor"
           }, {
@@ -182,6 +175,8 @@ Singleton {
             "id": "Brightness"
           }, {
             "id": "Clock"
+          }, {
+            "id": "ControlCenter"
           }]
       }
     }
@@ -199,23 +194,8 @@ Singleton {
       property bool animationDisabled: false
       property bool compactLockScreen: false
       property bool lockOnSuspend: true
-      property bool enableShadows: true
-      property string shadowDirection: "bottom_right"
-      property int shadowOffsetX: 2
-      property int shadowOffsetY: 3
       property string language: ""
       property bool debugMode: false
-    }
-
-    // ui
-    property JsonObject ui: JsonObject {
-      property string fontDefault: "Roboto"
-      property string fontFixed: "DejaVu Sans Mono"
-      property real fontDefaultScale: 1.0
-      property real fontFixedScale: 1.0
-      property bool tooltipsEnabled: true
-      property bool panelsAttachedToBar: true
-      property bool settingsPanelAttachToBar: false
     }
 
     // location
@@ -226,9 +206,6 @@ Singleton {
       property bool use12hourFormat: false
       property bool showWeekNumberInCalendar: false
       property bool showCalendarEvents: true
-      property bool showCalendarWeather: true
-      property bool analogClockInCalendar: false
-      property int firstDayOfWeek: -1 // -1 = auto (use locale), 0 = Sunday, 1 = Monday, 6 = Saturday
     }
 
     // screen recorder
@@ -247,10 +224,8 @@ Singleton {
     // wallpaper
     property JsonObject wallpaper: JsonObject {
       property bool enabled: true
-      property bool overviewEnabled: false
       property string directory: ""
       property bool enableMultiMonitorDirectories: false
-      property bool recursiveSearch: false
       property bool setWallpaperOnAllMonitors: true
       property string defaultWallpaper: ""
       property string fillMode: "crop"
@@ -261,7 +236,6 @@ Singleton {
       property string transitionType: "random"
       property real transitionEdgeSmoothness: 0.05
       property list<var> monitors: []
-      property string panelPosition: "follow_bar"
     }
 
     // applauncher
@@ -274,8 +248,6 @@ Singleton {
       property bool useApp2Unit: false
       property bool sortByMostUsed: true
       property string terminalCommand: "xterm -e"
-      property bool customLaunchPrefixEnabled: false
-      property string customLaunchPrefix: ""
     }
 
     // control center
@@ -323,7 +295,6 @@ Singleton {
 
     // dock
     property JsonObject dock: JsonObject {
-      property bool enabled: true
       property string displayMode: "always_visible" // "always_visible", "auto_hide", "exclusive"
       property real backgroundOpacity: 1.0
       property real floatingRatio: 1.0
@@ -342,12 +313,10 @@ Singleton {
 
     // notifications
     property JsonObject notifications: JsonObject {
-      property bool enabled: true
       property bool doNotDisturb: false
       property list<string> monitors: []
       property string location: "top_right"
       property bool overlayLayer: true
-      property real backgroundOpacity: 1.0
       property bool respectExpireTimeout: false
       property int lowUrgencyDuration: 3
       property int normalUrgencyDuration: 8
@@ -373,11 +342,19 @@ Singleton {
       property string preferredPlayer: ""
     }
 
+    // ui
+    property JsonObject ui: JsonObject {
+      property string fontDefault: "Roboto"
+      property string fontFixed: "DejaVu Sans Mono"
+      property real fontDefaultScale: 1.0
+      property real fontFixedScale: 1.0
+      property bool tooltipsEnabled: true
+      property bool panelsOverlayLayer: true
+    }
+
     // brightness
     property JsonObject brightness: JsonObject {
       property int brightnessStep: 5
-      property bool enforceMinimum: true
-      property bool enableDdcSupport: false
     }
 
     property JsonObject colorSchemes: JsonObject {
@@ -396,11 +373,9 @@ Singleton {
       property bool gtk: false
       property bool qt: false
       property bool kcolorscheme: false
-      property bool alacritty: false
       property bool kitty: false
       property bool ghostty: false
       property bool foot: false
-      property bool wezterm: false
       property bool fuzzel: false
       property bool discord: false
       property bool discord_vesktop: false
@@ -411,8 +386,6 @@ Singleton {
       property bool discord_dorion: false
       property bool pywalfox: false
       property bool vicinae: false
-      property bool walker: false
-      property bool code: false
       property bool enableUserTemplates: false
     }
 

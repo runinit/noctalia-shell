@@ -69,12 +69,12 @@ NPanel {
             icon: "view-list"
             tooltipText: I18n.tr("app-menu.list-view")
             baseSize: Style.baseWidgetSize * 0.8
-            highlighted: viewMode === "list"
             onClicked: {
               viewMode = "list"
-              if (Settings.data.appMenu) {
-                Settings.data.appMenu.viewMode = "list"
+              if (!Settings.data.appMenu) {
+                Settings.data.appMenu = {}
               }
+              Settings.data.appMenu.viewMode = "list"
             }
           }
 
@@ -82,12 +82,12 @@ NPanel {
             icon: "view-grid"
             tooltipText: I18n.tr("app-menu.grid-view")
             baseSize: Style.baseWidgetSize * 0.8
-            highlighted: viewMode === "grid"
             onClicked: {
               viewMode = "grid"
-              if (Settings.data.appMenu) {
-                Settings.data.appMenu.viewMode = "grid"
+              if (!Settings.data.appMenu) {
+                Settings.data.appMenu = {}
               }
+              Settings.data.appMenu.viewMode = "grid"
             }
           }
         }
