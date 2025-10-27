@@ -13,6 +13,10 @@ Item {
   property bool showMinimumSignal: false
   property real minimumSignalValue: 0.05 // Default to 5% of height
 
+  // Minimum signal properties
+  property bool showMinimumSignal: false
+  property real minimumSignalValue: 0.05 // Default to 5% of height
+
   // Pre-compute mirroring
   readonly property int valuesCount: values.length
   readonly property int totalBars: valuesCount * 2
