@@ -42,6 +42,21 @@ Singleton {
   property color mOutline: customColors.mOutline
   property color mShadow: customColors.mShadow
 
+  // --- Container Colors: Provide more subdued backgrounds for components
+  property color mPrimaryContainer: customColors.mPrimaryContainer
+  property color mOnPrimaryContainer: customColors.mOnPrimaryContainer
+  property color mSecondaryContainer: customColors.mSecondaryContainer
+  property color mOnSecondaryContainer: customColors.mOnSecondaryContainer
+  property color mTertiaryContainer: customColors.mTertiaryContainer
+  property color mOnTertiaryContainer: customColors.mOnTertiaryContainer
+
+  // --- Surface Container Colors: Progressive elevation levels
+  property color mSurfaceContainerLowest: customColors.mSurfaceContainerLowest
+  property color mSurfaceContainerLow: customColors.mSurfaceContainerLow
+  property color mSurfaceContainer: customColors.mSurfaceContainer
+  property color mSurfaceContainerHigh: customColors.mSurfaceContainerHigh
+  property color mSurfaceContainerHighest: customColors.mSurfaceContainerHighest
+
   property color transparent: "transparent"
 
   // --------------------------------
@@ -69,6 +84,23 @@ Singleton {
 
     property color mOutline: "#342c42"
     property color mShadow: "#120f18"
+
+    // Container colors
+    property color mPrimaryContainer: "#2d2539"
+    property color mOnPrimaryContainer: "#e5d5f0"
+
+    property color mSecondaryContainer: "#2b2337"
+    property color mOnSecondaryContainer: "#ded9e8"
+
+    property color mTertiaryContainer: "#2e2330"
+    property color mOnTertiaryContainer: "#f0dbe5"
+
+    // Surface containers
+    property color mSurfaceContainerLowest: "#16131d"
+    property color mSurfaceContainerLow: "#1a1620"
+    property color mSurfaceContainer: "#201c28"
+    property color mSurfaceContainerHigh: "#2b2635"
+    property color mSurfaceContainerHighest: "#362f42"
   }
 
   // ----------------------------------------------------------------
@@ -97,6 +129,23 @@ Singleton {
 
     property color mOutline: customColorsData.mOutline
     property color mShadow: customColorsData.mShadow
+
+    // Container colors
+    property color mPrimaryContainer: customColorsData.mPrimaryContainer
+    property color mOnPrimaryContainer: customColorsData.mOnPrimaryContainer
+
+    property color mSecondaryContainer: customColorsData.mSecondaryContainer
+    property color mOnSecondaryContainer: customColorsData.mOnSecondaryContainer
+
+    property color mTertiaryContainer: customColorsData.mTertiaryContainer
+    property color mOnTertiaryContainer: customColorsData.mOnTertiaryContainer
+
+    // Surface containers
+    property color mSurfaceContainerLowest: customColorsData.mSurfaceContainerLowest
+    property color mSurfaceContainerLow: customColorsData.mSurfaceContainerLow
+    property color mSurfaceContainer: customColorsData.mSurfaceContainer
+    property color mSurfaceContainerHigh: customColorsData.mSurfaceContainerHigh
+    property color mSurfaceContainerHighest: customColorsData.mSurfaceContainerHighest
   }
 
   // FileView to load custom colors data from colors.json
@@ -149,6 +198,23 @@ Singleton {
 
       property color mOutline: defaultColors.mOutline
       property color mShadow: defaultColors.mShadow
+
+      // Container colors
+      property color mPrimaryContainer: defaultColors.mPrimaryContainer
+      property color mOnPrimaryContainer: defaultColors.mOnPrimaryContainer
+
+      property color mSecondaryContainer: defaultColors.mSecondaryContainer
+      property color mOnSecondaryContainer: defaultColors.mOnSecondaryContainer
+
+      property color mTertiaryContainer: defaultColors.mTertiaryContainer
+      property color mOnTertiaryContainer: defaultColors.mOnTertiaryContainer
+
+      // Surface containers
+      property color mSurfaceContainerLowest: defaultColors.mSurfaceContainerLowest
+      property color mSurfaceContainerLow: defaultColors.mSurfaceContainerLow
+      property color mSurfaceContainer: defaultColors.mSurfaceContainer
+      property color mSurfaceContainerHigh: defaultColors.mSurfaceContainerHigh
+      property color mSurfaceContainerHighest: defaultColors.mSurfaceContainerHighest
     }
   }
 }
