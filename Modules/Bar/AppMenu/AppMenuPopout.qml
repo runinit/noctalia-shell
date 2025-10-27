@@ -34,12 +34,12 @@ NPanel {
     appLauncher.clearSearch()
   }
 
-  panelContent: Rectangle {
-    color: Color.transparent
-
+  panelContent: Item {
     ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Style.marginL
+      x: Style.marginL
+      y: Style.marginL
+      width: parent.width - (Style.marginL * 2)
+      height: parent.height - (Style.marginL * 2)
       spacing: Style.marginM
 
       // Header

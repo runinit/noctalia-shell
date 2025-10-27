@@ -305,7 +305,7 @@ Item {
     }
 
     // Category selector (optional)
-    Row {
+    Flow {
       Layout.fillWidth: true
       spacing: Style.marginS
       visible: showCategories
@@ -315,6 +315,9 @@ Item {
 
         NButton {
           text: modelData.displayName
+          baseSize: Style.baseWidgetSize * 0.8
+          backgroundColor: selectedCategory === modelData.name ? Color.mPrimary : Color.mSurfaceVariant
+          textColor: selectedCategory === modelData.name ? Color.mOnPrimary : Color.mOnSurfaceVariant
           onClicked: selectedCategory = modelData.name
         }
       }
@@ -344,6 +347,11 @@ Item {
             launchApp(modelData)
           }
 
+          background: Rectangle {
+            color: parent.highlighted ? Color.mSecondaryContainer : (parent.hovered ? Color.mSurfaceVariant : Color.transparent)
+            radius: Style.radiusM
+          }
+
           contentItem: RowLayout {
             spacing: Style.marginM
 
@@ -361,6 +369,7 @@ Item {
                 Layout.fillWidth: true
                 text: modelData.name || "Unknown"
                 font.weight: Font.Medium
+                color: Color.mOnSurface
                 elide: Text.ElideRight
               }
 
@@ -388,14 +397,19 @@ Item {
         model: searchResults
 
         delegate: QQC2.ItemDelegate {
-          width: gridView.cellWidth
-          height: gridView.cellHeight
+          width: gridView.cellWidth - Style.marginS
+          height: gridView.cellHeight - Style.marginS
 
           highlighted: index === selectedIndex
 
           onClicked: {
             selectedIndex = index
             launchApp(modelData)
+          }
+
+          background: Rectangle {
+            color: parent.highlighted ? Color.mSecondaryContainer : (parent.hovered ? Color.mSurfaceVariant : Color.transparent)
+            radius: Style.radiusM
           }
 
           contentItem: ColumnLayout {
@@ -414,6 +428,7 @@ Item {
               Layout.preferredWidth: parent.width - Style.marginM * 2
               text: modelData.name || "Unknown"
               font.pixelSize: Style.fontSizeS
+              color: Color.mOnSurface
               elide: Text.ElideRight
               horizontalAlignment: Text.AlignHCenter
               wrapMode: Text.WordWrap
