@@ -12,6 +12,7 @@ Singleton {
   property var widgets: ({
                            "ActiveWindow": activeWindowComponent,
                            "AppMenu": appMenuComponent,
+                           "AudioVisualizer": audioVisualizerComponent,
                            "Battery": batteryComponent,
                            "Bluetooth": bluetoothComponent,
                            "Brightness": brightnessComponent,
@@ -56,6 +57,10 @@ Singleton {
                                     "iconMode": "apps",
                                     "icon": "apps",
                                     "customIconPath": ""
+                                  },
+                                  "AudioVisualizer": {
+                                    "allowUserSettings": true,
+                                    "width": 200
                                   },
                                   "Battery": {
                                     "allowUserSettings": true,
@@ -174,6 +179,9 @@ Singleton {
   }
   property Component appMenuComponent: Component {
     AppMenu {}
+  }
+  property Component audioVisualizerComponent: Component {
+    AudioVisualizer {}
   }
   property Component batteryComponent: Component {
     Battery {}
