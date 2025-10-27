@@ -18,6 +18,16 @@ Singleton {
                                           "kitty": "~/.config/kitty/themes/noctalia.conf"
                                         })
 
+  // State for sequential template processing to avoid ARG_MAX limits
+  property var templateProcessingState: ({
+                                           active: false,
+                                           templateNames: [],
+                                           currentIndex: 0,
+                                           colors: null,
+                                           mode: "",
+                                           processNext: null
+                                         })
+
   readonly property var schemeNameMap: ({
                                           "Noctalia (default)": "Noctalia-default",
                                           "Noctalia (legacy)": "Noctalia-legacy",
@@ -330,18 +340,45 @@ Singleton {
       }
     }
 
-    const script = processAllTemplates(matugenColors, mode)
+    // Process templates one at a time to avoid ARG_MAX limits
+    templateProcessingState.active = true
+    templateProcessingState.templateNames = Object.keys(predefinedTemplateConfigs).filter(name => Settings.data.templates[name])
+    templateProcessingState.currentIndex = 0
+    templateProcessingState.colors = matugenColors
+    templateProcessingState.mode = mode
 
-    if (Settings.data.general.debugMode) {
-      Logger.d("AppThemeService", "Generated script length:", script.length, "chars")
+    templateProcessingState.processNext = function() {
+      if (templateProcessingState.currentIndex >= templateProcessingState.templateNames.length) {
+        // All templates processed, now process user templates
+        templateProcessingState.active = false
+        const userScript = processUserTemplates(templateProcessingState.colors, templateProcessingState.mode)
+        if (userScript && userScript.trim().length > 0) {
+          generateProcess.command = ["bash", "-lc", userScript]
+          generateProcess.running = true
+        }
+        return
+      }
+
+      const appName = templateProcessingState.templateNames[templateProcessingState.currentIndex]
+      const script = processTemplate(appName, templateProcessingState.colors, templateProcessingState.mode, Quickshell.env("HOME"))
+
+      if (Settings.data.general.debugMode) {
+        Logger.d("AppThemeService", `Processing template ${templateProcessingState.currentIndex + 1}/${templateProcessingState.templateNames.length}: ${appName}`)
+      }
+
+      templateProcessingState.currentIndex++
+
+      if (script && script.trim().length > 0) {
+        generateProcess.command = ["bash", "-lc", script]
+        generateProcess.running = true
+      } else {
+        // Skip to next template
+        Qt.callLater(templateProcessingState.processNext)
+      }
     }
 
-    if (script.trim().length > 0) {
-      generateProcess.command = ["bash", "-lc", script]
-      generateProcess.running = true
-    } else {
-      Logger.warn("AppThemeService", "No templates to process (empty script)")
-    }
+    // Start processing
+    templateProcessingState.processNext()
   }
 
   // Helper function to convert hex to HSL
@@ -552,6 +589,11 @@ Singleton {
     // Process user templates from ~/.config/matugen/config.toml
     script += processUserTemplates(colors, mode)
 
+    if (!script || script.trim().length === 0) {
+      return ""
+    }
+
+    // Return script directly - no chunking needed as we'll handle it at execution time
     return script
   }
 
@@ -635,21 +677,36 @@ Singleton {
 
     if (Object.keys(replacements).length === 0) return ""
 
-    // Use Python for replacement to avoid command line limits
-    // Pass JSON via stdin to avoid ARG_MAX issues
+    // Write JSON to temp file in chunks to avoid ARG_MAX limits
+    const tmpJson = `/tmp/noctalia-colors-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.json`
     const jsonData = JSON.stringify(replacements)
-    const jsonBase64 = Qt.btoa(jsonData)
 
-    return `echo '${jsonBase64}' | base64 -d | python3 -c "
-import sys, json
-replacements = json.load(sys.stdin)
+    // Split JSON into safe chunks (4KB per printf to stay well under ARG_MAX)
+    const chunkSize = 4000
+    let script = ""
+
+    for (let i = 0; i < jsonData.length; i += chunkSize) {
+      const chunk = jsonData.substring(i, Math.min(i + chunkSize, jsonData.length))
+      // Escape single quotes for safe shell embedding
+      const chunkEscaped = chunk.replace(/'/g, "'\\''")
+      const redirectOp = i === 0 ? ">" : ">>"
+      script += `printf '%s' '${chunkEscaped}' ${redirectOp} ${tmpJson}\n`
+    }
+
+    script += `python3 -c "
+import json
+with open('${tmpJson}', 'r') as f:
+    replacements = json.load(f)
 with open('${filePath}', 'r') as f:
     content = f.read()
 for pattern, replacement in replacements.items():
     content = content.replace(pattern, replacement)
 with open('${filePath}', 'w') as f:
     f.write(content)
-"\n`
+"
+rm -f ${tmpJson}
+`
+    return script
   }
 
   // --------------------------------------------------------------------------------
@@ -840,6 +897,11 @@ fi
         Logger.error("AppThemeService", "GenerateProcess exited with code:", code)
       } else if (Settings.data.general.debugMode) {
         Logger.d("AppThemeService", "Template generation completed successfully")
+      }
+
+      // Continue processing next template if in sequential mode
+      if (templateProcessingState.active) {
+        Qt.callLater(templateProcessingState.processNext)
       }
     }
   }
