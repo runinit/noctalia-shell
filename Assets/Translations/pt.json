@@ -607,6 +607,55 @@
         "label": "Ativar Bluetooth"
       }
     },
+    "power": {
+      "title": "Gerenciamento de energia",
+      "ac": {
+        "section": {
+          "label": "Energia CA",
+          "description": "Configurações de gerenciamento de energia quando conectado à tomada."
+        }
+      },
+      "battery": {
+        "section": {
+          "label": "Bateria",
+          "description": "Configurações de gerenciamento de energia quando funcionando com bateria."
+        }
+      },
+      "options": {
+        "section": {
+          "label": "Opções",
+          "description": "Opções adicionais de gerenciamento de energia."
+        }
+      },
+      "monitor-timeout": {
+        "label": "Desligar monitor",
+        "description": "Tempo antes de desligar a tela quando inativo."
+      },
+      "lock-timeout": {
+        "label": "Bloquear tela",
+        "description": "Tempo antes de bloquear a tela quando inativo."
+      },
+      "suspend-timeout": {
+        "label": "Suspender",
+        "description": "Tempo antes de suspender o sistema quando inativo."
+      },
+      "hibernate-timeout": {
+        "label": "Hibernar",
+        "description": "Tempo antes de hibernar o sistema quando inativo."
+      },
+      "lock-before-suspend": {
+        "label": "Bloquear antes de suspender",
+        "description": "Bloquear automaticamente a tela antes de suspender ou hibernar."
+      },
+      "respect-inhibitors": {
+        "label": "Respeitar inibidores",
+        "description": "Respeitar inibidores de inatividade de aplicativos (por exemplo, players de vídeo, apresentações)."
+      },
+      "loginctl-lock": {
+        "label": "Integração loginctl lock",
+        "description": "Integrar com eventos de bloqueio do systemd-logind."
+      }
+    },
     "screen-recorder": {
       "title": "Gravador de tela",
       "general": {

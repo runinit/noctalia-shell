@@ -645,6 +645,55 @@
         "label": "Enable Bluetooth"
       }
     },
+    "power": {
+      "title": "Power Management",
+      "ac": {
+        "section": {
+          "label": "AC Power",
+          "description": "Power management settings when plugged into AC power."
+        }
+      },
+      "battery": {
+        "section": {
+          "label": "Battery Power",
+          "description": "Power management settings when running on battery."
+        }
+      },
+      "options": {
+        "section": {
+          "label": "Options",
+          "description": "Additional power management options."
+        }
+      },
+      "monitor-timeout": {
+        "label": "Turn off monitor",
+        "description": "Time before turning off the display when idle."
+      },
+      "lock-timeout": {
+        "label": "Lock screen",
+        "description": "Time before locking the screen when idle."
+      },
+      "suspend-timeout": {
+        "label": "Suspend",
+        "description": "Time before suspending the system when idle."
+      },
+      "hibernate-timeout": {
+        "label": "Hibernate",
+        "description": "Time before hibernating the system when idle."
+      },
+      "lock-before-suspend": {
+        "label": "Lock before suspend",
+        "description": "Automatically lock the screen before suspending or hibernating."
+      },
+      "respect-inhibitors": {
+        "label": "Respect inhibitors",
+        "description": "Honor idle inhibitors from applications (e.g., video players, presentations)."
+      },
+      "loginctl-lock": {
+        "label": "Loginctl lock integration",
+        "description": "Integrate with systemd-logind lock events."
+      }
+    },
     "screen-recorder": {
       "title": "Screen recorder",
       "general": {

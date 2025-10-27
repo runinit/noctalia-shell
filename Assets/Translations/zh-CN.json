@@ -645,6 +645,55 @@
         "label": "启用蓝牙"
       }
     },
+    "power": {
+      "title": "电源管理",
+      "ac": {
+        "section": {
+          "label": "交流电源",
+          "description": "插入交流电源时的电源管理设置。"
+        }
+      },
+      "battery": {
+        "section": {
+          "label": "电池电源",
+          "description": "使用电池供电时的电源管理设置。"
+        }
+      },
+      "options": {
+        "section": {
+          "label": "选项",
+          "description": "其他电源管理选项。"
+        }
+      },
+      "monitor-timeout": {
+        "label": "关闭显示器",
+        "description": "空闲时关闭显示器之前的时间。"
+      },
+      "lock-timeout": {
+        "label": "锁定屏幕",
+        "description": "空闲时锁定屏幕之前的时间。"
+      },
+      "suspend-timeout": {
+        "label": "挂起",
+        "description": "空闲时挂起系统之前的时间。"
+      },
+      "hibernate-timeout": {
+        "label": "休眠",
+        "description": "空闲时休眠系统之前的时间。"
+      },
+      "lock-before-suspend": {
+        "label": "挂起前锁定",
+        "description": "在挂起或休眠之前自动锁定屏幕。"
+      },
+      "respect-inhibitors": {
+        "label": "遵守抑制器",
+        "description": "遵守应用程序的空闲抑制器（例如视频播放器、演示文稿）。"
+      },
+      "loginctl-lock": {
+        "label": "Loginctl 锁定集成",
+        "description": "与 systemd-logind 锁定事件集成。"
+      }
+    },
     "screen-recorder": {
       "title": "屏幕录制",
       "general": {

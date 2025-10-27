@@ -645,6 +645,55 @@
         "label": "Activar Bluetooth"
       }
     },
+    "power": {
+      "title": "Gestión de energía",
+      "ac": {
+        "section": {
+          "label": "Corriente alterna",
+          "description": "Configuración de gestión de energía cuando está conectado a la corriente."
+        }
+      },
+      "battery": {
+        "section": {
+          "label": "Batería",
+          "description": "Configuración de gestión de energía cuando funciona con batería."
+        }
+      },
+      "options": {
+        "section": {
+          "label": "Opciones",
+          "description": "Opciones adicionales de gestión de energía."
+        }
+      },
+      "monitor-timeout": {
+        "label": "Apagar monitor",
+        "description": "Tiempo antes de apagar la pantalla cuando está inactivo."
+      },
+      "lock-timeout": {
+        "label": "Bloquear pantalla",
+        "description": "Tiempo antes de bloquear la pantalla cuando está inactivo."
+      },
+      "suspend-timeout": {
+        "label": "Suspender",
+        "description": "Tiempo antes de suspender el sistema cuando está inactivo."
+      },
+      "hibernate-timeout": {
+        "label": "Hibernar",
+        "description": "Tiempo antes de hibernar el sistema cuando está inactivo."
+      },
+      "lock-before-suspend": {
+        "label": "Bloquear antes de suspender",
+        "description": "Bloquear automáticamente la pantalla antes de suspender o hibernar."
+      },
+      "respect-inhibitors": {
+        "label": "Respetar inhibidores",
+        "description": "Respetar los inhibidores de inactividad de las aplicaciones (p. ej., reproductores de video, presentaciones)."
+      },
+      "loginctl-lock": {
+        "label": "Integración de loginctl lock",
+        "description": "Integrar con eventos de bloqueo de systemd-logind."
+      }
+    },
     "screen-recorder": {
       "title": "Grabadora de pantalla",
       "general": {

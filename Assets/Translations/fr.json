@@ -645,6 +645,55 @@
         "label": "Activer le Bluetooth"
       }
     },
+    "power": {
+      "title": "Gestion de l'énergie",
+      "ac": {
+        "section": {
+          "label": "Alimentation secteur",
+          "description": "Paramètres de gestion de l'énergie lorsque branché sur secteur."
+        }
+      },
+      "battery": {
+        "section": {
+          "label": "Batterie",
+          "description": "Paramètres de gestion de l'énergie lorsque sur batterie."
+        }
+      },
+      "options": {
+        "section": {
+          "label": "Options",
+          "description": "Options supplémentaires de gestion de l'énergie."
+        }
+      },
+      "monitor-timeout": {
+        "label": "Éteindre l'écran",
+        "description": "Délai avant d'éteindre l'affichage en cas d'inactivité."
+      },
+      "lock-timeout": {
+        "label": "Verrouiller l'écran",
+        "description": "Délai avant de verrouiller l'écran en cas d'inactivité."
+      },
+      "suspend-timeout": {
+        "label": "Suspendre",
+        "description": "Délai avant de suspendre le système en cas d'inactivité."
+      },
+      "hibernate-timeout": {
+        "label": "Hiberner",
+        "description": "Délai avant d'hiberner le système en cas d'inactivité."
+      },
+      "lock-before-suspend": {
+        "label": "Verrouiller avant de suspendre",
+        "description": "Verrouiller automatiquement l'écran avant de suspendre ou d'hiberner."
+      },
+      "respect-inhibitors": {
+        "label": "Respecter les inhibiteurs",
+        "description": "Respecter les inhibiteurs d'inactivité des applications (par ex., lecteurs vidéo, présentations)."
+      },
+      "loginctl-lock": {
+        "label": "Intégration loginctl lock",
+        "description": "Intégrer avec les événements de verrouillage systemd-logind."
+      }
+    },
     "screen-recorder": {
       "title": "Enregistreur d'écran",
       "general": {

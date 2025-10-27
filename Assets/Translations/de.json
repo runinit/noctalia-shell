@@ -645,6 +645,55 @@
         "label": "Bluetooth aktivieren"
       }
     },
+    "power": {
+      "title": "Energieverwaltung",
+      "ac": {
+        "section": {
+          "label": "Netzbetrieb",
+          "description": "Energieverwaltungseinstellungen bei Anschluss an das Stromnetz."
+        }
+      },
+      "battery": {
+        "section": {
+          "label": "Akkubetrieb",
+          "description": "Energieverwaltungseinstellungen bei Akkubetrieb."
+        }
+      },
+      "options": {
+        "section": {
+          "label": "Optionen",
+          "description": "Zusätzliche Energieverwaltungsoptionen."
+        }
+      },
+      "monitor-timeout": {
+        "label": "Monitor ausschalten",
+        "description": "Zeit bis zum Ausschalten des Bildschirms bei Inaktivität."
+      },
+      "lock-timeout": {
+        "label": "Bildschirm sperren",
+        "description": "Zeit bis zum Sperren des Bildschirms bei Inaktivität."
+      },
+      "suspend-timeout": {
+        "label": "Bereitschaft",
+        "description": "Zeit bis zum Versetzen des Systems in den Bereitschaftsmodus bei Inaktivität."
+      },
+      "hibernate-timeout": {
+        "label": "Ruhezustand",
+        "description": "Zeit bis zum Versetzen des Systems in den Ruhezustand bei Inaktivität."
+      },
+      "lock-before-suspend": {
+        "label": "Vor Bereitschaft sperren",
+        "description": "Bildschirm automatisch vor Bereitschaft oder Ruhezustand sperren."
+      },
+      "respect-inhibitors": {
+        "label": "Inhibitoren respektieren",
+        "description": "Inaktivitätsinhibitoren von Anwendungen respektieren (z.B. Videoplayer, Präsentationen)."
+      },
+      "loginctl-lock": {
+        "label": "Loginctl-Lock-Integration",
+        "description": "Integration mit systemd-logind-Sperrereignissen."
+      }
+    },
     "screen-recorder": {
       "title": "Bildschirmrekorder",
       "general": {
