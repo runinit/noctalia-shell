@@ -1372,7 +1372,9 @@
     "play": "Lecture",
     "next-media": "Média suivant",
     "power-profile": "Profil d'alimentation '{profile}'",
-    "keyboard-layout": "Disposition du clavier {layout}"
+    "keyboard-layout": "Disposition du clavier {layout}",
+    "output-muted": "Couper la sortie audio",
+    "input-muted": "Couper l'entrée audio"
   },
   "clock": {
     "tooltip": "Ouvrir le calendrier"
