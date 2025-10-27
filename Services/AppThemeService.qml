@@ -589,11 +589,10 @@ Singleton {
   }
 
   function replaceColorsInFile(filePath, colors) {
-    // Replace color placeholders with all 11 matugen formats
-    let script = ""
+    // Replace color placeholders using Python to avoid command line length limits
 
-    // Helper to escape strings for sed regex
-    const escapeForSed = (str) => String(str).replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&')
+    // Build color replacements object
+    let replacements = {}
 
     // Process standard MD3 colors (primary, secondary, tertiary, etc.)
     Object.keys(colors).forEach(colorKey => {
@@ -601,8 +600,6 @@ Singleton {
       if (colorKey === "custom") return
 
       const colorData = colors[colorKey].default
-
-      // All 11 matugen formats
       const formats = [
         "hex", "hex_stripped", "rgb", "rgba", "hsl", "hsla",
         "red", "green", "blue", "alpha",
@@ -611,17 +608,16 @@ Singleton {
 
       formats.forEach(format => {
         if (colorData[format] !== undefined) {
-          const value = escapeForSed(colorData[format])
-          script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.${format}}}/${value}/g' '${filePath}'\n`
+          const key = `{{colors.${colorKey}.default.${format}}}`
+          replacements[key] = String(colorData[format])
         }
       })
     })
 
-    // Process custom semantic colors (e.g., {{colors.custom.pine.default.hex}})
+    // Process custom semantic colors
     if (colors.custom) {
       Object.keys(colors.custom).forEach(colorName => {
         const colorData = colors.custom[colorName].default
-
         const formats = [
           "hex", "hex_stripped", "rgb", "rgba", "hsl", "hsla",
           "red", "green", "blue", "alpha",
@@ -630,14 +626,30 @@ Singleton {
 
         formats.forEach(format => {
           if (colorData[format] !== undefined) {
-            const value = escapeForSed(colorData[format])
-            script += `sed -i 's/{{colors\\.custom\\.${colorName}\\.default\\.${format}}}/${value}/g' '${filePath}'\n`
+            const key = `{{colors.custom.${colorName}.default.${format}}}`
+            replacements[key] = String(colorData[format])
           }
         })
       })
     }
 
-    return script
+    if (Object.keys(replacements).length === 0) return ""
+
+    // Use Python for replacement to avoid command line limits
+    // Pass JSON via stdin to avoid ARG_MAX issues
+    const jsonData = JSON.stringify(replacements)
+    const jsonBase64 = Qt.btoa(jsonData)
+
+    return `echo '${jsonBase64}' | base64 -d | python3 -c "
+import sys, json
+replacements = json.load(sys.stdin)
+with open('${filePath}', 'r') as f:
+    content = f.read()
+for pattern, replacement in replacements.items():
+    content = content.replace(pattern, replacement)
+with open('${filePath}', 'w') as f:
+    f.write(content)
+"\n`
   }
 
   // --------------------------------------------------------------------------------
