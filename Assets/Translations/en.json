@@ -1319,6 +1319,12 @@
           "label": "Colorize Icons",
           "description": "Apply theme colors to tray icons."
         }
+      },
+      "audio-visualizer": {
+        "width": {
+          "label": "Width",
+          "description": "Custom component width."
+        }
       }
     }
   },
