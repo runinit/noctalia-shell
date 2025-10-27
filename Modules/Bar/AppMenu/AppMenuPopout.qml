@@ -11,7 +11,7 @@ NPanel {
   id: root
 
   preferredWidth: 600 * Style.uiScaleRatio
-  preferredHeight: 700 * Style.uiScaleRatio
+  preferredHeight: 650 * Style.uiScaleRatio
   panelKeyboardFocus: true
 
   // View mode setting
@@ -48,66 +48,75 @@ NPanel {
       height: parent.height - (Style.marginL * 2)
       spacing: Style.marginM
 
-      // Header
-      RowLayout {
+      // Header in a card
+      NBox {
         Layout.fillWidth: true
-        spacing: Style.marginM
+        Layout.preferredHeight: headerRow.implicitHeight + Style.marginM * 2
 
-        NIcon {
-          icon: "view-app-grid"
-          pointSize: Style.fontSizeXXL
-          color: Color.mPrimary
-        }
+        RowLayout {
+          id: headerRow
+          anchors.fill: parent
+          anchors.margins: Style.marginM
+          spacing: Style.marginM
 
-        NText {
-          text: I18n.tr("app-menu.title")
-          pointSize: Style.fontSizeL
-          font.weight: Style.fontWeightBold
-          color: Color.mOnSurface
-          Layout.fillWidth: true
-        }
+          NText {
+            text: "📱"
+            pointSize: Style.fontSizeXXL
+            color: Color.mPrimary
+          }
 
-        // View mode toggle
-        Row {
-          spacing: 4
+          NText {
+            text: I18n.tr("app-menu.title")
+            pointSize: Style.fontSizeL
+            font.weight: Style.fontWeightBold
+            color: Color.mOnSurface
+            Layout.fillWidth: true
+          }
 
-          NIconButton {
-            icon: "view-list"
-            tooltipText: I18n.tr("app-menu.list-view")
-            baseSize: Style.baseWidgetSize * 0.8
-            onClicked: {
-              viewMode = "list"
-              if (!Settings.data.appMenu) {
-                Settings.data.appMenu = {}
+          // View mode toggle
+          Row {
+            spacing: 4
+
+            NButton {
+              text: "☰"
+              tooltipText: I18n.tr("app-menu.list-view")
+              fontSize: Style.fontSizeL
+              backgroundColor: viewMode === "list" ? Color.mPrimary : Color.mSurfaceVariant
+              textColor: viewMode === "list" ? Color.mOnPrimary : Color.mOnSurfaceVariant
+              onClicked: {
+                viewMode = "list"
+                if (!Settings.data.appMenu) {
+                  Settings.data.appMenu = {}
+                }
+                Settings.data.appMenu.viewMode = "list"
               }
-              Settings.data.appMenu.viewMode = "list"
+            }
+
+            NButton {
+              text: "▦"
+              tooltipText: I18n.tr("app-menu.grid-view")
+              fontSize: Style.fontSizeL
+              backgroundColor: viewMode === "grid" ? Color.mPrimary : Color.mSurfaceVariant
+              textColor: viewMode === "grid" ? Color.mOnPrimary : Color.mOnSurfaceVariant
+              onClicked: {
+                viewMode = "grid"
+                if (!Settings.data.appMenu) {
+                  Settings.data.appMenu = {}
+                }
+                Settings.data.appMenu.viewMode = "grid"
+              }
             }
           }
 
-          NIconButton {
-            icon: "view-grid"
-            tooltipText: I18n.tr("app-menu.grid-view")
-            baseSize: Style.baseWidgetSize * 0.8
-            onClicked: {
-              viewMode = "grid"
-              if (!Settings.data.appMenu) {
-                Settings.data.appMenu = {}
-              }
-              Settings.data.appMenu.viewMode = "grid"
-            }
+          NButton {
+            text: "×"
+            tooltipText: I18n.tr("tooltips.close")
+            fontSize: Style.fontSizeL
+            backgroundColor: Color.transparent
+            textColor: Color.mOnSurface
+            onClicked: root.close()
           }
         }
-
-        NIconButton {
-          icon: "close"
-          tooltipText: I18n.tr("tooltips.close")
-          baseSize: Style.baseWidgetSize * 0.8
-          onClicked: root.close()
-        }
-      }
-
-      NDivider {
-        Layout.fillWidth: true
       }
 
       // App Launcher

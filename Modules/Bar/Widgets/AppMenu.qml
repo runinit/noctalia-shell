@@ -28,15 +28,16 @@ NIconButton {
     return {}
   }
 
-  readonly property string customIcon: widgetSettings.icon || widgetMetadata.icon || "view-app-grid"
+  readonly property string customIcon: widgetSettings.icon || widgetMetadata.icon || "applications-other"
   readonly property bool useDistroLogo: (widgetSettings.useDistroLogo !== undefined) ? widgetSettings.useDistroLogo : (widgetMetadata.useDistroLogo || false)
   readonly property string customIconPath: widgetSettings.customIconPath || ""
 
-  // Icon mode: "apps", "distro", "custom"
-  readonly property string iconMode: widgetSettings.iconMode || "apps"
+  // Icon mode: "icon", "distro", "text", "custom"
+  readonly property string iconMode: widgetSettings.iconMode || "icon"
 
-  // If we have a custom path or distro logo, don't use the theme icon.
+  // If we have text, distro logo, or custom path, don't use the theme icon.
   icon: {
+    if (iconMode === "text") return ""
     if (iconMode === "custom" && customIconPath !== "") return ""
     if (iconMode === "distro") return ""
     return customIcon
@@ -78,6 +79,17 @@ NIconButton {
         Logger.w("AppMenu", "Failed to show Niri overview:", e)
       }
     }
+  }
+
+  // Text mode - show "Apps"
+  NText {
+    id: appsText
+    anchors.centerIn: parent
+    text: "Apps"
+    visible: iconMode === "text"
+    font.weight: Style.fontWeightMedium
+    pointSize: Style.fontSizeS
+    color: root.colorFg
   }
 
   // Custom icon or distro logo
