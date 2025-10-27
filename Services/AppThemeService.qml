@@ -290,7 +290,7 @@ Singleton {
 
     const colors = schemeData[mode]
 
-    const matugenColors = generatePalette(colors.mPrimary, colors.mSecondary, colors.mTertiary, colors.mError, colors.mSurface, isDarkMode)
+    const matugenColors = generatePalette(colors.mPrimary, colors.mSecondary, colors.mTertiary, colors.mError, colors.mSurface, colors.mOutline, isDarkMode)
 
     // Add semantic palette colors if available
     const schemeName = Settings.data.colorSchemes.predefinedScheme
@@ -450,7 +450,7 @@ Singleton {
     const surfaceContainerHighest = ColorsConvert.generateSurfaceVariant(backgroundColor, 4, isDarkMode)
 
     // Generate outline colors (for borders/dividers)
-    const outline = isDarkMode ? "#938f99" : "#79747e"
+    const outline = outlineColor
     const outlineVariant = ColorsConvert.adjustLightness(outline, isDarkMode ? -10 : 10)
 
     // Shadow is always very dark
@@ -660,6 +660,9 @@ Singleton {
     // Note: We need {{{{ to produce {{ in Python f-string output
     let sedCommands = []
     Object.keys(colors).forEach(colorKey => {
+                                  // Skip custom namespace - it's handled separately
+                                  if (colorKey === "custom") return
+
                                   const colorData = colors[colorKey].default
                                   const escapedHex = colorData.hex.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
                                   const escapedHexStripped = colorData.hex_stripped.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
