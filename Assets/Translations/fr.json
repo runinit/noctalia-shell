@@ -565,7 +565,7 @@
             "description-missing": "Nécessite que le lanceur {app} soit installé"
           },
           "walker": {
-            "description": "Écrire {filepath}",
+            "description": "Écrire {filepath} et définir le thème sur noctalia",
             "description-missing": "Nécessite que le lanceur {app} soit installé"
           },
           "discord": {
