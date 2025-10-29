@@ -12,15 +12,30 @@ Singleton {
     try {
       if (iconName && typeof Quickshell !== 'undefined' && Quickshell.iconPath) {
         const p = Quickshell.iconPath(iconName, fallback)
-        if (p && p !== "")
-          return p
+        if (p && p !== "") {
+          // Strip ?fallback= syntax if present (QuickShell's internal format)
+          // IconImage doesn't understand this syntax
+          if (p.includes("?fallback=")) {
+            const primary = p.split("?fallback=")[0]
+            if (primary && primary !== "") {
+              return primary
+            }
+          } else {
+            return p
+          }
+        }
       }
     } catch (e) {
-
       // ignore and fall back
     }
+
+    // Try fallback icon
     try {
-      return Quickshell.iconPath ? (Quickshell.iconPath(fallback, true) || "") : ""
+      const fallbackResult = Quickshell.iconPath ? (Quickshell.iconPath(fallback, true) || "") : ""
+      if (fallbackResult && fallbackResult.includes("?fallback=")) {
+        return fallbackResult.split("?fallback=")[0] || ""
+      }
+      return fallbackResult
     } catch (e2) {
       return ""
     }

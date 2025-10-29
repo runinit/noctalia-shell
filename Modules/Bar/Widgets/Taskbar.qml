@@ -123,14 +123,24 @@ Rectangle {
         Layout.preferredHeight: root.itemSize
         Layout.alignment: Qt.AlignCenter
 
-        IconImage {
+        FallbackImage {
 
           id: appIcon
           width: parent.width
           height: parent.height
-          source: ThemeIcons.iconForAppId(taskbarItem.modelData.appId)
-          smooth: true
-          asynchronous: true
+          iconName: {
+            // Extract icon name from desktop entry
+            if (!modelData || !modelData.appId) return ""
+            try {
+              if (typeof DesktopEntries === 'undefined' || !DesktopEntries.byId) return ""
+              const appId = modelData.appId.toLowerCase()
+              const entry = (DesktopEntries.heuristicLookup) ? DesktopEntries.heuristicLookup(appId) : DesktopEntries.byId(appId)
+              return (entry && entry.icon) ? entry.icon : ""
+            } catch (e) {
+              return ""
+            }
+          }
+          fallbackName: "application-x-executable"
           opacity: modelData.isFocused ? Style.opacityFull : 0.6
 
           // Apply dock shader to all taskbar icons

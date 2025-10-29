@@ -54,7 +54,7 @@ Singleton {
                                   "AppMenu": {
                                     "allowUserSettings": true,
                                     "iconMode": "apps",
-                                    "icon": "view-app-grid",
+                                    "icon": "apps",
                                     "customIconPath": ""
                                   },
                                   "Battery": {

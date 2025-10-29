@@ -325,10 +325,19 @@ Variants {
               height: parent.height - (Style.marginM * 2)
               anchors.centerIn: parent
 
-              function getAppIcon(appData): string {
+              function getAppIconName(appData): string {
                 if (!appData || !appData.appId)
                   return ""
-                return ThemeIcons.iconForAppId(appData.appId?.toLowerCase())
+                // Get the desktop entry to extract icon name
+                try {
+                  if (typeof DesktopEntries === 'undefined' || !DesktopEntries.byId)
+                    return ""
+                  const appId = appData.appId.toLowerCase()
+                  const entry = (DesktopEntries.heuristicLookup) ? DesktopEntries.heuristicLookup(appId) : DesktopEntries.byId(appId)
+                  return (entry && entry.icon) ? entry.icon : ""
+                } catch (e) {
+                  return ""
+                }
               }
 
               RowLayout {
@@ -360,16 +369,16 @@ Variants {
                       }
                     }
 
-                    Image {
+                    FallbackImage {
                       id: appIcon
                       width: iconSize
                       height: iconSize
                       anchors.centerIn: parent
-                      source: dock.getAppIcon(modelData)
-                      visible: source.toString() !== ""
+                      iconName: dock.getAppIconName(modelData)
+                      fallbackName: "application-x-executable"
+                      visible: iconName !== ""
                       sourceSize.width: iconSize * 2
                       sourceSize.height: iconSize * 2
-                      smooth: true
                       mipmap: true
                       antialiasing: true
                       fillMode: Image.PreserveAspectFit

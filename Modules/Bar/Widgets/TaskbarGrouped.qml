@@ -134,14 +134,24 @@ Item {
               }
             }
 
-            IconImage {
+            FallbackImage {
               id: appIcon
 
               width: parent.width
               height: parent.height
-              source: ThemeIcons.iconForAppId(model.appId)
-              smooth: true
-              asynchronous: true
+              iconName: {
+                // Extract icon name from desktop entry
+                if (!model || !model.appId) return ""
+                try {
+                  if (typeof DesktopEntries === 'undefined' || !DesktopEntries.byId) return ""
+                  const appId = model.appId.toLowerCase()
+                  const entry = (DesktopEntries.heuristicLookup) ? DesktopEntries.heuristicLookup(appId) : DesktopEntries.byId(appId)
+                  return (entry && entry.icon) ? entry.icon : ""
+                } catch (e) {
+                  return ""
+                }
+              }
+              fallbackName: "application-x-executable"
               opacity: model.isFocused ? Style.opacityFull : 0.6
               layer.enabled: widgetSettings.colorizeIcons === true
 

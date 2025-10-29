@@ -15,7 +15,7 @@ ColumnLayout {
   property var widgetMetadata: null
 
   // Local state
-  property string valueIcon: widgetData.icon !== undefined ? widgetData.icon : (widgetMetadata.icon || "view-app-grid")
+  property string valueIcon: widgetData.icon !== undefined ? widgetData.icon : (widgetMetadata.icon || "apps")
   property string valueIconMode: widgetData.iconMode !== undefined ? widgetData.iconMode : "apps"
   property string valueCustomIconPath: widgetData.customIconPath !== undefined ? widgetData.customIconPath : ""
 
@@ -41,7 +41,7 @@ ColumnLayout {
       highlighted: valueIconMode === "apps"
       onClicked: {
         valueIconMode = "apps"
-        valueIcon = "view-app-grid"
+        valueIcon = "apps"
         valueCustomIconPath = ""
       }
     }
@@ -67,7 +67,7 @@ ColumnLayout {
   // Icon preview
   RowLayout {
     spacing: Style.marginM
-    visible: valueIconMode !== "apps" || valueIcon !== "view-app-grid"
+    visible: valueIconMode !== "apps" || valueIcon !== "apps"
 
     NLabel {
       label: I18n.tr("bar.widget-settings.app-menu.icon-preview.label")
@@ -119,7 +119,7 @@ ColumnLayout {
     text: I18n.tr("bar.widget-settings.app-menu.reset-to-default")
     onClicked: {
       valueIconMode = "apps"
-      valueIcon = "view-app-grid"
+      valueIcon = "apps"
       valueCustomIconPath = ""
     }
   }
