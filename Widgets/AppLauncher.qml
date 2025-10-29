@@ -429,14 +429,13 @@ Item {
           contentItem: RowLayout {
             spacing: Style.marginM
 
-            Image {
+            FallbackImage {
               Layout.preferredWidth: 40
               Layout.preferredHeight: 40
-              source: "image://icon/" + (modelData.icon || "application-x-executable")
+              iconName: modelData.icon || ""
+              fallbackName: "application-x-executable"
               sourceSize.width: 40
               sourceSize.height: 40
-              smooth: true
-              asynchronous: true
             }
 
             ColumnLayout {
@@ -517,15 +516,14 @@ Item {
             anchors.centerIn: parent
             spacing: Style.marginXS  // Tighter spacing
 
-            Image {
+            FallbackImage {
               Layout.alignment: Qt.AlignHCenter
               Layout.preferredWidth: defaultIconSize
               Layout.preferredHeight: defaultIconSize
-              source: "image://icon/" + (modelData.icon || "application-x-executable")
+              iconName: modelData.icon || ""
+              fallbackName: "application-x-executable"
               sourceSize.width: defaultIconSize
               sourceSize.height: defaultIconSize
-              smooth: true
-              asynchronous: true
             }
 
             NText {
