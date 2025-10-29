@@ -46,7 +46,7 @@ Item {
   property bool hasNotifiedLowBattery: false
 
   implicitWidth: pill.width
-  implicitHeight: pill.height
+  implicitHeight: Style.barHeight
 
   // Helper to evaluate and possibly notify
   function maybeNotify(percent, charging) {

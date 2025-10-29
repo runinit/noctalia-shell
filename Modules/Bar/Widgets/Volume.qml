@@ -38,7 +38,7 @@ Item {
   property int wheelAccumulator: 0
 
   implicitWidth: pill.width
-  implicitHeight: pill.height
+  implicitHeight: Style.barHeight
 
   function getIcon() {
     if (AudioService.muted) {

@@ -42,7 +42,7 @@ Item {
   readonly property bool hasExec: (leftClickExec || rightClickExec || middleClickExec)
 
   implicitWidth: pill.width
-  implicitHeight: pill.height
+  implicitHeight: Style.barHeight
 
   BarPill {
     id: pill

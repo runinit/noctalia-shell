@@ -89,18 +89,5 @@ Singleton {
       return (Settings.data.bar.position === "left" || Settings.data.bar.position === "right") ? 33 : 31
     }
   }
-  property real capsuleHeight: {
-    switch (Settings.data.bar.density) {
-      case "mini":
-      return barHeight * 1.0
-      case "compact":
-      return barHeight * 0.85
-      case "comfortable":
-      return barHeight * 0.73
-      default:
-
-      case "default":
-      return barHeight * 0.82
-    }
-  }
+  property real capsuleHeight: barHeight - 8
 }
