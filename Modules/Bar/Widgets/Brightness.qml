@@ -35,7 +35,7 @@ Item {
   property bool firstBrightnessReceived: false
 
   implicitWidth: pill.width
-  implicitHeight: pill.height
+  implicitHeight: Style.barHeight
   visible: getMonitor() !== null
 
   function getMonitor() {

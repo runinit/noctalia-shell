@@ -36,7 +36,7 @@ Item {
   property string currentLayout: KeyboardLayoutService.currentLayout
 
   implicitWidth: pill.width
-  implicitHeight: pill.height
+  implicitHeight: Style.barHeight
 
   BarPill {
     id: pill

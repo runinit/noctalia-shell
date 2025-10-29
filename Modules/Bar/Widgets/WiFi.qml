@@ -30,7 +30,7 @@ Item {
   readonly property string displayMode: widgetSettings.displayMode !== undefined ? widgetSettings.displayMode : widgetMetadata.displayMode
 
   implicitWidth: pill.width
-  implicitHeight: pill.height
+  implicitHeight: Style.barHeight
 
   BarPill {
     id: pill

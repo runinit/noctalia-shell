@@ -37,31 +37,33 @@ Item {
   property bool showPill: false
   property bool shouldAnimateHide: false
 
-  readonly property int pillHeight: Style.capsuleHeight
+  // Use barHeight instead of capsuleHeight for proper vertical centering
+  readonly property int pillHeight: Style.barHeight
   readonly property int pillPaddingHorizontal: Math.round(Style.capsuleHeight * 0.2)
   readonly property int pillOverlap: Math.round(Style.capsuleHeight * 0.5)
   readonly property int pillMaxWidth: Math.max(1, Math.round(textItem.implicitWidth + pillPaddingHorizontal * 2 + pillOverlap))
 
+  // Icon and text sizing should still be based on capsuleHeight for visual consistency
   readonly property real iconSize: {
     switch (root.density) {
     case "compact":
-      return Math.max(1, Math.round(pillHeight * 0.65))
+      return Math.max(1, Math.round(Style.capsuleHeight * 0.65))
     default:
-      return Math.max(1, Math.round(pillHeight * 0.48))
+      return Math.max(1, Math.round(Style.capsuleHeight * 0.48))
     }
   }
 
   readonly property real textSize: {
     switch (root.density) {
     case "compact":
-      return Math.max(1, Math.round(pillHeight * 0.45))
+      return Math.max(1, Math.round(Style.capsuleHeight * 0.45))
     default:
-      return Math.max(1, Math.round(pillHeight * 0.33))
+      return Math.max(1, Math.round(Style.capsuleHeight * 0.33))
     }
   }
 
-  width: pillHeight + Math.max(0, pill.width - pillOverlap)
-  height: pillHeight
+  width: Style.capsuleHeight + Math.max(0, pill.width - pillOverlap)
+  height: Style.barHeight
 
   Connections {
     target: root
@@ -76,7 +78,7 @@ Item {
     id: pill
 
     width: revealed ? pillMaxWidth : 1
-    height: pillHeight
+    height: Style.capsuleHeight
 
     x: oppositeDirection ? (iconCircle.x + iconCircle.width / 2) : // Opens right
                            (iconCircle.x + iconCircle.width / 2) - width // Opens left
@@ -84,12 +86,12 @@ Item {
     opacity: revealed ? Style.opacityFull : Style.opacityNone
     color: Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
 
-    readonly property int halfPillHeight: Math.round(pillHeight * 0.5)
+    readonly property int halfCapsuleHeight: Math.round(Style.capsuleHeight * 0.5)
 
-    topLeftRadius: oppositeDirection ? 0 : halfPillHeight
-    bottomLeftRadius: oppositeDirection ? 0 : halfPillHeight
-    topRightRadius: oppositeDirection ? halfPillHeight : 0
-    bottomRightRadius: oppositeDirection ? halfPillHeight : 0
+    topLeftRadius: oppositeDirection ? 0 : halfCapsuleHeight
+    bottomLeftRadius: oppositeDirection ? 0 : halfCapsuleHeight
+    topRightRadius: oppositeDirection ? halfCapsuleHeight : 0
+    bottomRightRadius: oppositeDirection ? halfCapsuleHeight : 0
     anchors.verticalCenter: parent.verticalCenter
 
     NText {
@@ -132,10 +134,10 @@ Item {
 
   Rectangle {
     id: iconCircle
-    width: pillHeight
-    height: pillHeight
+    width: Style.capsuleHeight
+    height: Style.capsuleHeight
     radius: width * 0.5
-    color: hovered ? Color.mHover : Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
+    color: hovered ? Color.mTertiary : Settings.data.bar.showCapsule ? Color.mSurfaceVariant : Color.transparent
     anchors.verticalCenter: parent.verticalCenter
 
     x: oppositeDirection ? 0 : (parent.width - width)
@@ -151,11 +153,9 @@ Item {
       icon: root.icon
       pointSize: iconSize
       applyUiScale: false
-      color: hovered ? Color.mOnHover : Color.mOnSurface
-      // Center horizontally
-      x: (iconCircle.width - width) / 2
-      // Center vertically accounting for font metrics
-      y: (iconCircle.height - height) / 2 + (height - contentHeight) / 2
+      color: hovered ? Color.mOnTertiary : Color.mOnSurface
+      // Center the icon within the circle - no offset needed
+      anchors.centerIn: parent
     }
   }
 

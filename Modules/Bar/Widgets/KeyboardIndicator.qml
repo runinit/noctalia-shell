@@ -47,7 +47,7 @@ Item {
   // Show widget only when there are active indicators (unless forced)
   visible: hasActiveIndicators || displayMode === "forceOpen"
   implicitWidth: visible ? pill.width : 0
-  implicitHeight: visible ? pill.height : 0
+  implicitHeight: visible ? Style.barHeight : 0
 
   BarPill {
     id: pill
