@@ -387,6 +387,7 @@ Singleton {
       property bool discord_dorion: false
       property bool pywalfox: false
       property bool vicinae: false
+      property bool walker: false
       property bool enableUserTemplates: false
     }
 
