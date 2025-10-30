@@ -174,7 +174,6 @@ ColumnLayout {
       delegate: NCheckbox {
         Layout.fillWidth: true
         label: modelData.name || "Unknown"
-        visible: Settings.data.dock.enabled
         description: {
           const compositorScale = CompositorService.getDisplayScale(modelData.name)
           I18n.tr("system.monitor-description", {
