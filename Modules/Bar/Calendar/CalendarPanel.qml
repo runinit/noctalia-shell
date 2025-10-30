@@ -10,7 +10,6 @@ import qs.Widgets
 NPanel {
   id: root
 
-  property ShellScreen screen
   readonly property var now: Time.date
 
   preferredWidth: (Settings.data.location.showWeekNumberInCalendar ? 400 : 380) * Style.uiScaleRatio

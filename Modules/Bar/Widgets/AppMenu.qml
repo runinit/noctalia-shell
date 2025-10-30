@@ -112,37 +112,4 @@ NIconButton {
     asynchronous: true
   }
 
-  // Panel loader
-  Component.onCompleted: {
-    Logger.d("AppMenu", "Component completed, scheduling panel creation")
-    // Register panel if not already registered
-    Qt.callLater(() => {
-      Logger.d("AppMenu", "Qt.callLater executed, checking for existing panel")
-      const existing = PanelService.getPanel("appMenuPanel")
-      Logger.d("AppMenu", "Existing panel:", existing)
-
-      if (!existing) {
-        Logger.d("AppMenu", "Creating new AppMenuPopout component")
-        const panelComponent = Qt.createComponent("../AppMenu/AppMenuPopout.qml")
-        Logger.d("AppMenu", "Component status:", panelComponent.status)
-
-        if (panelComponent.status === Component.Ready) {
-          Logger.d("AppMenu", "Component ready, creating object")
-          const panel = panelComponent.createObject(root, {
-            screen: root.screen,
-            objectName: "appMenuPanel"
-          })
-          Logger.d("AppMenu", "Panel object created:", panel)
-          PanelService.registerPanel(panel)
-          Logger.d("AppMenu", "Registered appMenuPanel")
-        } else if (panelComponent.status === Component.Error) {
-          Logger.e("AppMenu", "Failed to create AppMenuPopout:", panelComponent.errorString())
-        } else {
-          Logger.w("AppMenu", "Component not ready, status:", panelComponent.status)
-        }
-      } else {
-        Logger.d("AppMenu", "Panel already exists")
-      }
-    })
-  }
 }

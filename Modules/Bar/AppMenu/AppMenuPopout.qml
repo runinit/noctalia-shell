@@ -20,26 +20,6 @@ NPanel {
   // Show categories
   property bool showCategories: Settings.data.appMenu ? (Settings.data.appMenu.showCategories !== false) : true
 
-  onOpened: {
-    // Refresh apps when panel opens
-    if (AppSearchService.loaded) {
-      AppSearchService.refresh()
-    }
-    // Focus search field
-    Qt.callLater(() => {
-      if (appLauncher) {
-        appLauncher.focusSearch()
-      }
-    })
-  }
-
-  onClosed: {
-    // Clear search when closing
-    if (appLauncher) {
-      appLauncher.clearSearch()
-    }
-  }
-
   panelContent: Item {
     ColumnLayout {
       x: Style.marginL
@@ -135,6 +115,31 @@ NPanel {
 
         onClosed: {
           root.close()
+        }
+      }
+    }
+
+    // Handle panel opened/closed signals safely after appLauncher is defined
+    Connections {
+      target: root
+
+      function onOpened() {
+        // Refresh apps when panel opens
+        if (AppSearchService.loaded) {
+          AppSearchService.refresh()
+        }
+        // Focus search field
+        Qt.callLater(() => {
+          if (appLauncher) {
+            appLauncher.focusSearch()
+          }
+        })
+      }
+
+      function onClosed() {
+        // Clear search when closing
+        if (appLauncher) {
+          appLauncher.clearSearch()
         }
       }
     }
