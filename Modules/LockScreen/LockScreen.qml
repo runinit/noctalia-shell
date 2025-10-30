@@ -11,7 +11,8 @@ import Quickshell.Widgets
 import qs.Commons
 import qs.Services
 import qs.Widgets
-import qs.Widgets.AudioSpectrum
+import qs.Modules.Audio
+import qs.Modules.Bar.Calendar
 
 Loader {
   id: lockScreen
@@ -56,7 +57,7 @@ Loader {
         locked: lockScreen.active
 
         WlSessionLockSurface {
-          readonly property var now: Time.now
+          readonly property var now: Time.date
 
           Item {
             id: batteryIndicator
@@ -109,7 +110,7 @@ Loader {
             anchors.fill: parent
             visible: Settings.data.general.showScreenCorners
 
-            property color cornerColor: Settings.data.general.forceBlackScreenCorners ? Color.black : Qt.alpha(Color.mSurface, Settings.data.bar.backgroundOpacity)
+            property color cornerColor: Settings.data.general.forceBlackScreenCorners ? Qt.rgba(0, 0, 0, 1) : Qt.alpha(Color.mSurface, Settings.data.bar.backgroundOpacity)
             property real cornerRadius: Style.screenRadius
             property real cornerSize: Style.screenRadius
 
@@ -340,19 +341,7 @@ Loader {
 
                   // Date below
                   NText {
-                    text: {
-                      var lang = I18n.locale.name.split("_")[0]
-                      var formats = {
-                        "de": "dddd, d. MMMM",
-                        "es": "dddd, d 'de' MMMM",
-                        "fr": "dddd d MMMM",
-                        "pt": "dddd, d 'de' MMMM",
-                        "zh": "yyyy年M月d日 dddd",
-                        "uk": "dddd, d MMMM",
-                        "tr": "dddd, d MMMM"
-                      }
-                      return I18n.locale.toString(Time.now, formats[lang] || "dddd, MMMM d")
-                    }
+                    text: Qt.locale().toString(Time.date, "dddd, MMMM d")
                     pointSize: Style.fontSizeXL
                     font.weight: Font.Medium
                     color: Color.mOnSurfaceVariant
@@ -366,16 +355,47 @@ Loader {
                 }
 
                 // Clock
-                NClock {
-                  now: Time.now
-                  clockStyle: Settings.data.location.analogClockInCalendar ? "analog" : "digital"
+                ClockLoader {
+                  // The 'now' property is available as Time.date
+                  now: Time.date
+
+                  // Apply layout properties from the old Item
                   Layout.preferredWidth: 70
                   Layout.preferredHeight: 70
                   Layout.alignment: Qt.AlignVCenter
+
+                  // *** Override the colors to match the LockScreen style ***
                   backgroundColor: Color.mSurface
                   clockColor: Color.mOnSurface
-                  secondHandColor: Color.mPrimary
                 }
+                // ColumnLayout {
+                //   anchors.centerIn: parent
+                //   spacing: 0
+                //
+                //   NText {
+                //     text: {
+                //       var t = Settings.data.location.use12hourFormat ? Qt.locale().toString(Time.date, "hh AP") : Qt.locale().toString(Time.date, "HH")
+                //       return t
+                //     }
+                //     pointSize: Style.fontSizeM
+                //     font.weight: Style.fontWeightBold
+                //     family: Settings.data.ui.fontFixed
+                //     color: Color.mOnSurface
+                //     horizontalAlignment: Text.AlignHCenter
+                //     Layout.alignment: Qt.AlignHCenter
+                //   }
+                //
+                //   NText {
+                //     text: Qt.formatTime(Time.date, "mm")
+                //     pointSize: Style.fontSizeM
+                //     font.weight: Style.fontWeightBold
+                //     family: Settings.data.ui.fontFixed
+                //     color: Color.mOnSurfaceVariant
+                //     horizontalAlignment: Text.AlignHCenter
+                //     Layout.alignment: Qt.AlignHCenter
+                //   }
+                // }
+
               }
             }
 
@@ -584,7 +604,7 @@ Loader {
                       anchors.margins: 4
                       active: Settings.data.audio.visualizerType === "linear"
                       z: 0
-                      sourceComponent: NLinearSpectrum {
+                      sourceComponent: LinearSpectrum {
                         anchors.fill: parent
                         values: CavaService.values
                         fillColor: Color.mPrimary
@@ -597,7 +617,7 @@ Loader {
                       anchors.margins: 4
                       active: Settings.data.audio.visualizerType === "mirrored"
                       z: 0
-                      sourceComponent: NMirroredSpectrum {
+                      sourceComponent: MirroredSpectrum {
                         anchors.fill: parent
                         values: CavaService.values
                         fillColor: Color.mPrimary
@@ -610,7 +630,7 @@ Loader {
                       anchors.margins: 4
                       active: Settings.data.audio.visualizerType === "wave"
                       z: 0
-                      sourceComponent: NWaveSpectrum {
+                      sourceComponent: WaveSpectrum {
                         anchors.fill: parent
                         values: CavaService.values
                         fillColor: Color.mPrimary
@@ -768,7 +788,7 @@ Loader {
                         NText {
                           text: {
                             var weatherDate = new Date(LocationService.data.weather.daily.time[index].replace(/-/g, "/"))
-                            return I18n.locale.toString(weatherDate, "ddd")
+                            return Qt.locale().toString(weatherDate, "ddd")
                           }
                           pointSize: Style.fontSizeM
                           color: Color.mOnSurfaceVariant
@@ -943,11 +963,10 @@ Loader {
 
                         // Password display - show dots or actual text based on passwordVisible
                         Item {
-                          width: Math.min(passwordDisplayContent.width, 550)
+                          width: passwordDisplayContent.width
                           height: 20
                           visible: passwordInput.text.length > 0 && !parent.parent.parent.passwordVisible
                           anchors.verticalCenter: parent.verticalCenter
-                          clip: true
 
                           Row {
                             id: passwordDisplayContent
@@ -974,8 +993,6 @@ Loader {
                           font.weight: Font.Medium
                           visible: passwordInput.text.length > 0 && parent.parent.parent.passwordVisible
                           anchors.verticalCenter: parent.verticalCenter
-                          elide: Text.ElideRight
-                          width: Math.min(implicitWidth, 550)
                         }
 
                         Rectangle {
@@ -1091,7 +1108,7 @@ Loader {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Settings.data.general.compactLockScreen ? 36 : 48
                     radius: Settings.data.general.compactLockScreen ? 18 : 24
-                    color: logoutButtonArea.containsMouse ? Color.mHover : "transparent"
+                    color: logoutButtonArea.containsMouse ? Color.mTertiary : "transparent"
                     border.color: Color.mOutline
                     border.width: 1
 
@@ -1102,13 +1119,13 @@ Loader {
                       NIcon {
                         icon: "logout"
                         pointSize: Settings.data.general.compactLockScreen ? Style.fontSizeM : Style.fontSizeL
-                        color: logoutButtonArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
+                        color: logoutButtonArea.containsMouse ? Color.mOnTertiary : Color.mOnSurfaceVariant
                       }
 
                       NText {
                         text: I18n.tr("session-menu.logout")
+                        color: logoutButtonArea.containsMouse ? Color.mOnTertiary : Color.mOnSurfaceVariant
                         pointSize: Settings.data.general.compactLockScreen ? Style.fontSizeS : Style.fontSizeM
-                        color: logoutButtonArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
                         font.weight: Font.Medium
                       }
                     }
@@ -1139,7 +1156,7 @@ Loader {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Settings.data.general.compactLockScreen ? 36 : 48
                     radius: Settings.data.general.compactLockScreen ? 18 : 24
-                    color: suspendButtonArea.containsMouse ? Color.mHover : "transparent"
+                    color: suspendButtonArea.containsMouse ? Color.mTertiary : "transparent"
                     border.color: Color.mOutline
                     border.width: 1
 
@@ -1150,13 +1167,13 @@ Loader {
                       NIcon {
                         icon: "suspend"
                         pointSize: Settings.data.general.compactLockScreen ? Style.fontSizeM : Style.fontSizeL
-                        color: suspendButtonArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
+                        color: suspendButtonArea.containsMouse ? Color.mOnTertiary : Color.mOnSurfaceVariant
                       }
 
                       NText {
                         text: I18n.tr("session-menu.suspend")
+                        color: suspendButtonArea.containsMouse ? Color.mOnTertiary : Color.mOnSurfaceVariant
                         pointSize: Settings.data.general.compactLockScreen ? Style.fontSizeS : Style.fontSizeM
-                        color: suspendButtonArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
                         font.weight: Font.Medium
                       }
                     }
@@ -1187,7 +1204,7 @@ Loader {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Settings.data.general.compactLockScreen ? 36 : 48
                     radius: Settings.data.general.compactLockScreen ? 18 : 24
-                    color: rebootButtonArea.containsMouse ? Color.mHover : "transparent"
+                    color: rebootButtonArea.containsMouse ? Color.mTertiary : "transparent"
                     border.color: Color.mOutline
                     border.width: 1
 
@@ -1198,13 +1215,13 @@ Loader {
                       NIcon {
                         icon: "reboot"
                         pointSize: Settings.data.general.compactLockScreen ? Style.fontSizeM : Style.fontSizeL
-                        color: rebootButtonArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
+                        color: rebootButtonArea.containsMouse ? Color.mOnTertiary : Color.mOnSurfaceVariant
                       }
 
                       NText {
                         text: I18n.tr("session-menu.reboot")
+                        color: rebootButtonArea.containsMouse ? Color.mOnTertiary : Color.mOnSurfaceVariant
                         pointSize: Settings.data.general.compactLockScreen ? Style.fontSizeS : Style.fontSizeM
-                        color: rebootButtonArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
                         font.weight: Font.Medium
                       }
                     }
