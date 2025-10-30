@@ -54,6 +54,17 @@ Variants {
       }
     }
 
+    // Listen for AppSearchService to finish loading applications
+    // This ensures icons are populated once apps are discovered
+    Connections {
+      target: AppSearchService
+
+      function onApplicationsLoaded() {
+        Logger.d("Dock", "AppSearchService loaded, refreshing dock icons")
+        updateDockApps()
+      }
+    }
+
     // Shared properties between peek and dock windows
     readonly property string displayMode: Settings.data.dock.displayMode
     readonly property bool autoHide: displayMode === "auto_hide"
@@ -95,6 +106,33 @@ Variants {
     }
 
     // Function to update the combined dock apps model
+    // Helper function to get icon from AppSearchService (like AppLauncher does)
+    function getIconFromAppSearch(appId) {
+      if (!AppSearchService || !AppSearchService.applications || !appId) {
+        Logger.d("Dock", `Icon lookup failed for ${appId}: AppSearchService not ready`)
+        return ""
+      }
+
+      const normalizedAppId = appId.toLowerCase()
+      const app = AppSearchService.applications.find(a => {
+        if (!a || !a.id) return false
+        const id = a.id.toLowerCase()
+        // Try exact match first
+        if (id === normalizedAppId) return true
+        // Try without .desktop suffix
+        if (id.replace('.desktop', '') === normalizedAppId) return true
+        // Try the appId contains the id
+        if (normalizedAppId.includes(id)) return true
+        return false
+      })
+
+      const icon = (app && app.icon) ? app.icon : ""
+      if (!icon) {
+        Logger.d("Dock", `No icon found for ${appId} in ${AppSearchService.applications.length} apps`)
+      }
+      return icon
+    }
+
     function updateDockApps() {
       const runningApps = ToplevelManager ? (ToplevelManager.toplevels.values || []) : []
       const pinnedApps = Settings.data.dock.pinnedApps || []
@@ -112,7 +150,8 @@ Variants {
                                               "type": appType,
                                               "toplevel": toplevel,
                                               "appId": toplevel.appId,
-                                              "title": toplevel.title
+                                              "title": toplevel.title,
+                                              "icon": getIconFromAppSearch(toplevel.appId)
                                             })
                               processedAppIds.add(toplevel.appId)
                             }
@@ -126,7 +165,8 @@ Variants {
                                              "type": "pinned",
                                              "toplevel": null,
                                              "appId": pinnedAppId,
-                                             "title": pinnedAppId
+                                             "title": pinnedAppId,
+                                             "icon": getIconFromAppSearch(pinnedAppId)
                                            })
                            }
                          })
@@ -325,21 +365,6 @@ Variants {
               height: parent.height - (Style.marginM * 2)
               anchors.centerIn: parent
 
-              function getAppIconName(appData): string {
-                if (!appData || !appData.appId)
-                  return ""
-                // Get the desktop entry to extract icon name
-                try {
-                  if (typeof DesktopEntries === 'undefined' || !DesktopEntries.byId)
-                    return ""
-                  const appId = appData.appId.toLowerCase()
-                  const entry = (DesktopEntries.heuristicLookup) ? DesktopEntries.heuristicLookup(appId) : DesktopEntries.byId(appId)
-                  return (entry && entry.icon) ? entry.icon : ""
-                } catch (e) {
-                  return ""
-                }
-              }
-
               RowLayout {
                 id: dockLayout
                 spacing: Style.marginM
@@ -369,20 +394,13 @@ Variants {
                       }
                     }
 
-                    FallbackImage {
+                    IconImage {
                       id: appIcon
                       width: iconSize
                       height: iconSize
                       anchors.centerIn: parent
-                      iconName: dock.getAppIconName(modelData)
-                      fallbackName: "application-x-executable"
-                      visible: iconName !== ""
-                      sourceSize.width: iconSize * 2
-                      sourceSize.height: iconSize * 2
-                      mipmap: true
-                      antialiasing: true
-                      fillMode: Image.PreserveAspectFit
-                      cache: true
+                      source: modelData.icon ? ThemeIcons.iconFromName(modelData.icon, "application-x-executable") : ""
+                      asynchronous: true
 
                       // Dim pinned apps that aren't running
                       opacity: appButton.isRunning ? 1.0 : 0.6
@@ -417,7 +435,7 @@ Variants {
                     // Fall back if no icon
                     NIcon {
                       anchors.centerIn: parent
-                      visible: !appIcon.visible
+                      visible: !appIcon.source || appIcon.source === ""
                       icon: "question-mark"
                       pointSize: iconSize * 0.7
                       color: appButton.isActive ? Color.mPrimary : Color.mOnSurfaceVariant
