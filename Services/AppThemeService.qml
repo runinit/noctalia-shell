@@ -194,6 +194,106 @@ Singleton {
     return semanticPaletteMaps[normalizedName] || null
   }
 
+  // Convert color scheme to matugen v3.0.0 JSON format
+  // Takes schemeData {dark: {...}, light: {...}} and mode ("dark" or "light")
+  // Returns JSON object compatible with `matugen json <file>` command
+  function convertSchemeToMatugenJson(schemeData, mode) {
+    if (!schemeData || !schemeData[mode]) {
+      Logger.e("AppThemeService", `Invalid scheme data or mode: ${mode}`)
+      return null
+    }
+
+    const colors = schemeData[mode]
+    const matugenJson = {
+      "colors": {}
+    }
+
+    // Map Material Design 3 colors from mPrimary format to matugen format
+    const colorMapping = {
+      "mPrimary": "primary",
+      "mOnPrimary": "on_primary",
+      "mPrimaryContainer": "primary_container",
+      "mOnPrimaryContainer": "on_primary_container",
+      "mSecondary": "secondary",
+      "mOnSecondary": "on_secondary",
+      "mSecondaryContainer": "secondary_container",
+      "mOnSecondaryContainer": "on_secondary_container",
+      "mTertiary": "tertiary",
+      "mOnTertiary": "on_tertiary",
+      "mTertiaryContainer": "tertiary_container",
+      "mOnTertiaryContainer": "on_tertiary_container",
+      "mError": "error",
+      "mOnError": "on_error",
+      "mErrorContainer": "error_container",
+      "mOnErrorContainer": "on_error_container",
+      "mSurface": "surface",
+      "mOnSurface": "on_surface",
+      "mSurfaceVariant": "surface_variant",
+      "mOnSurfaceVariant": "on_surface_variant",
+      "mSurfaceDim": "surface_dim",
+      "mSurfaceBright": "surface_bright",
+      "mSurfaceContainerLowest": "surface_container_lowest",
+      "mSurfaceContainerLow": "surface_container_low",
+      "mSurfaceContainer": "surface_container",
+      "mSurfaceContainerHigh": "surface_container_high",
+      "mSurfaceContainerHighest": "surface_container_highest",
+      "mInverseSurface": "inverse_surface",
+      "mInverseOnSurface": "inverse_on_surface",
+      "mInversePrimary": "inverse_primary",
+      "mOutline": "outline",
+      "mOutlineVariant": "outline_variant",
+      "mShadow": "shadow",
+      "mScrim": "scrim"
+    }
+
+    // Convert each color from scheme data
+    Object.keys(colorMapping).forEach(oldKey => {
+      if (colors[oldKey]) {
+        const newKey = colorMapping[oldKey]
+        matugenJson.colors[newKey] = {
+          "default": {
+            "color": colors[oldKey]
+          }
+        }
+      }
+    })
+
+    // Add semantic palette colors at root level (for themes like Rosepine, Catppuccin, Nord)
+    const schemeName = Settings.data.colorSchemes.predefinedScheme
+    const semanticPalette = getSemanticPalette(schemeName)
+
+    if (semanticPalette && semanticPalette.palette) {
+      Object.keys(semanticPalette.palette).forEach(colorName => {
+        matugenJson[colorName] = {
+          "color": semanticPalette.palette[colorName]
+        }
+      })
+
+      if (Settings.data.general.debugMode) {
+        Logger.d("AppThemeService", `Added ${Object.keys(semanticPalette.palette).length} semantic colors for ${schemeName}`)
+      }
+    }
+
+    return matugenJson
+  }
+
+  // Write JSON object to file
+  // Returns bash script to write the JSON safely
+  function writeJsonToFile(jsonObject, filePath) {
+    const jsonString = JSON.stringify(jsonObject, null, 2)
+
+    // Escape single quotes in JSON for heredoc
+    const escapedJson = jsonString.replace(/'/g, "'\\''")
+
+    // Use cat with heredoc to write JSON to file
+    const script = `cat > '${filePath}' << 'MATUGEN_JSON_EOF'
+${escapedJson}
+MATUGEN_JSON_EOF
+`
+    return script
+  }
+
+
   Connections {
     target: WallpaperService
     function onWallpaperChanged(screenName, path) {
@@ -272,13 +372,16 @@ Singleton {
   }
 
   // --------------------------------------------------------------------------------
-  // Predefined Scheme Generation
-  //  For predefined color schemes, we bypass matugen's generation which do not gives good results.
-  //  Instead, we use 'sed' to apply a custom palette to the existing matugen templates.
+  // Predefined Scheme Generation (matugen v3.0.0 with JSON import)
+  //  Uses matugen's native JSON import feature to apply predefined color schemes.
+  //  This replaces the previous workaround that manually processed templates.
   // --------------------------------------------------------------------------------
   function generateFromPredefinedScheme(schemeData) {
+    console.log("=== generateFromPredefinedScheme called ===")
+    Logger.i("AppThemeService", "=== generateFromPredefinedScheme called ===")
+
     if (Settings.data.general.debugMode) {
-      Logger.d("AppThemeService", "Generating templates from predefined color scheme")
+      Logger.d("AppThemeService", "Generating templates from predefined color scheme using matugen v3 JSON import")
     }
 
     // Early return if no scheme data provided
@@ -298,87 +401,55 @@ Singleton {
       return
     }
 
-    const colors = schemeData[mode]
-
-    const matugenColors = generatePalette(colors.mPrimary, colors.mSecondary, colors.mTertiary, colors.mError, colors.mSurface, colors.mOutline, isDarkMode)
-
-    // Add semantic palette colors if available
-    const schemeName = Settings.data.colorSchemes.predefinedScheme
-    const semanticPalette = getSemanticPalette(schemeName)
-
-    if (semanticPalette && semanticPalette.palette) {
-      // Create custom namespace with all original palette colors
-      matugenColors.custom = {}
-
-      Object.keys(semanticPalette.palette).forEach(colorName => {
-        const colorHex = semanticPalette.palette[colorName]
-        // Use the same createColorObject function to generate all 11 formats
-        const hsl = hexToHSL(colorHex)
-        const rgb = ColorsConvert.hexToRgb(colorHex)
-
-        matugenColors.custom[colorName] = {
-          "default": {
-            "hex": colorHex,
-            "hex_stripped": colorHex.replace(/^#/, ""),
-            "rgb": ColorsConvert.toRgbString(colorHex),
-            "rgba": ColorsConvert.toRgbaString(colorHex, 1.0),
-            "red": String(rgb.r),
-            "green": String(rgb.g),
-            "blue": String(rgb.b),
-            "alpha": "1.0",
-            "hsl": ColorsConvert.toHslString(colorHex),
-            "hsla": ColorsConvert.toHslaString(colorHex, 1.0),
-            "hue": String(Math.round(hsl.h)),
-            "saturation": String(Math.round(hsl.s)),
-            "lightness": String(Math.round(hsl.l))
-          }
-        }
-      })
-
-      if (Settings.data.general.debugMode) {
-        Logger.d("AppThemeService", `Added semantic palette: ${schemeName} with ${Object.keys(matugenColors.custom).length} colors`)
-      }
+    // Convert to matugen v3 JSON format
+    console.log("Converting scheme to matugen JSON...")
+    const matugenJson = convertSchemeToMatugenJson(schemeData, mode)
+    console.log("Conversion result:", matugenJson ? "SUCCESS" : "FAILED")
+    if (!matugenJson) {
+      Logger.e("AppThemeService", "Failed to convert scheme to matugen JSON format")
+      return
     }
 
-    // Process templates one at a time to avoid ARG_MAX limits
-    templateProcessingState.active = true
-    templateProcessingState.templateNames = Object.keys(predefinedTemplateConfigs).filter(name => Settings.data.templates[name])
-    templateProcessingState.currentIndex = 0
-    templateProcessingState.colors = matugenColors
-    templateProcessingState.mode = mode
-
-    templateProcessingState.processNext = function() {
-      if (templateProcessingState.currentIndex >= templateProcessingState.templateNames.length) {
-        // All templates processed, now process user templates
-        templateProcessingState.active = false
-        const userScript = processUserTemplates(templateProcessingState.colors, templateProcessingState.mode)
-        if (userScript && userScript.trim().length > 0) {
-          generateProcess.command = ["bash", "-lc", userScript]
-          generateProcess.running = true
-        }
-        return
-      }
-
-      const appName = templateProcessingState.templateNames[templateProcessingState.currentIndex]
-      const script = processTemplate(appName, templateProcessingState.colors, templateProcessingState.mode, Quickshell.env("HOME"))
-
-      if (Settings.data.general.debugMode) {
-        Logger.d("AppThemeService", `Processing template ${templateProcessingState.currentIndex + 1}/${templateProcessingState.templateNames.length}: ${appName}`)
-      }
-
-      templateProcessingState.currentIndex++
-
-      if (script && script.trim().length > 0) {
-        generateProcess.command = ["bash", "-lc", script]
-        generateProcess.running = true
-      } else {
-        // Skip to next template
-        Qt.callLater(templateProcessingState.processNext)
-      }
+    // Build matugen command using JSON input
+    const jsonPath = Settings.cacheDir + "predefined-scheme.json"
+    console.log("JSON path:", jsonPath)
+    const config = MatugenTemplates.buildConfigToml()
+    console.log("Config result:", config ? "SUCCESS (length: " + config.length + ")" : "FAILED")
+    if (!config) {
+      Logger.e("AppThemeService", "Failed to build matugen config")
+      return
     }
 
-    // Start processing
-    templateProcessingState.processNext()
+    const pathEsc = dynamicConfigPath.replace(/'/g, "'\\''")
+    const jsonPathEsc = jsonPath.replace(/'/g, "'\\''")
+
+    // Build script: write config, write JSON, run matugen json command
+    const delimiter = "MATUGEN_CONFIG_EOF_" + Math.random().toString(36).substr(2, 9)
+    let script = `cat > '${pathEsc}' << '${delimiter}'\n${config}\n${delimiter}\n`
+    script += writeJsonToFile(matugenJson, jsonPath)
+    script += `matugen json '${jsonPathEsc}' --config '${pathEsc}' --mode ${mode}\n`
+
+    // Add user templates if enabled (using same JSON input)
+    if (Settings.data.templates.enableUserTemplates) {
+      const userConfigPath = getUserConfigPath()
+      script += `\n# Execute user config with JSON input if it exists\n`
+      script += `if [ -f '${userConfigPath}' ]; then\n`
+      script += `  matugen json '${jsonPathEsc}' --config '${userConfigPath}' --mode ${mode}\n`
+      script += "fi\n"
+    }
+
+    console.log("About to execute matugen command")
+    console.log("Script preview (first 200 chars):", script.substring(0, 200))
+
+    if (Settings.data.general.debugMode) {
+      Logger.d("AppThemeService", "Executing matugen json command for predefined scheme")
+    }
+
+    console.log("Setting generateProcess.command")
+    generateProcess.command = ["bash", "-lc", script]
+    console.log("Starting generateProcess")
+    generateProcess.running = true
+    console.log("generateProcess started:", generateProcess.running)
   }
 
   // Helper function to convert hex to HSL
