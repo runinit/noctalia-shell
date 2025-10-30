@@ -183,7 +183,8 @@ Singleton {
           "output": "~/.cache/wal/colors.json"
         }],
       "input": "pywalfox.json",
-      "postHook": AppThemeService.colorsApplyScript + " pywalfox"
+      "postHook": AppThemeService.colorsApplyScript + " pywalfox",
+      "condition": Settings.data.colorSchemes.useWallpaperColors // Only works with wallpaper colors (needs {{image}} variable)
     }, {
       "name": "discord_vesktop",
       "templates": [{
@@ -250,6 +251,11 @@ Singleton {
       var shouldInclude = true
       if (app.condition !== undefined) {
         shouldInclude = app.condition
+      }
+
+      // Special handling for pywalfox - only include in wallpaper mode (needs {{image}} variable)
+      if (app.name === "pywalfox" && !Settings.data.colorSchemes.useWallpaperColors) {
+        shouldInclude = false
       }
 
       if (Settings.data.templates[app.name] && shouldInclude) {

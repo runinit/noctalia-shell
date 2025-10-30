@@ -18,6 +18,9 @@ Singleton {
                                           "kitty": "~/.config/kitty/themes/noctalia.conf"
                                         })
 
+  // Track the current generation mode to determine if postHooks need manual execution
+  property string currentGenerationMode: "wallpaper" // "wallpaper" or "predefined"
+
   // State for sequential template processing to avoid ARG_MAX limits
   property var templateProcessingState: ({
                                            active: false,
@@ -203,6 +206,7 @@ Singleton {
   // Convert color scheme to matugen v3.0.0 JSON format
   // Takes schemeData {dark: {...}, light: {...}} and mode ("dark" or "light")
   // Returns JSON object compatible with `matugen json <file>` command
+  // Generates full Material Design 3 color palette from base colors if needed
   function convertSchemeToMatugenJson(schemeData, mode) {
     if (!schemeData || !schemeData[mode]) {
       Logger.e("AppThemeService", `Invalid scheme data or mode: ${mode}`)
@@ -210,6 +214,51 @@ Singleton {
     }
 
     const colors = schemeData[mode]
+    const isDarkMode = mode === "dark"
+
+    // Check if we have a complete MD3 palette or just base colors
+    const hasCompletePalette = colors.mSurfaceContainer && colors.mSurfaceDim && colors.mSurfaceBright
+
+    let fullPalette
+    if (hasCompletePalette) {
+      // Scheme already has complete MD3 colors, use them directly
+      fullPalette = colors
+      if (Settings.data.general.debugMode) {
+        Logger.d("AppThemeService", "Scheme has complete MD3 palette, using existing colors")
+      }
+    } else {
+      // Scheme only has base colors, generate full MD3 palette
+      const primary = colors.mPrimary || "#eb6f92"
+      const secondary = colors.mSecondary || "#9ccfd8"
+      const tertiary = colors.mTertiary || "#c4a7e7"
+      const error = colors.mError || "#eb6f92"
+      const surface = colors.mSurface || (isDarkMode ? "#191724" : "#faf4ed")
+      const outline = colors.mOutline || (isDarkMode ? "#6e6a86" : "#908caa")
+
+      if (Settings.data.general.debugMode) {
+        Logger.d("AppThemeService", "Generating full MD3 palette from base colors")
+      }
+
+      // Generate complete palette using existing function
+      const generatedColors = generatePalette(primary, secondary, tertiary, error, surface, outline, isDarkMode)
+
+      // Convert generated palette back to mPrimary format for consistency
+      fullPalette = {}
+      Object.keys(generatedColors).forEach(key => {
+        if (generatedColors[key] && generatedColors[key].default && generatedColors[key].default.hex) {
+          const mKey = "m" + key.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join("")
+          fullPalette[mKey] = generatedColors[key].default.hex
+        }
+      })
+
+      // Preserve any existing colors from the scheme
+      Object.keys(colors).forEach(key => {
+        if (!fullPalette[key]) {
+          fullPalette[key] = colors[key]
+        }
+      })
+    }
+
     const matugenJson = {
       "colors": {}
     }
@@ -220,29 +269,44 @@ Singleton {
       "mOnPrimary": "on_primary",
       "mPrimaryContainer": "primary_container",
       "mOnPrimaryContainer": "on_primary_container",
+      "mPrimaryFixed": "primary_fixed",
+      "mPrimaryFixedDim": "primary_fixed_dim",
+      "mOnPrimaryFixed": "on_primary_fixed",
+      "mOnPrimaryFixedVariant": "on_primary_fixed_variant",
       "mSecondary": "secondary",
       "mOnSecondary": "on_secondary",
       "mSecondaryContainer": "secondary_container",
       "mOnSecondaryContainer": "on_secondary_container",
+      "mSecondaryFixed": "secondary_fixed",
+      "mSecondaryFixedDim": "secondary_fixed_dim",
+      "mOnSecondaryFixed": "on_secondary_fixed",
+      "mOnSecondaryFixedVariant": "on_secondary_fixed_variant",
       "mTertiary": "tertiary",
       "mOnTertiary": "on_tertiary",
       "mTertiaryContainer": "tertiary_container",
       "mOnTertiaryContainer": "on_tertiary_container",
+      "mTertiaryFixed": "tertiary_fixed",
+      "mTertiaryFixedDim": "tertiary_fixed_dim",
+      "mOnTertiaryFixed": "on_tertiary_fixed",
+      "mOnTertiaryFixedVariant": "on_tertiary_fixed_variant",
       "mError": "error",
       "mOnError": "on_error",
       "mErrorContainer": "error_container",
       "mOnErrorContainer": "on_error_container",
+      "mBackground": "background",
+      "mOnBackground": "on_background",
       "mSurface": "surface",
       "mOnSurface": "on_surface",
-      "mSurfaceVariant": "surface_variant",
-      "mOnSurfaceVariant": "on_surface_variant",
       "mSurfaceDim": "surface_dim",
       "mSurfaceBright": "surface_bright",
+      "mSurfaceVariant": "surface_variant",
+      "mOnSurfaceVariant": "on_surface_variant",
       "mSurfaceContainerLowest": "surface_container_lowest",
       "mSurfaceContainerLow": "surface_container_low",
       "mSurfaceContainer": "surface_container",
       "mSurfaceContainerHigh": "surface_container_high",
       "mSurfaceContainerHighest": "surface_container_highest",
+      "mSurfaceTint": "surface_tint",
       "mInverseSurface": "inverse_surface",
       "mInverseOnSurface": "inverse_on_surface",
       "mInversePrimary": "inverse_primary",
@@ -252,13 +316,13 @@ Singleton {
       "mScrim": "scrim"
     }
 
-    // Convert each color from scheme data
+    // Convert each color from full palette
     Object.keys(colorMapping).forEach(oldKey => {
-      if (colors[oldKey]) {
+      if (fullPalette[oldKey]) {
         const newKey = colorMapping[oldKey]
         matugenJson.colors[newKey] = {
           "default": {
-            "color": colors[oldKey]
+            "color": fullPalette[oldKey]
           }
         }
       }
@@ -319,6 +383,52 @@ MATUGEN_JSON_EOF
   }
 
   // --------------------------------------------------------------------------------
+  // Execute postHooks for all enabled application templates
+  // This is used when matugen generates templates but doesn't execute postHooks
+  // (e.g., in predefined scheme mode with matugen json command)
+  // --------------------------------------------------------------------------------
+  function executeApplicationPostHooks() {
+    const mode = Settings.data.colorSchemes.darkMode ? "dark" : "light"
+    const commands = []
+
+    if (Settings.data.general.debugMode) {
+      Logger.d("AppThemeService", "Executing application postHooks for enabled templates")
+    }
+
+    // Iterate through all predefined templates
+    Object.keys(predefinedTemplateConfigs).forEach(appName => {
+      // Check if template is enabled in settings
+      if (Settings.data.templates[appName]) {
+        const config = predefinedTemplateConfigs[appName]
+
+        // Execute postProcess callback if it exists
+        if (config.postProcess) {
+          const postCommand = config.postProcess(mode)
+          if (postCommand && postCommand.trim().length > 0) {
+            commands.push(postCommand.trim())
+
+            if (Settings.data.general.debugMode) {
+              Logger.d("AppThemeService", `Added postHook for ${appName}:`, postCommand.trim())
+            }
+          }
+        }
+      }
+    })
+
+    // Execute all postHook commands
+    if (commands.length > 0) {
+      if (Settings.data.general.debugMode) {
+        Logger.d("AppThemeService", `Executing ${commands.length} postHook commands`)
+      }
+
+      postHookProcess.command = ["bash", "-lc", commands.join('\n')]
+      postHookProcess.running = true
+    } else if (Settings.data.general.debugMode) {
+      Logger.d("AppThemeService", "No postHooks to execute")
+    }
+  }
+
+  // --------------------------------------------------------------------------------
   function init() {
     Logger.i("AppThemeService", "Service started")
   }
@@ -362,6 +472,7 @@ MATUGEN_JSON_EOF
     const mode = Settings.data.colorSchemes.darkMode ? "dark" : "light"
     const script = buildMatugenScript(content, wp, mode)
 
+    currentGenerationMode = "wallpaper"
     generateProcess.command = ["bash", "-lc", script]
     generateProcess.running = true
   }
@@ -452,6 +563,7 @@ MATUGEN_JSON_EOF
     }
 
     console.log("Setting generateProcess.command")
+    currentGenerationMode = "predefined"
     generateProcess.command = ["bash", "-lc", script]
     console.log("Starting generateProcess")
     generateProcess.running = true
@@ -972,8 +1084,20 @@ fi
     onExited: function(code) {
       if (code !== 0) {
         Logger.error("AppThemeService", "GenerateProcess exited with code:", code)
-      } else if (Settings.data.general.debugMode) {
-        Logger.d("AppThemeService", "Template generation completed successfully")
+      } else {
+        if (Settings.data.general.debugMode) {
+          Logger.d("AppThemeService", "Template generation completed successfully")
+        }
+
+        // Execute postHooks for predefined scheme mode
+        // In wallpaper mode, matugen executes postHooks from TOML natively
+        // In predefined mode (matugen json), postHooks are not executed automatically
+        if (currentGenerationMode === "predefined") {
+          if (Settings.data.general.debugMode) {
+            Logger.d("AppThemeService", "Predefined scheme mode detected, executing postHooks manually")
+          }
+          executeApplicationPostHooks()
+        }
       }
 
       // Continue processing next template if in sequential mode
@@ -992,6 +1116,36 @@ fi
         if (this.text) {
           Logger.d("AppThemeService", "CopyProcess stderr:", this.text)
         }
+      }
+    }
+  }
+
+  Process {
+    id: postHookProcess
+    workingDirectory: Quickshell.shellDir
+    running: false
+
+    stdout: StdioCollector {
+      onStreamFinished: {
+        if (Settings.data.general.debugMode && this.text && this.text.trim().length > 0) {
+          Logger.d("AppThemeService", "PostHookProcess stdout:", this.text)
+        }
+      }
+    }
+
+    stderr: StdioCollector {
+      onStreamFinished: {
+        if (this.text && this.text.trim().length > 0) {
+          Logger.d("AppThemeService", "PostHookProcess stderr:", this.text)
+        }
+      }
+    }
+
+    onExited: function(code) {
+      if (code !== 0) {
+        Logger.error("AppThemeService", "PostHookProcess exited with code:", code)
+      } else if (Settings.data.general.debugMode) {
+        Logger.d("AppThemeService", "PostHook execution completed successfully")
       }
     }
   }
