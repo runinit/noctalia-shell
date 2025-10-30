@@ -1,7 +1,7 @@
 import QtQuick
 
 // Image component that tries multiple icon sources with fuzzel-inspired fallback strategy
-// Mimics fuzzel's icon resolution: theme -> pixmaps -> hicolor -> fallback
+// Optimized to prevent crashes from mass simultaneous loading
 // Usage: FallbackImage { iconName: "zed"; width: 48; height: 48 }
 Image {
   id: root
@@ -10,71 +10,99 @@ Image {
   property string fallbackName: "application-x-executable"
   property int currentAttempt: 0
 
-  // List of paths to try for icon resolution (fuzzel-inspired)
+  // List of paths to try for icon resolution (reduced to 6 essential paths)
   property var attemptPaths: []
 
   asynchronous: true
   smooth: true
 
+  // Helper function to check if component is truly visible
+  function isActuallyVisible() {
+    if (!root) return false
+    if (!root.visible) return false
+    if (root.opacity <= 0) return false // ListView sets opacity:0 for offscreen items
+
+    // Check parent chain visibility
+    var p = root.parent
+    while (p) {
+      if (!p.visible || (p.opacity !== undefined && p.opacity <= 0)) {
+        return false
+      }
+      p = p.parent
+    }
+    return true
+  }
+
   onIconNameChanged: {
-    if (!root || !root.visible) return // Guard: don't process if not visible
+    // Enhanced visibility guard - check before doing ANY work
+    if (!isActuallyVisible()) return
 
     if (!iconName) {
+      loadTimer.stop()
       source = "image://icon/" + fallbackName
       return
     }
 
-    // Build list of paths to try - FILE PATHS FIRST, then image://icon/
-    // Reason: image://icon/ always returns Ready status (even for missing icons),
-    // but file:// returns Error when file doesn't exist, allowing fallback to work
+    // Reduced path list: 6 essential locations instead of 17
+    // This reduces failed operations by 65%
     attemptPaths = [
-      // 1. Try common non-theme locations FIRST (what Qt misses but fuzzel finds)
-      //    These will fail fast with Image.Error if file doesn't exist
-      "file:///usr/share/icons/" + iconName + ".png",
-      "file:///usr/share/icons/" + iconName + ".svg",
-
-      // 2. Try pixmaps directories (Qt doesn't search these!)
+      // 1. Pixmaps (most reliable for app icons)
       "file:///usr/share/pixmaps/" + iconName + ".png",
-      "file:///usr/share/pixmaps/" + iconName + ".svg",
 
-      // 3. Try hicolor theme explicitly (universal fallback theme)
+      // 2. Hicolor scalable (universal fallback)
       "file:///usr/share/icons/hicolor/scalable/apps/" + iconName + ".svg",
-      "file:///usr/share/icons/hicolor/128x128/apps/" + iconName + ".png",
-      "file:///usr/share/icons/hicolor/64x64/apps/" + iconName + ".png",
+
+      // 3. Hicolor 48x48 (common size)
       "file:///usr/share/icons/hicolor/48x48/apps/" + iconName + ".png",
 
-      // 3b. Try flatpak hicolor theme (flatpak applications)
+      // 4. Flatpak hicolor scalable
       "file:///var/lib/flatpak/exports/share/icons/hicolor/scalable/apps/" + iconName + ".svg",
-      "file:///var/lib/flatpak/exports/share/icons/hicolor/128x128/apps/" + iconName + ".png",
-      "file:///var/lib/flatpak/exports/share/icons/hicolor/64x64/apps/" + iconName + ".png",
-      "file:///var/lib/flatpak/exports/share/icons/hicolor/48x48/apps/" + iconName + ".png",
 
-      // 4. Try Breeze theme (many icons exist here but not in other themes)
-      "file:///usr/share/icons/breeze/apps/48/" + iconName + ".svg",
-      "file:///usr/share/icons/breeze/preferences/32/" + iconName + ".svg",
-      "file:///usr/share/icons/breeze/actions/22/" + iconName + ".svg",
-      "file:///usr/share/icons/breeze/actions/24/" + iconName + ".svg",
-
-      // 5. Try theme icon via image://icon/ (Qt's QIcon::fromTheme)
-      //    This comes AFTER file checks because it always returns Ready
+      // 5. Theme icon via Qt (checks all installed themes)
       "image://icon/" + iconName,
 
-      // 6. Finally try fallback icon
+      // 6. Fallback
       "image://icon/" + fallbackName
     ]
 
     currentAttempt = 0
-    source = attemptPaths[0]
+
+    // Add small delay to prevent cascade when many icons load at once
+    loadTimer.restart()
+  }
+
+  // Delay timer to stagger icon loading
+  Timer {
+    id: loadTimer
+    interval: Math.random() * 50 // Random 0-50ms delay
+    running: false
+    onTriggered: {
+      if (isActuallyVisible() && attemptPaths.length > 0) {
+        source = attemptPaths[currentAttempt]
+      }
+    }
   }
 
   onStatusChanged: {
-    // If current source failed and we have more to try, move to next
-    // This is non-blocking: Qt Image loads async, we just react to failures
-    if (!root || !attemptPaths || attemptPaths.length === 0) return // Guard against invalid state
+    // Enhanced guard - exit early if not truly visible
+    if (!isActuallyVisible()) return
+    if (!attemptPaths || attemptPaths.length === 0) return
 
+    // If current source failed and we have more to try, move to next
     if (status === Image.Error && currentAttempt < attemptPaths.length - 1) {
       currentAttempt++
-      source = attemptPaths[currentAttempt]
+      // Small delay before next attempt to prevent cascade
+      Qt.callLater(() => {
+        if (isActuallyVisible()) {
+          source = attemptPaths[currentAttempt]
+        }
+      })
     }
+  }
+
+  // Cleanup when destroyed
+  Component.onDestruction: {
+    loadTimer.stop()
+    attemptPaths = []
   }
 }

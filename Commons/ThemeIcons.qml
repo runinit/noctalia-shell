@@ -4,8 +4,47 @@ import QtQuick
 import Quickshell
 import qs.Services
 
+/**
+ * ThemeIcons - Icon resolution utilities
+ *
+ * STANDARD ICON PATTERN (Recommended):
+ * Use Qt's IconImage with ThemeIcons.iconFromName() for icon theme resolution:
+ *
+ *   import QtQuick.Controls
+ *   import qs.Commons
+ *
+ *   IconImage {
+ *     width: 40
+ *     height: 40
+ *     source: modelData.icon ? ThemeIcons.iconFromName(modelData.icon, "application-x-executable") : ""
+ *     asynchronous: true
+ *   }
+ *
+ * This pattern:
+ * - Follows XDG Icon Theme Specification (modern Linux desktop conventions)
+ * - Uses Quickshell's icon path resolution via Quickshell.iconPath()
+ * - Searches standard icon paths (/usr/share/icons, /usr/share/pixmaps, etc.)
+ * - Respects the active icon theme
+ * - Handles SVG and PNG formats
+ * - Provides automatic fallback to specified fallback icon
+ *
+ * HELPER FUNCTIONS:
+ * The functions below provide icon resolution helpers.
+ */
+
 Singleton {
   id: root
+
+  /**
+   * Get icon URL using Qt's icon theme provider
+   * Returns: "image://icon/{iconName}" URL for use with Image components
+   *
+   * Prefer using IconImage's 'name' property instead of this function.
+   */
+  function iconUrl(iconName, fallbackName) {
+    const name = iconName || fallbackName || "application-x-executable"
+    return `image://icon/${name}`
+  }
 
   function iconFromName(iconName, fallbackName) {
     const fallback = fallbackName || "application-x-executable"
