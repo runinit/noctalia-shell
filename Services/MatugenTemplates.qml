@@ -182,9 +182,8 @@ Singleton {
           "version": "pywalfox",
           "output": "~/.cache/wal/colors.json"
         }],
-      "input": "pywalfox.json",
-      "postHook": AppThemeService.colorsApplyScript + " pywalfox",
-      "condition": Settings.data.colorSchemes.useWallpaperColors // Only works with wallpaper colors (needs {{image}} variable)
+      "input": "pywalfox.json", // Note: switches to pywalfox-predefined.json in predefined mode
+      "postHook": AppThemeService.colorsApplyScript + " pywalfox"
     }, {
       "name": "discord_vesktop",
       "templates": [{
@@ -253,15 +252,17 @@ Singleton {
         shouldInclude = app.condition
       }
 
-      // Special handling for pywalfox - only include in wallpaper mode (needs {{image}} variable)
-      if (app.name === "pywalfox" && !Settings.data.colorSchemes.useWallpaperColors) {
-        shouldInclude = false
-      }
-
       if (Settings.data.templates[app.name] && shouldInclude) {
         app.templates.forEach(function (template) {
           lines.push("\n[templates." + template.version + "]")
-          lines.push('input_path = "' + Quickshell.shellDir + '/Assets/MatugenTemplates/' + app.input + '"')
+
+          // Special handling for pywalfox - use different template based on mode
+          var inputFile = app.input
+          if (app.name === "pywalfox" && !Settings.data.colorSchemes.useWallpaperColors) {
+            inputFile = "pywalfox-predefined.json"
+          }
+
+          lines.push('input_path = "' + Quickshell.shellDir + '/Assets/MatugenTemplates/' + inputFile + '"')
           lines.push('output_path = "' + template.output + '"')
           if (app.postHook) {
             var postHook = app.postHook.replace("{mode}", mode)

@@ -388,6 +388,7 @@ Singleton {
       property bool discord_equibop: false
       property bool discord_lightcord: false
       property bool discord_dorion: false
+      property bool discord_vencord: false
       property bool pywalfox: false
       property bool vicinae: false
       property bool walker: false
