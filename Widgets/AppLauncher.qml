@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import Quickshell
+import Quickshell.Widgets
 import qs.Commons
 import qs.Services
 import qs.Widgets
@@ -429,13 +430,11 @@ Item {
           contentItem: RowLayout {
             spacing: Style.marginM
 
-            FallbackImage {
+            IconImage {
               Layout.preferredWidth: 40
               Layout.preferredHeight: 40
-              iconName: modelData.icon || ""
-              fallbackName: "application-x-executable"
-              sourceSize.width: 40
-              sourceSize.height: 40
+              source: modelData.icon ? ThemeIcons.iconFromName(modelData.icon, "application-x-executable") : ""
+              asynchronous: true
             }
 
             ColumnLayout {
@@ -516,14 +515,12 @@ Item {
             anchors.centerIn: parent
             spacing: Style.marginXS  // Tighter spacing
 
-            FallbackImage {
+            IconImage {
               Layout.alignment: Qt.AlignHCenter
               Layout.preferredWidth: defaultIconSize
               Layout.preferredHeight: defaultIconSize
-              iconName: modelData.icon || ""
-              fallbackName: "application-x-executable"
-              sourceSize.width: defaultIconSize
-              sourceSize.height: defaultIconSize
+              source: modelData.icon ? ThemeIcons.iconFromName(modelData.icon, "application-x-executable") : ""
+              asynchronous: true
             }
 
             NText {

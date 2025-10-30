@@ -27,6 +27,7 @@ import qs.Modules.SessionMenu
 // Bar & Bar Components
 import qs.Modules.Bar
 import qs.Modules.Bar.Extras
+import qs.Modules.Bar.AppMenu
 import qs.Modules.Bar.Bluetooth
 import qs.Modules.Bar.Battery
 import qs.Modules.Bar.Calendar
@@ -179,6 +180,11 @@ ShellRoot {
       BatteryPanel {
         id: batteryPanel
         objectName: "batteryPanel"
+      }
+
+      AppMenuPopout {
+        id: appMenuPanel
+        objectName: "appMenuPanel"
       }
 
       // SpotlightModal disabled - has property errors
