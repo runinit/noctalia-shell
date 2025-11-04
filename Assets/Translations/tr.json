@@ -1,4 +1,5 @@
 {
+  "Never": "Asla",
   "authentication": {
     "error": "Kimlik doğrulama hatası",
     "failed": "Kimlik doğrulama başarısız"
@@ -1428,6 +1429,55 @@
         }
       },
       "title": "Ekran Görüntüsü"
+    },
+    "power": {
+      "ac": {
+        "section": {
+          "description": "AC gücüne takılıyken güç yönetimi ayarları.",
+          "label": "AC Gücü"
+        }
+      },
+      "battery": {
+        "section": {
+          "description": "Pille çalışırken güç yönetimi ayarları.",
+          "label": "Pil"
+        }
+      },
+      "hibernate-timeout": {
+        "description": "Hareketsizlik nedeniyle sistemin hazırda bekletme moduna geçmeden önceki süre.",
+        "label": "Hazırda bekleme süresi"
+      },
+      "lock-before-suspend": {
+        "description": "Sistem askıya alınmadan önce ekranı otomatik olarak kilitle.",
+        "label": "Askıya almadan önce kilitle"
+      },
+      "lock-timeout": {
+        "description": "Hareketsizlik nedeniyle ekranın kilitlenmesinden önceki süre.",
+        "label": "Kilit süresi"
+      },
+      "loginctl-lock": {
+        "description": "Ekran kilidi yönetimi için systemd-logind entegrasyonunu etkinleştir.",
+        "label": "Loginctl kilit entegrasyonu"
+      },
+      "monitor-timeout": {
+        "description": "Hareketsizlik nedeniyle ekranın kapanmasından önceki süre.",
+        "label": "Monitör süresi"
+      },
+      "options": {
+        "section": {
+          "description": "Ek güç yönetimi ayarları.",
+          "label": "Seçenekler"
+        }
+      },
+      "respect-inhibitors": {
+        "description": "Uygulamalar uyanık kalmayı istediğinde otomatik uyku/askıya almayı engelle.",
+        "label": "Boşta kalma engelleyicilerini dikkate al"
+      },
+      "suspend-timeout": {
+        "description": "Hareketsizlik nedeniyle sistemin askıya alınmasından önceki süre.",
+        "label": "Askıya alma süresi"
+      },
+      "title": "Güç"
     },
     "screen-recorder": {
       "audio": {

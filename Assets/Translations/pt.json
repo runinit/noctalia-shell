@@ -1,4 +1,5 @@
 {
+  "Never": "Nunca",
   "authentication": {
     "error": "Erro de autenticação",
     "failed": "Falha na autenticação"
@@ -1428,6 +1429,55 @@
         }
       },
       "title": "Exibição na tela"
+    },
+    "power": {
+      "ac": {
+        "section": {
+          "description": "Configurações de gerenciamento de energia quando conectado à energia AC.",
+          "label": "Energia AC"
+        }
+      },
+      "battery": {
+        "section": {
+          "description": "Configurações de gerenciamento de energia quando funcionando com bateria.",
+          "label": "Bateria"
+        }
+      },
+      "hibernate-timeout": {
+        "description": "Tempo antes do sistema hibernar devido à inatividade.",
+        "label": "Tempo de hibernação"
+      },
+      "lock-before-suspend": {
+        "description": "Bloquear automaticamente a tela antes do sistema suspender.",
+        "label": "Bloquear antes de suspender"
+      },
+      "lock-timeout": {
+        "description": "Tempo antes da tela bloquear devido à inatividade.",
+        "label": "Tempo de bloqueio"
+      },
+      "loginctl-lock": {
+        "description": "Ativar integração com systemd-logind para gerenciamento de bloqueio de tela.",
+        "label": "Integração loginctl"
+      },
+      "monitor-timeout": {
+        "description": "Tempo antes da tela desligar devido à inatividade.",
+        "label": "Tempo de desligamento do monitor"
+      },
+      "options": {
+        "section": {
+          "description": "Configurações adicionais de gerenciamento de energia.",
+          "label": "Opções"
+        }
+      },
+      "respect-inhibitors": {
+        "description": "Prevenir suspensão automática quando aplicativos solicitarem permanecer ativos.",
+        "label": "Respeitar inibidores de inatividade"
+      },
+      "suspend-timeout": {
+        "description": "Tempo antes do sistema suspender devido à inatividade.",
+        "label": "Tempo de suspensão"
+      },
+      "title": "Energia"
     },
     "screen-recorder": {
       "audio": {

@@ -363,13 +363,20 @@ Loader {
                       property string appTitle: modelData ? (modelData.title || modelData.appId) : ""
                       property bool isRunning: modelData && (modelData.type === "running" || modelData.type === "pinned-running")
 
-                    IconImage {
+                    Image {
                       id: appIcon
                       width: iconSize
                       height: iconSize
                       anchors.centerIn: parent
-                      name: modelData.icon || "application-x-executable"
-                      asynchronous: true
+                      source: dock.getAppIcon(modelData)
+                      visible: source.toString() !== ""
+                      sourceSize.width: iconSize * 2
+                      sourceSize.height: iconSize * 2
+                      smooth: true
+                      mipmap: true
+                      antialiasing: true
+                      fillMode: Image.PreserveAspectFit
+                      cache: true
 
                       // Dim pinned apps that aren't running
                       opacity: appButton.isRunning ? 1.0 : 0.6

@@ -1,4 +1,5 @@
 {
+  "Never": "Niemals",
   "authentication": {
     "error": "Authentifizierungsfehler",
     "failed": "Authentifizierung fehlgeschlagen"
@@ -1428,6 +1429,55 @@
         }
       },
       "title": "On-Screen Display"
+    },
+    "power": {
+      "ac": {
+        "section": {
+          "description": "Energieverwaltungseinstellungen im Netzbetrieb.",
+          "label": "Netzbetrieb"
+        }
+      },
+      "battery": {
+        "section": {
+          "description": "Energieverwaltungseinstellungen im Akkubetrieb.",
+          "label": "Akkubetrieb"
+        }
+      },
+      "hibernate-timeout": {
+        "description": "Zeit bis das System aufgrund von Inaktivität in den Ruhezustand wechselt.",
+        "label": "Ruhezustand-Timeout"
+      },
+      "lock-before-suspend": {
+        "description": "Bildschirm automatisch sperren, bevor das System in den Ruhezustand wechselt.",
+        "label": "Vor Ruhezustand sperren"
+      },
+      "lock-timeout": {
+        "description": "Zeit bis der Bildschirm aufgrund von Inaktivität gesperrt wird.",
+        "label": "Sperr-Timeout"
+      },
+      "loginctl-lock": {
+        "description": "Integration mit systemd-logind für Bildschirmsperrverwaltung aktivieren.",
+        "label": "Loginctl-Sperrintegration"
+      },
+      "monitor-timeout": {
+        "description": "Zeit bis der Bildschirm aufgrund von Inaktivität ausgeschaltet wird.",
+        "label": "Monitor-Timeout"
+      },
+      "options": {
+        "section": {
+          "description": "Zusätzliche Energieverwaltungseinstellungen.",
+          "label": "Optionen"
+        }
+      },
+      "respect-inhibitors": {
+        "description": "Automatischen Ruhezustand/Suspend verhindern, wenn Anwendungen aktiv bleiben möchten.",
+        "label": "Leerlauf-Inhibitoren respektieren"
+      },
+      "suspend-timeout": {
+        "description": "Zeit bis das System aufgrund von Inaktivität in den Suspend-Modus wechselt.",
+        "label": "Suspend-Timeout"
+      },
+      "title": "Energie"
     },
     "screen-recorder": {
       "audio": {

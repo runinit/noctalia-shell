@@ -1,4 +1,5 @@
 {
+  "Never": "Jamais",
   "authentication": {
     "error": "Erreur d'authentification",
     "failed": "Échec de l'authentification"
@@ -1428,6 +1429,55 @@
         }
       },
       "title": "Affichage à l'écran"
+    },
+    "power": {
+      "ac": {
+        "section": {
+          "description": "Paramètres de gestion de l'énergie lorsque branché sur secteur.",
+          "label": "Alimentation secteur"
+        }
+      },
+      "battery": {
+        "section": {
+          "description": "Paramètres de gestion de l'énergie sur batterie.",
+          "label": "Batterie"
+        }
+      },
+      "hibernate-timeout": {
+        "description": "Délai avant mise en hibernation du système en cas d'inactivité.",
+        "label": "Délai d'hibernation"
+      },
+      "lock-before-suspend": {
+        "description": "Verrouiller automatiquement l'écran avant la mise en veille du système.",
+        "label": "Verrouiller avant la mise en veille"
+      },
+      "lock-timeout": {
+        "description": "Délai avant verrouillage de l'écran en cas d'inactivité.",
+        "label": "Délai de verrouillage"
+      },
+      "loginctl-lock": {
+        "description": "Activer l'intégration avec systemd-logind pour la gestion du verrouillage de l'écran.",
+        "label": "Intégration loginctl"
+      },
+      "monitor-timeout": {
+        "description": "Délai avant extinction de l'écran en cas d'inactivité.",
+        "label": "Délai d'extinction de l'écran"
+      },
+      "options": {
+        "section": {
+          "description": "Paramètres supplémentaires de gestion de l'énergie.",
+          "label": "Options"
+        }
+      },
+      "respect-inhibitors": {
+        "description": "Empêcher la mise en veille automatique lorsque les applications demandent à rester actives.",
+        "label": "Respecter les inhibiteurs d'inactivité"
+      },
+      "suspend-timeout": {
+        "description": "Délai avant mise en veille du système en cas d'inactivité.",
+        "label": "Délai de mise en veille"
+      },
+      "title": "Énergie"
     },
     "screen-recorder": {
       "audio": {

@@ -1,4 +1,5 @@
 {
+  "Never": "Nunca",
   "authentication": {
     "error": "Error de autenticación",
     "failed": "Autenticación fallida"
@@ -1428,6 +1429,55 @@
         }
       },
       "title": "Visualización en pantalla"
+    },
+    "power": {
+      "ac": {
+        "section": {
+          "description": "Configuración de gestión de energía cuando está conectado a la corriente.",
+          "label": "Corriente AC"
+        }
+      },
+      "battery": {
+        "section": {
+          "description": "Configuración de gestión de energía cuando funciona con batería.",
+          "label": "Batería"
+        }
+      },
+      "hibernate-timeout": {
+        "description": "Tiempo antes de que el sistema hiberne por inactividad.",
+        "label": "Tiempo de espera de hibernación"
+      },
+      "lock-before-suspend": {
+        "description": "Bloquear automáticamente la pantalla antes de que el sistema se suspenda.",
+        "label": "Bloquear antes de suspender"
+      },
+      "lock-timeout": {
+        "description": "Tiempo antes de que la pantalla se bloquee por inactividad.",
+        "label": "Tiempo de espera de bloqueo"
+      },
+      "loginctl-lock": {
+        "description": "Habilitar integración con systemd-logind para gestión de bloqueo de pantalla.",
+        "label": "Integración de bloqueo loginctl"
+      },
+      "monitor-timeout": {
+        "description": "Tiempo antes de que la pantalla se apague por inactividad.",
+        "label": "Tiempo de espera del monitor"
+      },
+      "options": {
+        "section": {
+          "description": "Configuración adicional de gestión de energía.",
+          "label": "Opciones"
+        }
+      },
+      "respect-inhibitors": {
+        "description": "Evitar suspensión automática cuando las aplicaciones soliciten permanecer activas.",
+        "label": "Respetar inhibidores de inactividad"
+      },
+      "suspend-timeout": {
+        "description": "Tiempo antes de que el sistema se suspenda por inactividad.",
+        "label": "Tiempo de espera de suspensión"
+      },
+      "title": "Energía"
     },
     "screen-recorder": {
       "audio": {

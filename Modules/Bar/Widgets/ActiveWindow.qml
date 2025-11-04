@@ -113,7 +113,7 @@ Item {
     return Math.min(calculateContentWidth(), maxWidth)
   }
 
-  function getAppIconName() {
+  function getAppIcon() {
     try {
       // Try CompositorService first
       const focusedWindow = CompositorService.getFocusedWindow()
@@ -121,16 +121,9 @@ Item {
         try {
           const idValue = focusedWindow.appId
           const normalizedId = (typeof idValue === 'string') ? idValue : String(idValue)
-          const appId = normalizedId.toLowerCase()
-
-          // Look up desktop entry to get icon name
-          if (typeof DesktopEntries !== 'undefined' && DesktopEntries.byId) {
-            const entry = (DesktopEntries.heuristicLookup)
-              ? DesktopEntries.heuristicLookup(appId)
-              : DesktopEntries.byId(appId)
-            if (entry && entry.icon) {
-              return entry.icon
-            }
+          const iconResult = ThemeIcons.iconForAppId(normalizedId.toLowerCase())
+          if (iconResult && iconResult !== "") {
+            return iconResult
           }
         } catch (iconError) {
           Logger.w("ActiveWindow", "Error getting icon from CompositorService:", iconError)
@@ -145,16 +138,9 @@ Item {
             if (activeToplevel.appId) {
               const idValue2 = activeToplevel.appId
               const normalizedId2 = (typeof idValue2 === 'string') ? idValue2 : String(idValue2)
-              const appId2 = normalizedId2.toLowerCase()
-
-              // Look up desktop entry to get icon name
-              if (typeof DesktopEntries !== 'undefined' && DesktopEntries.byId) {
-                const entry = (DesktopEntries.heuristicLookup)
-                  ? DesktopEntries.heuristicLookup(appId2)
-                  : DesktopEntries.byId(appId2)
-                if (entry && entry.icon) {
-                  return entry.icon
-                }
+              const iconResult2 = ThemeIcons.iconForAppId(normalizedId2.toLowerCase())
+              if (iconResult2 && iconResult2 !== "") {
+                return iconResult2
               }
             }
           } catch (fallbackError) {
@@ -163,10 +149,10 @@ Item {
         }
       }
 
-      return fallbackIcon
+      return ThemeIcons.iconFromName(fallbackIcon)
     } catch (e) {
-      Logger.w("ActiveWindow", "Error in getAppIconName:", e)
-      return fallbackIcon
+      Logger.w("ActiveWindow", "Error in getAppIcon:", e)
+      return ThemeIcons.iconFromName(fallbackIcon)
     }
   }
 
@@ -221,10 +207,10 @@ Item {
           IconImage {
             id: windowIcon
             anchors.fill: parent
-            name: getAppIconName()
+            source: getAppIcon()
             asynchronous: true
             smooth: true
-            visible: name !== ""
+            visible: source !== ""
 
             // Apply dock shader to active window icon (always themed)
             layer.enabled: widgetSettings.colorizeIcons !== false
@@ -400,10 +386,10 @@ Item {
           IconImage {
             id: windowIconVertical
             anchors.fill: parent
-            name: getAppIconName()
+            source: getAppIcon()
             asynchronous: true
             smooth: true
-            visible: name !== ""
+            visible: source !== ""
 
             // Apply dock shader to active window icon (always themed)
             layer.enabled: widgetSettings.colorizeIcons !== false
@@ -440,16 +426,16 @@ Item {
     target: CompositorService
     function onActiveWindowChanged() {
       try {
-        windowIcon.name = Qt.binding(getAppIconName)
-        windowIconVertical.name = Qt.binding(getAppIconName)
+        windowIcon.source = Qt.binding(getAppIcon)
+        windowIconVertical.source = Qt.binding(getAppIcon)
       } catch (e) {
         Logger.w("ActiveWindow", "Error in onActiveWindowChanged:", e)
       }
     }
     function onWindowListChanged() {
       try {
-        windowIcon.name = Qt.binding(getAppIconName)
-        windowIconVertical.name = Qt.binding(getAppIconName)
+        windowIcon.source = Qt.binding(getAppIcon)
+        windowIconVertical.source = Qt.binding(getAppIcon)
       } catch (e) {
         Logger.w("ActiveWindow", "Error in onWindowListChanged:", e)
       }

@@ -1,4 +1,5 @@
 {
+  "Never": "从不",
   "authentication": {
     "error": "认证错误",
     "failed": "认证失败"
@@ -1428,6 +1429,55 @@
         }
       },
       "title": "屏显菜单"
+    },
+    "power": {
+      "ac": {
+        "section": {
+          "description": "Power management settings when plugged into AC power.",
+          "label": "AC Power"
+        }
+      },
+      "battery": {
+        "section": {
+          "description": "Power management settings when running on battery.",
+          "label": "Battery Power"
+        }
+      },
+      "hibernate-timeout": {
+        "description": "Time before the system hibernates due to inactivity.",
+        "label": "Hibernate timeout"
+      },
+      "lock-before-suspend": {
+        "description": "Automatically lock the screen before the system suspends.",
+        "label": "Lock before suspend"
+      },
+      "lock-timeout": {
+        "description": "Time before the screen locks due to inactivity.",
+        "label": "Lock timeout"
+      },
+      "loginctl-lock": {
+        "description": "Enable integration with systemd-logind for lock screen management.",
+        "label": "Loginctl lock integration"
+      },
+      "monitor-timeout": {
+        "description": "Time before the screen turns off due to inactivity.",
+        "label": "Monitor timeout"
+      },
+      "options": {
+        "section": {
+          "description": "Additional power management settings.",
+          "label": "Options"
+        }
+      },
+      "respect-inhibitors": {
+        "description": "Prevent automatic sleep/suspend when applications request to stay awake.",
+        "label": "Respect idle inhibitors"
+      },
+      "suspend-timeout": {
+        "description": "Time before the system suspends due to inactivity.",
+        "label": "Suspend timeout"
+      },
+      "title": "Power"
     },
     "screen-recorder": {
       "audio": {
