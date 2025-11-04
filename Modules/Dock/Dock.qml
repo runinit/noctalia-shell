@@ -363,6 +363,82 @@ Loader {
                       property string appTitle: modelData ? (modelData.title || modelData.appId) : ""
                       property bool isRunning: modelData && (modelData.type === "running" || modelData.type === "pinned-running")
 
+                    IconImage {
+                      id: appIcon
+                      width: iconSize
+                      height: iconSize
+                      anchors.centerIn: parent
+                      name: modelData.icon || "application-x-executable"
+                      asynchronous: true
+
+                      // Dim pinned apps that aren't running
+                      opacity: appButton.isRunning ? 1.0 : 0.6
+
+                      scale: appButton.hovered ? 1.15 : 1.0
+
+                      // Apply dock-specific colorization shader only to non-focused apps
+                      layer.enabled: !appButton.isActive && Settings.data.dock.colorizeIcons
+                      layer.effect: ShaderEffect {
+                        property color targetColor: Settings.data.colorSchemes.darkMode ? Color.mOnSurface : Color.mSurfaceVariant
+                        property real colorizeMode: 0.0 // Dock mode (grayscale)
+
+                        fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/appicon_colorize.frag.qsb")
+                      }
+
+                      Behavior on scale {
+                        NumberAnimation {
+                          duration: Style.animationNormal
+                          easing.type: Easing.OutBack
+                          easing.overshoot: 1.2
+                        }
+                      }
+
+                      Behavior on opacity {
+                        NumberAnimation {
+                          duration: Style.animationFast
+                          easing.type: Easing.OutQuad
+                        }
+                      }
+                    }
+
+                    // Fall back if no icon
+                    NIcon {
+                      anchors.centerIn: parent
+                      visible: !appIcon.visible
+                      icon: "question-mark"
+                      pointSize: iconSize * 0.7
+                      color: appButton.isActive ? Color.mPrimary : Color.mOnSurfaceVariant
+                      opacity: appButton.isRunning ? 1.0 : 0.6
+                      scale: appButton.hovered ? 1.15 : 1.0
+
+                      Behavior on scale {
+                        NumberAnimation {
+                          duration: Style.animationFast
+                          easing.type: Easing.OutBack
+                          easing.overshoot: 1.2
+                        }
+                      }
+
+                      Behavior on opacity {
+                        NumberAnimation {
+                          duration: Style.animationFast
+                          easing.type: Easing.OutQuad
+                        }
+                      }
+                    }
+
+                    // Context menu popup
+                    DockMenu {
+                      id: contextMenu
+                      onHoveredChanged: {
+                        // Only update menuHovered if this menu is current and visible
+                        if (root.currentContextMenu === contextMenu && contextMenu.visible) {
+                          menuHovered = hovered
+                        } else {
+                          menuHovered = false
+                        }
+                      }
+
                       // Listen for the toplevel being closed
                       Connections {
                         target: modelData?.toplevel

@@ -485,8 +485,8 @@ SmartPanel {
                   sourceComponent: Component {
                     IconImage {
                       anchors.fill: parent
-                      source: modelData.icon ? ThemeIcons.iconFromName(modelData.icon, "application-x-executable") : ""
-                      visible: modelData.icon && source !== ""
+                      name: modelData.icon || "application-x-executable"
+                      visible: modelData.icon || true
                       asynchronous: true
                     }
                   }
