@@ -756,6 +756,20 @@ ColumnLayout {
                      }
                    }
       }
+
+      NCheckbox {
+        label: "Niriswitcher"
+        description: ProgramCheckerService.niriswitcherAvailable ? "Theme will be applied to ~/.config/niriswitcher/style-dark.css" : "Niriswitcher is not installed"
+        checked: Settings.data.templates.niriswitcher
+        enabled: ProgramCheckerService.niriswitcherAvailable
+        opacity: ProgramCheckerService.niriswitcherAvailable ? 1.0 : 0.6
+        onToggled: checked => {
+                     if (ProgramCheckerService.niriswitcherAvailable) {
+                       Settings.data.templates.niriswitcher = checked
+                       AppThemeService.generate()
+                     }
+                   }
+      }
     }
 
     // Miscellaneous

@@ -24,6 +24,7 @@ Singleton {
   property bool wlsunsetAvailable: false
   property bool app2unitAvailable: false
   property bool codeAvailable: false
+  property bool niriswitcherAvailable: false
   property bool gnomeCalendarAvailable: false
   property bool xdotoolAvailable: false
 
@@ -112,6 +113,7 @@ Singleton {
                                             "gpuScreenRecorderAvailable": ["sh", "-c", "command -v gpu-screen-recorder >/dev/null 2>&1 || (command -v flatpak >/dev/null 2>&1 && flatpak list --app | grep -q 'com.dec05eba.gpu_screen_recorder')"],
                                             "wlsunsetAvailable": ["which", "wlsunset"],
                                             "codeAvailable": ["which", "code"],
+                                            "niriswitcherAvailable": ["which", "niriswitcher"],
                                             "gnomeCalendarAvailable": ["which", "gnome-calendar"],
                                             "xdotoolAvailable": ["which", "xdotool"]
                                           })

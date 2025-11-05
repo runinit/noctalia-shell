@@ -1,50 +1,16 @@
-/* Niriswitcher Theme - Generated with Matugen */
+/* Niriswitcher Noctalia Theme - Generated with Matugen
+ * Custom color scheme for Noctalia Shell
+ * Only overrides colors - uses default niriswitcher styling
+ */
 
 :root {
   --bg-color: {{colors.surface.default.hex}};
   --label-color: {{colors.on_surface.default.hex}};
-  --border-color: {{colors.surface_variant.default.hex}};
+  --alternate-label-color: {{colors.on_surface.default.hex}};
+  --dim-label-color: {{colors.on_surface_variant.default.hex}};
+  --border-color: {{colors.outline_variant.default.hex}};
   --highlight-color: {{colors.surface_container_high.default.hex}};
   --urgency-color: {{colors.error.default.hex}};
   --indicator-focus-color: {{colors.primary.default.hex}};
-}
-
-#niriswitcher {
-  background-color: var(--bg-color);
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
-}
-
-#application-title {
-  color: var(--label-color);
-}
-
-#workspace-name {
-  color: var(--label-color);
-}
-
-.application-name {
-  opacity: 0.7;
-  color: var(--label-color);
-}
-
-.application.selected {
-  background-color: var(--highlight-color);
-}
-
-.application.selected .application-name {
-  opacity: 1;
-  color: var(--label-color);
-}
-
-.workspace-indicator {
-  background-color: var(--border-color);
-}
-
-.workspace-indicator.selected {
-  background-color: var(--indicator-focus-color);
-}
-
-.application.urgent {
-  border-color: var(--urgency-color);
+  --indicator-color: {{colors.secondary.default.hex}};
 }

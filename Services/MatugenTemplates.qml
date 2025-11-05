@@ -247,7 +247,8 @@ Singleton {
           "version": "niriswitcher",
           "output": "~/.config/niriswitcher/style-dark.css"
         }],
-      "input": "niriswitcher.css"
+      "input": "niriswitcher.css",
+      "postHook": "systemctl --user restart niriswitcher.service"
     }]
 
   // --------------------------------

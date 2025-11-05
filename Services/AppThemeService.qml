@@ -134,7 +134,7 @@ Singleton {
                                                         "outputs": [{
                                                             "path": "~/.config/niriswitcher/style-dark.css"
                                                           }],
-                                                        "postProcess": () => `pkill -SIGUSR1 niriswitcher || true\n`
+                                                        "postProcess": () => `systemctl --user restart niriswitcher.service || pkill -SIGUSR1 niriswitcher || true\n`
                                                       }
                                                     })
 
