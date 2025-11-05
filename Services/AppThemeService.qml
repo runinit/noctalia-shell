@@ -280,17 +280,17 @@ Singleton {
 
     // Generate "fixed" colors for Material Design 3
     // These remain consistent across light/dark themes
-    const primaryFixed = isDarkMode ? ColorsConvert.adjustLightness(primaryColor, 30) : ColorsConvert.adjustLightness(primaryColor, -10)
+    const primaryFixed = isDarkMode ? ColorsConvert.adjustLightness(colors.mPrimary, 30) : ColorsConvert.adjustLightness(colors.mPrimary, -10)
     const primaryFixedDim = ColorsConvert.adjustLightness(primaryFixed, isDarkMode ? -10 : -5)
     const onPrimaryFixed = ColorsConvert.generateOnColor(primaryFixed, !isDarkMode)
     const onPrimaryFixedVariant = ColorsConvert.adjustLightness(onPrimaryFixed, isDarkMode ? 10 : -10)
 
-    const secondaryFixed = isDarkMode ? ColorsConvert.adjustLightness(secondaryColor, 30) : ColorsConvert.adjustLightness(secondaryColor, -10)
+    const secondaryFixed = isDarkMode ? ColorsConvert.adjustLightness(colors.mSecondary, 30) : ColorsConvert.adjustLightness(colors.mSecondary, -10)
     const secondaryFixedDim = ColorsConvert.adjustLightness(secondaryFixed, isDarkMode ? -10 : -5)
     const onSecondaryFixed = ColorsConvert.generateOnColor(secondaryFixed, !isDarkMode)
     const onSecondaryFixedVariant = ColorsConvert.adjustLightness(onSecondaryFixed, isDarkMode ? 10 : -10)
 
-    const tertiaryFixed = isDarkMode ? ColorsConvert.adjustLightness(tertiaryColor, 30) : ColorsConvert.adjustLightness(tertiaryColor, -10)
+    const tertiaryFixed = isDarkMode ? ColorsConvert.adjustLightness(colors.mTertiary, 30) : ColorsConvert.adjustLightness(colors.mTertiary, -10)
     const tertiaryFixedDim = ColorsConvert.adjustLightness(tertiaryFixed, isDarkMode ? -10 : -5)
     const onTertiaryFixed = ColorsConvert.generateOnColor(tertiaryFixed, !isDarkMode)
     const onTertiaryFixedVariant = ColorsConvert.adjustLightness(onTertiaryFixed, isDarkMode ? 10 : -10)
@@ -302,11 +302,11 @@ Singleton {
     // Generate inverse colors for high contrast scenarios
     const inverseSurface = ColorsConvert.generateOnColor(surface, !isDarkMode)
     const inverseOnSurface = surface
-    const inversePrimary = isDarkMode ? ColorsConvert.adjustLightness(primaryColor, -30) : ColorsConvert.adjustLightness(primaryColor, 30)
+    const inversePrimary = isDarkMode ? ColorsConvert.adjustLightness(colors.mPrimary, -30) : ColorsConvert.adjustLightness(colors.mPrimary, 30)
 
     // Additional utility colors
     const scrim = "#000000"
-    const surfaceTint = primaryColor
+    const surfaceTint = colors.mPrimary
 
     return {
       "primary": c(colors.mPrimary),
