@@ -241,6 +241,13 @@ Singleton {
           "output": "~/.vscode/extensions/hyprluna.hyprluna-theme-1.0.2/themes/hyprluna.json"
         }],
       "input": "code.json"
+    }, {
+      "name": "niriswitcher",
+      "templates": [{
+          "version": "niriswitcher",
+          "output": "~/.config/niriswitcher/style.css"
+        }],
+      "input": "niriswitcher.css"
     }]
 
   // --------------------------------

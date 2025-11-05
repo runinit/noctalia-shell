@@ -128,6 +128,12 @@ Singleton {
                                                         "outputs": [{
                                                             "path": "~/.config/walker/themes/noctalia/style.css"
                                                           }]
+                                                      },
+                                                      "niriswitcher": {
+                                                        "input": "niriswitcher.css",
+                                                        "outputs": [{
+                                                            "path": "~/.config/niriswitcher/style.css"
+                                                          }]
                                                       }
                                                     })
 
@@ -1014,6 +1020,7 @@ fi
                                            const outputDir = outputPath.substring(0, outputPath.lastIndexOf('/'))
                                            const templatePath = getTerminalColorsTemplate(terminal)
 
+                                           Logger.d("AppThemeService", `Terminal ${terminal}: ${templatePath} -> ${outputPath}`)
                                            commands.push(`mkdir -p ${outputDir}`)
                                            commands.push(`cp -f ${templatePath} ${outputPath}`)
                                            commands.push(`${colorsApplyScript} ${terminal}`)
@@ -1021,6 +1028,7 @@ fi
                                        })
 
     if (commands.length > 0) {
+      Logger.i("AppThemeService", `Copying ${commands.length / 3} terminal themes`)
       copyProcess.command = ["bash", "-lc", commands.join('; ')]
       copyProcess.running = true
     }

@@ -392,6 +392,8 @@ Singleton {
       property bool pywalfox: false
       property bool vicinae: false
       property bool walker: false
+      property bool code: false
+      property bool niriswitcher: false
       property bool enableUserTemplates: false
     }
 
