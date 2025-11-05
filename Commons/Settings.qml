@@ -400,7 +400,7 @@ Singleton {
       property bool ghostty: false
       property bool foot: false
       property bool wezterm: false
-      property bool fuzzel: true
+      property bool fuzzel: false
       property bool discord: false
       property bool discord_vesktop: false
       property bool discord_webcord: false
@@ -408,7 +408,7 @@ Singleton {
       property bool discord_equibop: false
       property bool discord_lightcord: false
       property bool discord_dorion: false
-      property bool pywalfox: true
+      property bool pywalfox: false
       property bool vicinae: false
       property bool walker: false
       property bool code: false
