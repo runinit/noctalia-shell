@@ -392,14 +392,14 @@ Singleton {
                                script += `if [ -d "${baseConfigDir}" ]; then\n`
                                script += `  mkdir -p ${outputDir}\n`
                                script += `  cp '${templatePath}' '${outputPath}'\n`
-                               script += `  ${replaceColorsInFile(outputPath, palette)}\n`
+                               script += `  ${replaceColorsInFile(outputPath, palette, Settings.data.colorSchemes.darkMode)}\n`
                                script += `else\n`
                                script += `  echo "Discord client ${appName} not found at ${baseConfigDir}, skipping theme generation"\n`
                                script += `fi\n`
                              } else {
                                script += `mkdir -p ${outputDir}\n`
                                script += `cp '${templatePath}' '${outputPath}'\n`
-                               script += replaceColorsInFile(outputPath, palette)
+                               script += replaceColorsInFile(outputPath, palette, Settings.data.colorSchemes.darkMode)
                              }
                            })
 
@@ -410,7 +410,7 @@ Singleton {
     return script
   }
 
-  function replaceColorsInFile(filePath, colors) {
+  function replaceColorsInFile(filePath, colors, isDarkMode) {
     // This handle both ".hex" and ".hex_stripped" the EXACT same way. Our predefined color schemes are
     // always RRGGBB without alpha so this is fine and keeps compatibility with matugen.
     let script = ""
@@ -419,6 +419,12 @@ Singleton {
                                   const escapedColor = colorValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
                                   script += `sed -i 's/{{colors\\.${colorKey}\\.default\\.hex\\(_stripped\\)\\?}}/${escapedColor}/g' '${filePath}'\n`
                                 })
+
+    // Replace non-color placeholders
+    const mode = isDarkMode ? "dark" : "light"
+    script += `sed -i 's/{{mode}}/${mode}/g' '${filePath}'\n`
+    script += `sed -i 's/{{image}}//g' '${filePath}'\n`  // Empty for predefined schemes
+
     return script
   }
 
