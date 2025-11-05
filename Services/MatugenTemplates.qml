@@ -245,7 +245,7 @@ Singleton {
       "name": "niriswitcher",
       "templates": [{
           "version": "niriswitcher",
-          "output": "~/.config/niriswitcher/style.css"
+          "output": "~/.config/niriswitcher/style-dark.css"
         }],
       "input": "niriswitcher.css"
     }]

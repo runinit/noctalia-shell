@@ -132,8 +132,9 @@ Singleton {
                                                       "niriswitcher": {
                                                         "input": "niriswitcher.css",
                                                         "outputs": [{
-                                                            "path": "~/.config/niriswitcher/style.css"
-                                                          }]
+                                                            "path": "~/.config/niriswitcher/style-dark.css"
+                                                          }],
+                                                        "postProcess": () => `pkill -SIGUSR1 niriswitcher || true\n`
                                                       }
                                                     })
 
