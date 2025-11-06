@@ -91,6 +91,7 @@ ColumnLayout {
         minimumWidth: 300
         onSelected: function (key) {
           Settings.data.ui.fontDefault = key
+          FontService.applyFonts()
         }
       }
 
@@ -105,6 +106,7 @@ ColumnLayout {
         minimumWidth: 300
         onSelected: function (key) {
           Settings.data.ui.fontFixed = key
+          FontService.applyFonts()
         }
       }
 
@@ -181,6 +183,176 @@ ColumnLayout {
           }
         }
       }
+
+      // Application text scaling
+      ColumnLayout {
+        Layout.topMargin: Style.marginL
+
+        NLabel {
+          label: I18n.tr("settings.general.fonts.text-scaling.label")
+          description: I18n.tr("settings.general.fonts.text-scaling.description")
+        }
+
+        RowLayout {
+          spacing: Style.marginL
+          Layout.fillWidth: true
+
+          NValueSlider {
+            Layout.fillWidth: true
+            from: 0.5
+            to: 2.0
+            stepSize: 0.05
+            value: Settings.data.appearance.textScaling
+            onMoved: value => {
+              Settings.data.appearance.textScaling = value
+              FontService.applyTextScaling(value)
+            }
+            text: Math.floor(Settings.data.appearance.textScaling * 100) + "%"
+          }
+
+          // Reset button container
+          Item {
+            Layout.preferredWidth: 30 * Style.uiScaleRatio
+            Layout.preferredHeight: 30 * Style.uiScaleRatio
+
+            NIconButton {
+              icon: "refresh"
+              baseSize: Style.baseWidgetSize * 0.8
+              tooltipText: I18n.tr("settings.general.fonts.text-scaling.reset")
+              onClicked: {
+                Settings.data.appearance.textScaling = 1.0
+                FontService.applyTextScaling(1.0)
+              }
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
+        }
+      }
+    }
+  }
+
+  NDivider {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.marginXL
+    Layout.bottomMargin: Style.marginXL
+  }
+
+  // Icon Theme
+  ColumnLayout {
+    spacing: Style.marginL
+    Layout.fillWidth: true
+
+    NHeader {
+      label: "Icon Theme"
+      description: "Select icon theme for GTK and Qt applications"
+    }
+
+    NSearchableComboBox {
+      label: "Icon Theme"
+      description: "Icon theme used across system applications"
+      model: IconThemeService.availableIconThemes
+      currentKey: Settings.data.appearance.iconTheme
+      placeholder: "Select icon theme..."
+      searchPlaceholder: "Search icon themes..."
+      popupHeight: 320
+      minimumWidth: 300
+      onSelected: function (key) {
+        IconThemeService.applyIconTheme(key)
+      }
+    }
+  }
+
+  NDivider {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.marginXL
+    Layout.bottomMargin: Style.marginXL
+  }
+
+  // GTK Theme
+  ColumnLayout {
+    spacing: Style.marginL
+    Layout.fillWidth: true
+
+    NHeader {
+      label: "GTK Theme"
+      description: "Select GTK theme for GTK applications"
+    }
+
+    NSearchableComboBox {
+      label: "GTK Theme"
+      description: "GTK theme used for GTK3 and GTK4 applications"
+      model: GtkThemeService.availableGtkThemes
+      currentKey: Settings.data.appearance.gtkTheme
+      placeholder: "Select GTK theme..."
+      searchPlaceholder: "Search GTK themes..."
+      popupHeight: 320
+      minimumWidth: 300
+      onSelected: function (key) {
+        GtkThemeService.applyGtkTheme(key)
+      }
+    }
+
+    NToggle {
+      label: "Auto-switch theme variants"
+      description: "Automatically switch between light/dark theme variants based on dark mode setting"
+      checked: Settings.data.appearance.syncGtkThemeWithDarkMode
+      onToggled: checked => Settings.data.appearance.syncGtkThemeWithDarkMode = checked
+    }
+  }
+
+  NDivider {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.marginXL
+    Layout.bottomMargin: Style.marginXL
+  }
+
+  // Qt Style
+  ColumnLayout {
+    spacing: Style.marginL
+    Layout.fillWidth: true
+
+    NHeader {
+      label: "Qt Style"
+      description: "Select Qt widget style for Qt applications"
+    }
+
+    NSearchableComboBox {
+      label: "Qt Style"
+      description: "Qt style used for Qt5 and Qt6 applications"
+      model: QtStyleService.availableQtStyles
+      currentKey: Settings.data.appearance.qtStyle
+      placeholder: "Select Qt style..."
+      searchPlaceholder: "Search Qt styles..."
+      popupHeight: 320
+      minimumWidth: 300
+      onSelected: function (key) {
+        QtStyleService.applyQtStyle(key)
+      }
+    }
+  }
+
+  NDivider {
+    Layout.fillWidth: true
+    Layout.topMargin: Style.marginXL
+    Layout.bottomMargin: Style.marginXL
+  }
+
+  // Flatpak Integration
+  ColumnLayout {
+    spacing: Style.marginL
+    Layout.fillWidth: true
+
+    NHeader {
+      label: "Flatpak Integration"
+      description: "Apply themes to Flatpak applications"
+    }
+
+    NToggle {
+      label: "Apply themes to Flatpak apps"
+      description: "Enable theme integration for sandboxed Flatpak applications"
+      checked: Settings.data.appearance.applyToFlatpak
+      onToggled: checked => Settings.data.appearance.applyToFlatpak = checked
     }
   }
 

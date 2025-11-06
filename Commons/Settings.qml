@@ -397,6 +397,16 @@ Singleton {
       property bool enableUserTemplates: false
     }
 
+    // appearance settings (icon themes, GTK/QT themes, etc.)
+    property JsonObject appearance: JsonObject {
+      property string iconTheme: "Adwaita"
+      property string gtkTheme: "Adwaita-dark"
+      property string qtStyle: "Fusion"
+      property bool syncGtkThemeWithDarkMode: true
+      property bool applyToFlatpak: false
+      property real textScaling: 1.0  // Font/text scaling factor (0.5 - 2.0)
+    }
+
     // night light
     property JsonObject nightLight: JsonObject {
       property bool enabled: false

@@ -245,6 +245,335 @@ Singleton {
     return results
   }
 
+  // Apply fonts to GTK and Qt applications
+  function applyFonts() {
+    Logger.i("Font", "Applying fonts to GTK and Qt applications...")
+
+    // Apply to GTK 3
+    applyGtk3Fonts()
+
+    // Apply to GTK 4
+    applyGtk4Fonts()
+
+    // Apply to Qt5
+    applyQt5Fonts()
+
+    // Apply to Qt6
+    applyQt6Fonts()
+
+    // Apply via gsettings
+    applyGsettingsFonts()
+
+    Logger.i("Font", "Fonts applied successfully")
+  }
+
+  // Apply fonts to GTK 3
+  function applyGtk3Fonts() {
+    var configDir = Quickshell.env("HOME") + "/.config/gtk-3.0"
+    var configFile = configDir + "/settings.ini"
+
+    // Ensure directory exists
+    runCommand(["mkdir", "-p", configDir])
+
+    // Read and update config
+    readAndUpdateConfigFont(configFile, "gtk-font-name",
+      `${Settings.data.ui.fontDefault} ${Settings.data.ui.fontDefaultSize}`, "[Settings]")
+  }
+
+  // Helper to read config file and update a font setting
+  function readAndUpdateConfigFont(filePath, key, value, section) {
+    readFile(filePath, function(content) {
+      // Handle empty content (file doesn't exist or is empty)
+      var lines = content && content.trim() !== "" ? content.split("\n") : []
+      var updated = false
+      var inSection = false
+
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() === section) {
+          inSection = true
+        } else if (lines[i].trim().startsWith("[")) {
+          inSection = false
+        }
+
+        if (inSection && lines[i].startsWith(key + "=")) {
+          lines[i] = `${key}=${value}`
+          updated = true
+        }
+      }
+
+      // If not found, add it
+      if (!updated) {
+        if (lines.length === 0 || !lines.some(l => l.trim() === section)) {
+          lines.unshift(section)
+        }
+        for (var j = 0; j < lines.length; j++) {
+          if (lines[j].trim() === section) {
+            lines.splice(j + 1, 0, `${key}=${value}`)
+            break
+          }
+        }
+      }
+
+      writeFile(filePath, lines.join("\n"))
+    })
+  }
+
+  // Apply fonts to GTK 4
+  function applyGtk4Fonts() {
+    var configDir = Quickshell.env("HOME") + "/.config/gtk-4.0"
+    var configFile = configDir + "/settings.ini"
+
+    // Ensure directory exists
+    runCommand(["mkdir", "-p", configDir])
+
+    // Read and update config
+    readAndUpdateConfigFont(configFile, "gtk-font-name",
+      `${Settings.data.ui.fontDefault} ${Settings.data.ui.fontDefaultSize}`, "[Settings]")
+  }
+
+  // Apply fonts to Qt5
+  function applyQt5Fonts() {
+    var configDir = Quickshell.env("HOME") + "/.config/qt5ct"
+    var configFile = configDir + "/qt5ct.conf"
+
+    // Ensure directory exists
+    runCommand(["mkdir", "-p", configDir])
+
+    // Read and update config with both general and fixed fonts
+    readFile(configFile, function(content) {
+      // Handle empty content (file doesn't exist or is empty)
+      var lines = content && content.trim() !== "" ? content.split("\n") : []
+      var generalUpdated = false
+      var fixedUpdated = false
+      var inFonts = false
+
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() === "[Fonts]") {
+          inFonts = true
+        } else if (lines[i].trim().startsWith("[")) {
+          inFonts = false
+        }
+
+        if (inFonts) {
+          if (lines[i].startsWith("general=")) {
+            lines[i] = `general="${Settings.data.ui.fontDefault}",${Settings.data.ui.fontDefaultSize},-1,5,50,0,0,0,0,0`
+            generalUpdated = true
+          } else if (lines[i].startsWith("fixed=")) {
+            lines[i] = `fixed="${Settings.data.ui.fontFixed}",${Settings.data.ui.fontFixedSize},-1,5,50,0,0,0,0,0`
+            fixedUpdated = true
+          }
+        }
+      }
+
+      // If not found, add them
+      if (!generalUpdated || !fixedUpdated) {
+        if (lines.length === 0 || !lines.some(l => l.trim() === "[Fonts]")) {
+          lines.push("[Fonts]")
+        }
+        for (var j = 0; j < lines.length; j++) {
+          if (lines[j].trim() === "[Fonts]") {
+            if (!generalUpdated) {
+              lines.splice(j + 1, 0, `general="${Settings.data.ui.fontDefault}",${Settings.data.ui.fontDefaultSize},-1,5,50,0,0,0,0,0`)
+              j++
+            }
+            if (!fixedUpdated) {
+              lines.splice(j + 1, 0, `fixed="${Settings.data.ui.fontFixed}",${Settings.data.ui.fontFixedSize},-1,5,50,0,0,0,0,0`)
+            }
+            break
+          }
+        }
+      }
+
+      writeFile(configFile, lines.join("\n"))
+    })
+  }
+
+  // Apply fonts to Qt6
+  function applyQt6Fonts() {
+    var configDir = Quickshell.env("HOME") + "/.config/qt6ct"
+    var configFile = configDir + "/qt6ct.conf"
+
+    // Ensure directory exists
+    runCommand(["mkdir", "-p", configDir])
+
+    // Read and update config with both general and fixed fonts
+    readFile(configFile, function(content) {
+      // Handle empty content (file doesn't exist or is empty)
+      var lines = content && content.trim() !== "" ? content.split("\n") : []
+      var generalUpdated = false
+      var fixedUpdated = false
+      var inFonts = false
+
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() === "[Fonts]") {
+          inFonts = true
+        } else if (lines[i].trim().startsWith("[")) {
+          inFonts = false
+        }
+
+        if (inFonts) {
+          if (lines[i].startsWith("general=")) {
+            lines[i] = `general="${Settings.data.ui.fontDefault}",${Settings.data.ui.fontDefaultSize},-1,5,50,0,0,0,0,0`
+            generalUpdated = true
+          } else if (lines[i].startsWith("fixed=")) {
+            lines[i] = `fixed="${Settings.data.ui.fontFixed}",${Settings.data.ui.fontFixedSize},-1,5,50,0,0,0,0,0`
+            fixedUpdated = true
+          }
+        }
+      }
+
+      // If not found, add them
+      if (!generalUpdated || !fixedUpdated) {
+        if (lines.length === 0 || !lines.some(l => l.trim() === "[Fonts]")) {
+          lines.push("[Fonts]")
+        }
+        for (var j = 0; j < lines.length; j++) {
+          if (lines[j].trim() === "[Fonts]") {
+            if (!generalUpdated) {
+              lines.splice(j + 1, 0, `general="${Settings.data.ui.fontDefault}",${Settings.data.ui.fontDefaultSize},-1,5,50,0,0,0,0,0`)
+              j++
+            }
+            if (!fixedUpdated) {
+              lines.splice(j + 1, 0, `fixed="${Settings.data.ui.fontFixed}",${Settings.data.ui.fontFixedSize},-1,5,50,0,0,0,0,0`)
+            }
+            break
+          }
+        }
+      }
+
+      writeFile(configFile, lines.join("\n"))
+    })
+  }
+
+  // Apply fonts via gsettings
+  function applyGsettingsFonts() {
+    // Interface font
+    runCommand(["gsettings", "set", "org.gnome.desktop.interface", "font-name", `${Settings.data.ui.fontDefault} ${Settings.data.ui.fontDefaultSize}`])
+
+    // Document font
+    runCommand(["gsettings", "set", "org.gnome.desktop.interface", "document-font-name", `${Settings.data.ui.fontDefault} ${Settings.data.ui.fontDefaultSize}`])
+
+    // Monospace font
+    runCommand(["gsettings", "set", "org.gnome.desktop.interface", "monospace-font-name", `${Settings.data.ui.fontFixed} ${Settings.data.ui.fontFixedSize}`])
+
+    // Text scaling factor
+    if (Settings.data.appearance && Settings.data.appearance.textScaling) {
+      runCommand(["gsettings", "set", "org.gnome.desktop.interface", "text-scaling-factor", Settings.data.appearance.textScaling.toString()])
+    }
+  }
+
+  // Apply text scaling separately (can be called independently)
+  function applyTextScaling(scaling) {
+    if (!scaling) {
+      scaling = Settings.data.appearance && Settings.data.appearance.textScaling ? Settings.data.appearance.textScaling : 1.0
+    }
+
+    Logger.i("Font", `Applying text scaling: ${scaling}`)
+
+    // Update settings (auto-saves after 1 second)
+    if (Settings.data.appearance) {
+      Settings.data.appearance.textScaling = scaling
+    }
+
+    // Apply to gsettings (GTK)
+    runCommand(["gsettings", "set", "org.gnome.desktop.interface", "text-scaling-factor", scaling.toString()])
+
+    // Apply to Qt5 (using font DPI)
+    applyQt5TextScaling(scaling)
+
+    // Apply to Qt6 (using font DPI)
+    applyQt6TextScaling(scaling)
+
+    Logger.i("Font", "Text scaling applied successfully")
+  }
+
+  // Apply text scaling to Qt5 via DPI
+  function applyQt5TextScaling(scaling) {
+    var configDir = Quickshell.env("HOME") + "/.config/qt5ct"
+    var configFile = configDir + "/qt5ct.conf"
+
+    // Ensure directory exists
+    runCommand(["mkdir", "-p", configDir])
+
+    // Calculate DPI based on scaling (base DPI = 96)
+    var dpi = Math.round(96 * scaling)
+
+    // Read and update config
+    readAndUpdateConfigFont(configFile, "dpi", dpi.toString(), "[Fonts]")
+  }
+
+  // Apply text scaling to Qt6 via DPI
+  function applyQt6TextScaling(scaling) {
+    var configDir = Quickshell.env("HOME") + "/.config/qt6ct"
+    var configFile = configDir + "/qt6ct.conf"
+
+    // Ensure directory exists
+    runCommand(["mkdir", "-p", configDir])
+
+    // Calculate DPI based on scaling (base DPI = 96)
+    var dpi = Math.round(96 * scaling)
+
+    // Read and update config
+    readAndUpdateConfigFont(configFile, "dpi", dpi.toString(), "[Fonts]")
+  }
+
+  // Process for reading files (needs output)
+  Process {
+    id: fileReader
+    running: false
+    property var callback: null
+    property var outputLines: []
+
+    stdout: SplitParser {
+      id: fileReaderCollector
+      onRead: data => {
+        if (data) {
+          fileReader.outputLines.push(data)
+        }
+      }
+    }
+
+    onExited: (exitCode, exitStatus) => {
+      if (fileReader.callback) {
+        let fullOutput = fileReader.outputLines.join("\n")
+        fileReader.callback(fullOutput)
+        fileReader.callback = null
+        fileReader.outputLines = []
+      }
+    }
+  }
+
+  // Helper function to run a command (fire-and-forget)
+  function runCommand(command) {
+    Quickshell.execDetached(command)
+  }
+
+  // Helper function to read a file asynchronously
+  function readFile(filePath, callback) {
+    fileReader.callback = callback
+    // Use 'cat' with error suppression - if file doesn't exist, callback gets empty string
+    fileReader.command = ["sh", "-c", `cat "${filePath}" 2>/dev/null || true`]
+    fileReader.running = true
+  }
+
+  // Helper function to write a file
+  function writeFile(filePath, content) {
+    let qml = `
+      import QtQuick
+      import Quickshell.Io
+      Process {
+        running: true
+        command: ["sh", "-c", "cat > '${filePath}'"]
+        property string data: \`${content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`
+        Component.onCompleted: {
+          stdin = data
+        }
+        onExited: destroy()
+      }
+    `
+    Qt.createQmlObject(qml, root, "fileWriter")
+  }
+
   // Process for fontconfig commands
   Process {
     id: fontconfigProcess

@@ -91,6 +91,11 @@ ShellRoot {
         NightLightService.apply()
         DarkModeService.init()
         FontService.init()
+        // IconThemeService, GtkThemeService, and QtStyleService
+        // initialize automatically via Component.onCompleted
+        IconThemeService.ready
+        GtkThemeService.ready
+        QtStyleService.ready
         HooksService.init()
         BluetoothService.init()
         BatteryService.init()
