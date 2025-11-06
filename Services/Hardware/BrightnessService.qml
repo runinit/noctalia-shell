@@ -146,6 +146,13 @@ Singleton {
     property int maxBrightness: 100
     property bool ignoreNextChange: false
 
+    // Extract just the device name from the full path for brightnessctl
+    readonly property string deviceName: {
+      if (backlightDevice === "") return ""
+      var parts = backlightDevice.split("/")
+      return parts[parts.length - 1]
+    }
+
     // Signal for brightness changes
     signal brightnessUpdated(real newBrightness)
 
@@ -319,7 +326,12 @@ Singleton {
         Quickshell.execDetached(["ddcutil", "-b", busNum, "setvcp", "10", rounded])
       } else {
         monitor.ignoreNextChange = true
-        Quickshell.execDetached(["brightnessctl", "s", rounded + "%"])
+        // Use device-specific brightnessctl command to avoid defaulting to wrong device
+        if (deviceName !== "") {
+          Quickshell.execDetached(["brightnessctl", "-d", deviceName, "s", rounded + "%"])
+        } else {
+          Quickshell.execDetached(["brightnessctl", "s", rounded + "%"])
+        }
       }
 
       if (isDdc) {
@@ -333,9 +345,44 @@ Singleton {
       } else if (isDdc) {
         initProc.command = ["ddcutil", "-b", busNum, "getvcp", "10", "--brief"]
       } else {
-        // Internal backlight - find the first available backlight device and get its info
-        // This now returns: device_path, current_brightness, max_brightness (on separate lines)
-        initProc.command = ["sh", "-c", "for dev in /sys/class/backlight/*; do " + "  if [ -f \"$dev/brightness\" ] && [ -f \"$dev/max_brightness\" ]; then " + "    echo \"$dev\"; " + "    cat \"$dev/brightness\"; " + "    cat \"$dev/max_brightness\"; " + "    break; " + "  fi; " + "done"]
+        // Internal backlight - find the best available backlight device
+        // Priority: amdgpu > intel > acpi > other (skip nvidia_* as they're often dummies in hybrid setups)
+        // Returns: device_path, current_brightness, max_brightness (on separate lines)
+        initProc.command = ["sh", "-c",
+          "# Try amdgpu devices first\n" +
+          "for dev in /sys/class/backlight/amdgpu*; do\n" +
+          "  if [ -f \"$dev/brightness\" ] && [ -f \"$dev/max_brightness\" ]; then\n" +
+          "    echo \"$dev\"; cat \"$dev/brightness\"; cat \"$dev/max_brightness\"; exit 0\n" +
+          "  fi\n" +
+          "done\n" +
+          "# Try intel devices\n" +
+          "for dev in /sys/class/backlight/intel*; do\n" +
+          "  if [ -f \"$dev/brightness\" ] && [ -f \"$dev/max_brightness\" ]; then\n" +
+          "    echo \"$dev\"; cat \"$dev/brightness\"; cat \"$dev/max_brightness\"; exit 0\n" +
+          "  fi\n" +
+          "done\n" +
+          "# Try acpi devices\n" +
+          "for dev in /sys/class/backlight/acpi*; do\n" +
+          "  if [ -f \"$dev/brightness\" ] && [ -f \"$dev/max_brightness\" ]; then\n" +
+          "    echo \"$dev\"; cat \"$dev/brightness\"; cat \"$dev/max_brightness\"; exit 0\n" +
+          "  fi\n" +
+          "done\n" +
+          "# Fallback to any other non-nvidia device\n" +
+          "for dev in /sys/class/backlight/*; do\n" +
+          "  case \"$dev\" in\n" +
+          "    */nvidia*) continue ;;\n" +
+          "  esac\n" +
+          "  if [ -f \"$dev/brightness\" ] && [ -f \"$dev/max_brightness\" ]; then\n" +
+          "    echo \"$dev\"; cat \"$dev/brightness\"; cat \"$dev/max_brightness\"; exit 0\n" +
+          "  fi\n" +
+          "done\n" +
+          "# Last resort: use nvidia if it's the only option\n" +
+          "for dev in /sys/class/backlight/nvidia*; do\n" +
+          "  if [ -f \"$dev/brightness\" ] && [ -f \"$dev/max_brightness\" ]; then\n" +
+          "    echo \"$dev\"; cat \"$dev/brightness\"; cat \"$dev/max_brightness\"; exit 0\n" +
+          "  fi\n" +
+          "done"
+        ]
       }
       initProc.running = true
     }
