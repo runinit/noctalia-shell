@@ -364,3 +364,67 @@ See [development guidelines](https://docs.noctalia.dev/development/guideline)
 - Use `Logger.qml` for logging (Logger.i, Logger.d, Logger.w, Logger.e)
 - Check console output for service initialization messages
 - Verify service initialization order if adding dependencies
+
+---
+
+## Fork Integration History
+
+### v3.0 Upstream Integration (2025-11-07)
+
+Successfully integrated fork-specific changes with upstream noctalia-shell v3.0 release.
+
+**Integration Method**: Interactive rebase of 96 commits onto upstream/main (commit f8cffcd3)
+
+**Major Architectural Changes from Upstream**:
+- Deleted `NFullScreenWindow` and `NPanel` base classes
+- Introduced `MainScreen` component for unified bar + panel management
+- Reorganized panel structure: `Modules/Settings/` → `Modules/Panels/Settings/`
+- Enhanced theming system with new template support
+
+**Fork-Specific Features Preserved**:
+1. **Fuzzel Theming** - Matugen template integration for Fuzzel launcher
+2. **Niri Switcher** - Niri compositor workspace switcher support
+3. **Power Management** - Enhanced battery and power profile management
+4. **AppMenu Integration** - Application menu features
+5. **Spotlight Features** - Search and launcher improvements
+6. **Walker Terminal Theming** - Walker terminal theme integration with font config sync
+7. **Niriswitcher Theming** - Dynamic theming for niriswitcher with CSS generation
+8. **Audio Panel** - New audio device panel with right-click integration
+9. **AudioVisualizer** - Bar widget for audio visualization with Cava integration
+10. **Dock Enhancements** - Multi-display support and setup wizard integration
+11. **Recursive Wallpaper Search** - Option to search wallpapers recursively
+12. **Notification Transparency** - Configurable notification background opacity
+13. **Brightness Controls** - Minimum brightness enforcement and improved hybrid GPU support
+
+**Conflict Resolution Strategy**:
+- Accepted upstream's architectural improvements (MainScreen, panel reorganization)
+- Kept fork's feature additions where they didn't conflict with upstream changes
+- Used upstream's version when both branches fixed the same issue (e.g., overview wallpaper blur)
+- Merged settings files to preserve both upstream and fork configuration options
+
+**Key Decisions**:
+- **Dropped commit 59be275a**: Fork's overview wallpaper fix was superseded by upstream's better implementation
+- **Dropped commit 6f9eef9c**: Vicinae AppImage detection improvement already in upstream
+- **Skipped commit b767441f**: Minimum brightness toggle already existed in upstream
+- **Skipped commit 19cd1a8c**: Notification history delete functionality already in upstream
+
+**Files with Significant Merges**:
+- `Assets/settings-default.json` - Combined template settings (walker, code, niriswitcher)
+- `Services/ColorSchemeService.qml` - Used upstream's generic `hasEnabledTemplates()` over fork's hardcoded list
+- `Services/ProgramCheckerService.qml` - Merged program availability checks (vicinae AppImage, walker, code, niriswitcher, xdotool)
+- `Bin/colors-apply.sh` - Integrated enhanced Walker and Fuzzel theming scripts
+- `Commons/Settings.qml` - Merged new settings while avoiding duplicate sections
+
+**Testing Required**:
+1. Verify shell startup with `qs -p .`
+2. Test all fork-specific features (Fuzzel theming, Walker integration, Niri switcher, audio panel)
+3. Validate multi-display dock behavior
+4. Check recursive wallpaper search functionality
+5. Test notification transparency slider
+6. Verify brightness controls with hybrid GPUs
+
+**Branch Structure**:
+- `main` - Original fork state (backup)
+- `pre-v3-integration` - Pre-integration backup
+- `fork-working-copy` - Successfully rebased branch (current)
+- Remote `upstream/main` - Upstream v3.0 base (commit f8cffcd3)
