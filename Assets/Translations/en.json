@@ -515,14 +515,14 @@
         "matugen-scheme-type": {
           "label": "Matugen scheme type",
           "description": {
-            "scheme-content": "Derives colors that closely match the underlying image",
-            "scheme-expressive": "Vibrant palette with playful saturation",
-            "scheme-fidelity": "High-fidelity palette that preserves source hues",
-            "scheme-fruit-salad": "Colorful mix of bright contrasting accents",
-            "scheme-monochrome": "Minimal palette built around a single hue",
-            "scheme-neutral": "Muted palette with subdued and calming tones",
-            "scheme-rainbow": "Diverse palette spanning the full spectrum",
-            "scheme-tonal-spot": "Balanced palette with focused accents"
+            "content": "A scheme that places the source color in Scheme.primaryContainer.",
+            "expressive": "A scheme that places the source color in Scheme.primaryContainer.",
+            "fidelity": "A scheme that maximizes chroma while maintaining tone consistency.",
+            "fruit-salad": "A playful theme - the seed color's hue does not appear in the theme.",
+            "monochrome": "A scheme with minimal chroma.",
+            "neutral": "A scheme with near-zero chroma.",
+            "rainbow": "A playful theme with contrasting hues.",
+            "tonal-spot": "A calm theme, source color as accent, tonal palette with low chroma."
           }
         }
       },
@@ -581,22 +581,30 @@
           "foot": {
             "description": "Write {filepath} and reload",
             "description-missing": "Requires {app} to be installed"
+          },
+          "alacritty": {
+            "description": "Apply color scheme to Alacritty terminal emulator",
+            "description-missing": "Alacritty config file not found. Make sure Alacritty is installed."
+          },
+          "wezterm": {
+            "description": "Apply color scheme to WezTerm terminal emulator",
+            "description-missing": "WezTerm config file not found. Make sure WezTerm is installed."
           }
         },
         "programs": {
           "label": "Programs",
           "description": "Application-specific theming.",
           "fuzzel": {
-            "description": "Write {filepath} and reload",
-            "description-missing": "Requires {app} to be installed"
+            "description": "Apply color scheme to Fuzzel application launcher",
+            "description-missing": "Fuzzel config file not found. Make sure Fuzzel is installed."
           },
           "vicinae": {
             "description": "Write {filepath} and reload",
             "description-missing": "Requires {app} to be installed"
           },
           "walker": {
-            "description": "Write {filepath} and set theme to noctalia",
-            "description-missing": "Requires {app} to be installed"
+            "description": "Apply color scheme to Walker launcher",
+            "description-missing": "Walker config file not found. Make sure Walker is installed."
           },
           "discord": {
             "description": "Write {filepath} for {client}",
@@ -605,6 +613,10 @@
           "pywalfox": {
             "description": "Write {filepath} and run pywalfox update",
             "description-missing": "Requires {app} to be installed"
+          },
+          "code": {
+            "description": "Apply color scheme to Visual Studio Code",
+            "description-missing": "Visual Studio Code settings file not found. Make sure VS Code is installed."
           }
         },
         "misc": {
@@ -901,6 +913,22 @@
       "panels-overlay": {
         "label": "Open panels in overlay layer",
         "description": "Panels will appear above fullscreen windows"
+      },
+      "panels-attached-to-bar": {
+        "label": "Panels attached to bar",
+        "description": "Controls whether panels like Launcher and Control Center attach to the bar or float independently."
+      },
+      "settings-panel-attached-to-bar": {
+        "label": "Settings panel attached to bar",
+        "description": "Controls whether the Settings panel attaches to the bar or floats independently."
+      },
+      "shadows": {
+        "label": "Shadows",
+        "description": "Enable drop shadows for windows, panels, and UI elements.",
+        "direction": {
+          "label": "Shadow direction",
+          "description": "Controls the direction of drop shadows for UI elements."
+        }
       }
     },
     "lock-screen": {
