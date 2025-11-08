@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Commons
-import qs.Modules.Audio
+import qs.Widgets.AudioSpectrum
 import qs.Services
 import qs.Widgets
 
@@ -105,7 +105,7 @@ Item {
   // No imperative activation needed; bound to shouldShow
   Component {
     id: linearComponent
-    LinearSpectrum {
+    NLinearSpectrum {
       anchors.fill: parent
       values: CavaService.values
       showMinimumSignal: true
@@ -115,7 +115,7 @@ Item {
 
   Component {
     id: mirroredComponent
-    MirroredSpectrum {
+    NMirroredSpectrum {
       anchors.fill: parent
       values: CavaService.values
       showMinimumSignal: true
@@ -125,7 +125,7 @@ Item {
 
   Component {
     id: waveComponent
-    WaveSpectrum {
+    NWaveSpectrum {
       anchors.fill: parent
       values: CavaService.values
       showMinimumSignal: true

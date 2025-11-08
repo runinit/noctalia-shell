@@ -6,14 +6,16 @@ import qs.Commons
 Item {
   id: root
 
-  property string widgetId: ""
-  property var widgetProps: ({})
-  property string screenName: widgetProps && widgetProps.screen ? widgetProps.screen.name : ""
-  property string section: widgetProps && widgetProps.section || ""
-  property int sectionIndex: widgetProps && widgetProps.sectionWidgetIndex || 0
+  required property string widgetId
+  required property var widgetScreen
+  required property var widgetProps
 
   property string barDensity: "default"
   readonly property real scaling: barDensity === "mini" ? 0.8 : (barDensity === "compact" ? 0.9 : 1.0)
+
+  // Extract section info from widgetProps
+  readonly property string section: widgetProps.section || ""
+  readonly property int sectionIndex: widgetProps.sectionWidgetIndex || 0
 
   // Don't reserve space unless the loaded widget is really visible
   implicitWidth: getImplicitSize(loader.item, "implicitWidth")

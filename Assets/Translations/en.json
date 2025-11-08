@@ -58,6 +58,11 @@
             "label": "Monospaced font size",
             "description": "Increase or decrease the size of the monospaced text."
           }
+        },
+        "text-scaling": {
+          "label": "Application text scaling",
+          "description": "Adjust text size in applications that support the system text scaling factor.",
+          "reset": "Reset text scaling"
         }
       },
       "language": {
@@ -675,18 +680,34 @@
       }
     },
     "power": {
-      "title": "Power Management",
+      "title": "Power",
       "ac": {
         "section": {
           "label": "AC Power",
-          "description": "Power management settings when plugged into AC power."
+          "description": "Idle timeouts when plugged into AC power."
         }
       },
       "battery": {
         "section": {
-          "label": "Battery Power",
-          "description": "Power management settings when running on battery."
+          "label": "Battery",
+          "description": "Idle timeouts when running on battery power."
         }
+      },
+      "monitor-timeout": {
+        "label": "Turn off monitors",
+        "description": "Time before turning off monitors when idle."
+      },
+      "lock-timeout": {
+        "label": "Lock screen",
+        "description": "Time before locking the screen when idle."
+      },
+      "suspend-timeout": {
+        "label": "Suspend system",
+        "description": "Time before suspending the system when idle."
+      },
+      "hibernate-timeout": {
+        "label": "Hibernate system",
+        "description": "Time before hibernating the system when idle."
       },
       "options": {
         "section": {
@@ -694,33 +715,17 @@
           "description": "Additional power management options."
         }
       },
-      "monitor-timeout": {
-        "label": "Turn off monitor",
-        "description": "Time before turning off the display when idle."
-      },
-      "lock-timeout": {
-        "label": "Lock screen",
-        "description": "Time before locking the screen when idle."
-      },
-      "suspend-timeout": {
-        "label": "Suspend",
-        "description": "Time before suspending the system when idle."
-      },
-      "hibernate-timeout": {
-        "label": "Hibernate",
-        "description": "Time before hibernating the system when idle."
-      },
       "lock-before-suspend": {
         "label": "Lock before suspend",
-        "description": "Automatically lock the screen before suspending or hibernating."
+        "description": "Automatically lock the screen before system suspends."
       },
       "respect-inhibitors": {
-        "label": "Respect inhibitors",
-        "description": "Honor idle inhibitors from applications (e.g., video players, presentations)."
+        "label": "Respect idle inhibitors",
+        "description": "Honor applications that prevent idle actions (e.g., media players)."
       },
       "loginctl-lock": {
-        "label": "Loginctl lock integration",
-        "description": "Integrate with systemd-logind lock events."
+        "label": "loginctl lock integration",
+        "description": "Integrate with systemd-logind for lock screen events."
       }
     },
     "screen-recorder": {
@@ -780,55 +785,6 @@
           "label": "Audio codec",
           "description": "Opus is recommended for best performance and smallest audio size."
         }
-      }
-    },
-    "power": {
-      "title": "Power",
-      "ac": {
-        "section": {
-          "label": "AC Power",
-          "description": "Idle timeouts when plugged into AC power."
-        }
-      },
-      "battery": {
-        "section": {
-          "label": "Battery",
-          "description": "Idle timeouts when running on battery power."
-        }
-      },
-      "monitor-timeout": {
-        "label": "Turn off monitors",
-        "description": "Time before turning off monitors when idle."
-      },
-      "lock-timeout": {
-        "label": "Lock screen",
-        "description": "Time before locking the screen when idle."
-      },
-      "suspend-timeout": {
-        "label": "Suspend system",
-        "description": "Time before suspending the system when idle."
-      },
-      "hibernate-timeout": {
-        "label": "Hibernate system",
-        "description": "Time before hibernating the system when idle."
-      },
-      "options": {
-        "section": {
-          "label": "Options",
-          "description": "Additional power management options."
-        }
-      },
-      "lock-before-suspend": {
-        "label": "Lock before suspend",
-        "description": "Automatically lock the screen before system suspends."
-      },
-      "respect-inhibitors": {
-        "label": "Respect idle inhibitors",
-        "description": "Honor applications that prevent idle actions (e.g., media players)."
-      },
-      "loginctl-lock": {
-        "label": "loginctl lock integration",
-        "description": "Integrate with systemd-logind for lock screen events."
       }
     },
     "about": {
