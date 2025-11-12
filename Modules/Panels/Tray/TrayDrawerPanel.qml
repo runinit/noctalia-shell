@@ -144,15 +144,27 @@ SmartPanel {
             backer.fillMode: Image.PreserveAspectFit
             source: {
               let icon = modelData?.icon || ""
-              if (!icon)
+              const appName = modelData?.tooltip || "unknown"
+
+              Logger.d("TrayIcon", "Loading icon for:", appName)
+              Logger.d("TrayIcon", "  Raw icon value:", icon)
+
+              if (!icon) {
+                Logger.w("TrayIcon", "  No icon provided for:", appName)
                 return ""
+              }
+
               if (icon.includes("?path=")) {
                 const chunks = icon.split("?path=")
                 const name = chunks[0]
                 const path = chunks[1]
                 const fileName = name.substring(name.lastIndexOf("/") + 1)
-                return `file://${path}/${fileName}`
+                const resolvedPath = `file://${path}/${fileName}`
+                Logger.d("TrayIcon", "  Custom path icon:", resolvedPath)
+                return resolvedPath
               }
+
+              Logger.d("TrayIcon", "  Using icon as-is:", icon)
               return icon
             }
 
