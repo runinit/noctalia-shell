@@ -469,6 +469,34 @@ Singleton {
     property JsonObject battery: JsonObject {
       property int chargingMode: 0
     }
+
+    // idle management
+    property JsonObject idleManagement: JsonObject {
+      property bool enabled: false
+      property bool respectKeepAwake: true
+      property int debounceSeconds: 5
+      property list<string> inhibitApps: []
+
+      property JsonObject acMode: JsonObject {
+        property int dimTimeout: 0           // seconds, 0 = disabled
+        property int dimBrightness: 30       // percentage
+        property int screenOffTimeout: 0
+        property int lockTimeout: 300        // 5 min default
+        property int suspendTimeout: 0
+      }
+
+      property JsonObject batteryMode: JsonObject {
+        property int dimTimeout: 120         // 2 min
+        property int dimBrightness: 20
+        property int screenOffTimeout: 180   // 3 min
+        property int lockTimeout: 240        // 4 min
+        property int suspendTimeout: 600     // 10 min
+      }
+
+      // Optional lid actions
+      property string lidCloseAction: "none"   // none, lock, suspend, hibernate
+      property string lidOpenAction: "none"    // none, wake
+    }
   }
 
   // -----------------------------------------------------
