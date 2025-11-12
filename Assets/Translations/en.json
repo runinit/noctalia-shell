@@ -1348,6 +1348,65 @@
       },
       "title": "Lock screen"
     },
+    "idle-management": {
+      "ac-mode": {
+        "description": "Configure idle timeouts when connected to AC power.",
+        "label": "AC Power Mode"
+      },
+      "advanced": {
+        "description": "Additional idle management settings.",
+        "label": "Advanced Settings"
+      },
+      "battery-mode": {
+        "description": "Configure idle timeouts when running on battery power.",
+        "label": "Battery Power Mode"
+      },
+      "debounce": {
+        "description": "Wait this many seconds after waking before allowing suspend. Prevents immediate suspend if you briefly wake your screen then walk away.",
+        "label": "Suspend debounce duration"
+      },
+      "dim-brightness": {
+        "label": "Dimmed brightness level"
+      },
+      "dim-timeout": {
+        "description": "Dim screen brightness after this many minutes of inactivity.",
+        "label": "Dim screen timeout"
+      },
+      "enabled": {
+        "description": "Enable automatic idle detection and power management.",
+        "label": "Enable idle management"
+      },
+      "respect-keep-awake": {
+        "description": "When enabled, idle actions will be blocked while the Keep Awake button is active. Disable this to ignore Keep Awake and allow idle actions even when Keep Awake is enabled.",
+        "label": "Respect Keep Awake button"
+      },
+      "inhibitor-apps": {
+        "add": "Add app to inhibitor list",
+        "description": "Prevent idle actions while these apps are running (enter process names, e.g., 'vlc', 'firefox').",
+        "hint": "Tip: Use exact process names as shown in 'ps' or 'htop'. Idle actions will be blocked while any of these apps are running.",
+        "label": "Inhibitor apps",
+        "placeholder": "e.g., vlc, mpv, steam",
+        "remove": "Remove app from inhibitor list"
+      },
+      "lock-timeout": {
+        "description": "Lock the screen after this many minutes of inactivity.",
+        "label": "Lock screen timeout"
+      },
+      "screen-off-timeout": {
+        "description": "Turn off displays (DPMS) after this many minutes of inactivity.",
+        "label": "Screen off timeout"
+      },
+      "section": {
+        "description": "Configure automatic screen dimming, locking, and suspend based on idle time.",
+        "label": "Idle Management"
+      },
+      "suspend-timeout": {
+        "description": "Suspend the system after this many minutes of inactivity.",
+        "label": "Suspend timeout"
+      },
+      "title": "Idle Management",
+      "zero-disables": "(0 = disabled)"
+    },
     "network": {
       "bluetooth": {
         "label": "Enable Bluetooth"
