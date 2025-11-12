@@ -197,7 +197,15 @@ vicinae)
 
 pywalfox)
     echo "🎨 Updating pywalfox themes..."
-    pywalfox update
+    # Check if pywalfox daemon is running
+    if pgrep -f "python.*pywalfox.*start" > /dev/null 2>&1; then
+        pywalfox update 2>&1 | grep -v "^ERROR:root:" || true
+    else
+        echo "⚠️  Pywalfox daemon not running. Theme file created but not applied to Firefox."
+        echo "    Start daemon with: pywalfox start"
+        # Still exit successfully - this is not a fatal error
+        true
+    fi
     ;;
 
 *)

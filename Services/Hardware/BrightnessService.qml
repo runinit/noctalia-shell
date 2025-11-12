@@ -319,7 +319,9 @@ Singleton {
         Quickshell.execDetached(["ddcutil", "-b", busNum, "setvcp", "10", rounded])
       } else {
         monitor.ignoreNextChange = true
-        Quickshell.execDetached(["brightnessctl", "s", rounded + "%"])
+        // Extract device name from path (e.g., /sys/class/backlight/amdgpu_bl2 → amdgpu_bl2)
+        const deviceName = monitor.backlightDevice.split("/").pop()
+        Quickshell.execDetached(["brightnessctl", "-d", deviceName, "s", rounded + "%"])
       }
 
       if (isDdc) {

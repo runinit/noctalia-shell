@@ -14,6 +14,14 @@ Singleton {
   property bool isNiri: false
   property bool isSway: false
 
+  // Computed property for compositor name (used by other services)
+  readonly property string compositor: {
+    if (isHyprland) return "hyprland"
+    if (isSway) return "sway"
+    if (isNiri) return "niri"
+    return "unknown"
+  }
+
   // Generic workspace and window data
   property ListModel workspaces: ListModel {}
   property ListModel windows: ListModel {}
