@@ -65,6 +65,7 @@ SmartPanel {
     Bar,
     ColorScheme,
     LockScreen,
+    IdleManagement,
     ControlCenter,
     OSD,
     Display,
@@ -164,6 +165,10 @@ SmartPanel {
     LockScreenTab {}
   }
   Component {
+    id: idleManagementTab
+    IdleManagementTab {}
+  }
+  Component {
     id: sessionMenuTab
     SessionMenuTab {}
   }
@@ -230,10 +235,10 @@ SmartPanel {
                      "icon": "settings-lock-screen",
                      "source": lockScreenTab
                    }, {
-                     "id": SettingsPanel.Tab.SessionMenu,
-                     "label": "settings.session-menu.title",
-                     "icon": "settings-session-menu",
-                     "source": sessionMenuTab
+                     "id": SettingsPanel.Tab.IdleManagement,
+                     "label": "settings.idle-management.title",
+                     "icon": "hourglass-low",
+                     "source": idleManagementTab
                    }, {
                      "id": SettingsPanel.Tab.Audio,
                      "label": "settings.audio.title",
