@@ -27,7 +27,7 @@ Singleton {
     }
 
     try {
-      const fallbackPath = Quickshell.iconPath ? (Quickshell.iconPath(fallback, true) || "") : ""
+      const fallbackPath = Quickshell.iconPath ? Quickshell.iconPath(fallback, true) : ""
       Logger.d("ThemeIcons", "  Trying fallback:", fallback, "->", fallbackPath)
       if (fallbackPath) {
         Logger.d("ThemeIcons", "  ✓ Fallback resolved to:", fallbackPath)
