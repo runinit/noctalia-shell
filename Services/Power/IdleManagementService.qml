@@ -240,10 +240,20 @@ Singleton {
 
   function doLock() {
     Logger.i("IdleManagement", "Locking screen")
+
+    // Remember if screen was off before locking
+    const wasScreenOff = isScreenOff
+
     try {
       if (PanelService.lockScreen && !PanelService.lockScreen.active) {
         PanelService.lockScreen.active = true
         isLocked = true
+
+        // If screen was off, turn it back off after lock screen renders
+        if (wasScreenOff) {
+          Logger.i("IdleManagement", "Screen was off before lock, re-applying DPMS")
+          postLockDpmsTimer.start()
+        }
       }
     } catch (e) {
       Logger.e("IdleManagement", "Failed to lock screen:", e)
@@ -331,6 +341,20 @@ Singleton {
       }
 
       callback = null
+    }
+  }
+
+  // Timer to re-apply DPMS after lock screen shows
+  Timer {
+    id: postLockDpmsTimer
+    interval: 100  // 100ms delay to let lock screen render
+    repeat: false
+
+    onTriggered: {
+      if (isLocked && isScreenOff) {
+        Logger.d("IdleManagement", "Re-applying DPMS after lock")
+        turnOffDisplays()
+      }
     }
   }
 
