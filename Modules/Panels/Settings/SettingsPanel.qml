@@ -65,6 +65,7 @@ SmartPanel {
     Bar,
     ColorScheme,
     LockScreen,
+    IdleManagement,
     ControlCenter,
     OSD,
     Display,
@@ -161,6 +162,10 @@ SmartPanel {
     id: lockScreenTab
     LockScreenTab {}
   }
+  Component {
+    id: idleManagementTab
+    IdleManagementTab {}
+  }
 
   // Order *DOES* matter
   function updateTabsModel() {
@@ -199,6 +204,11 @@ SmartPanel {
                      "label": "settings.lock-screen.title",
                      "icon": "settings-lock-screen",
                      "source": lockScreenTab
+                   }, {
+                     "id": SettingsPanel.Tab.IdleManagement,
+                     "label": "settings.idle-management.title",
+                     "icon": "hourglass-low",
+                     "source": idleManagementTab
                    }, {
                      "id": SettingsPanel.Tab.Audio,
                      "label": "settings.audio.title",
