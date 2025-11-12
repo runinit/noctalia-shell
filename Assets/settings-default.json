@@ -1,5 +1,5 @@
 {
-  "settingsVersion": 21,
+  "settingsVersion": 22,
   "setupCompleted": false,
   "bar": {
     "position": "top",
@@ -213,7 +213,8 @@
     "respectExpireTimeout": false,
     "lowUrgencyDuration": 3,
     "normalUrgencyDuration": 8,
-    "criticalUrgencyDuration": 15
+    "criticalUrgencyDuration": 15,
+    "enableKeyboardLayoutToast": true
   },
   "osd": {
     "enabled": true,
@@ -286,5 +287,27 @@
   },
   "battery": {
     "chargingMode": 0
+  },
+  "idleManagement": {
+    "enabled": false,
+    "respectKeepAwake": true,
+    "debounceSeconds": 5,
+    "inhibitApps": [],
+    "acMode": {
+      "dimTimeout": 0,
+      "dimBrightness": 30,
+      "screenOffTimeout": 0,
+      "lockTimeout": 300,
+      "suspendTimeout": 0
+    },
+    "batteryMode": {
+      "dimTimeout": 120,
+      "dimBrightness": 20,
+      "screenOffTimeout": 180,
+      "lockTimeout": 240,
+      "suspendTimeout": 600
+    },
+    "lidCloseAction": "none",
+    "lidOpenAction": "none"
   }
 }
