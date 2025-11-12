@@ -81,6 +81,7 @@ ShellRoot {
         BatteryService.init()
         IdleInhibitorService.init()
         PowerProfileService.init()
+        IdleManagementService.init()
         HostService.init()
         FontService.init()
 
