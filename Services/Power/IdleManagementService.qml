@@ -26,7 +26,7 @@ Singleton {
     : Settings.data.idleManagement.batteryMode
 
   // State tracking
-  property real originalBrightness: 1.0
+  property var originalBrightnesses: ({})  // Store per-monitor brightness
   property bool isDimmed: false
   property bool isScreenOff: false
   property bool isLocked: false
@@ -164,9 +164,15 @@ Singleton {
     if (isDimmed) return
 
     Logger.i("IdleManagement", "Dimming brightness")
-    originalBrightness = BrightnessService.brightness
     const targetBrightness = currentMode.dimBrightness / 100.0
-    BrightnessService.setBrightness(targetBrightness)
+
+    // Save current brightness for each monitor and dim them
+    originalBrightnesses = {}
+    BrightnessService.monitors.forEach((monitor, index) => {
+      originalBrightnesses[index] = monitor.brightness
+      monitor.setBrightness(targetBrightness)
+    })
+
     isDimmed = true
   }
 
@@ -174,7 +180,15 @@ Singleton {
     if (!isDimmed) return
 
     Logger.i("IdleManagement", "Restoring brightness")
-    BrightnessService.setBrightness(originalBrightness)
+
+    // Restore original brightness for each monitor
+    BrightnessService.monitors.forEach((monitor, index) => {
+      const savedBrightness = originalBrightnesses[index]
+      if (savedBrightness !== undefined) {
+        monitor.setBrightness(savedBrightness)
+      }
+    })
+
     isDimmed = false
   }
 
@@ -337,9 +351,12 @@ Singleton {
       default:
         Logger.w("IdleManagement", "DPMS not supported for compositor:", compositor)
         // Fallback: try to use BrightnessService to set brightness to 0
-        if (BrightnessService) {
-          originalBrightness = BrightnessService.brightness
-          BrightnessService.setBrightness(0)
+        if (BrightnessService && BrightnessService.monitors.length > 0) {
+          originalBrightnesses = {}
+          BrightnessService.monitors.forEach((monitor, index) => {
+            originalBrightnesses[index] = monitor.brightness
+            monitor.setBrightness(0)
+          })
         }
         break
     }
@@ -362,8 +379,13 @@ Singleton {
       default:
         Logger.w("IdleManagement", "DPMS not supported for compositor:", compositor)
         // Fallback: restore brightness
-        if (BrightnessService && originalBrightness > 0) {
-          BrightnessService.setBrightness(originalBrightness)
+        if (BrightnessService && BrightnessService.monitors.length > 0) {
+          BrightnessService.monitors.forEach((monitor, index) => {
+            const savedBrightness = originalBrightnesses[index]
+            if (savedBrightness !== undefined && savedBrightness > 0) {
+              monitor.setBrightness(savedBrightness)
+            }
+          })
         }
         break
     }
