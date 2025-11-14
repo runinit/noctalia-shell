@@ -26,7 +26,7 @@ Singleton {
     : Settings.data.idleManagement.batteryMode
 
   // State tracking
-  property var originalBrightnesses: ({})  // Store per-monitor brightness
+  property var originalBrightnesses: ({})  // Store per-monitor brightness by screen name
   property bool isDimmed: false
   property bool isScreenOff: false
   property bool isLocked: false
@@ -168,8 +168,10 @@ Singleton {
 
     // Save current brightness for each monitor and dim them
     originalBrightnesses = {}
-    BrightnessService.monitors.forEach((monitor, index) => {
-      originalBrightnesses[index] = monitor.brightness
+    BrightnessService.monitors.forEach((monitor) => {
+      const monitorId = monitor.modelData.name
+      originalBrightnesses[monitorId] = monitor.brightness
+      Logger.d("IdleManagement", `Saving brightness for ${monitorId}: ${monitor.brightness}`)
       monitor.setBrightness(targetBrightness)
     })
 
@@ -182,10 +184,14 @@ Singleton {
     Logger.i("IdleManagement", "Restoring brightness")
 
     // Restore original brightness for each monitor
-    BrightnessService.monitors.forEach((monitor, index) => {
-      const savedBrightness = originalBrightnesses[index]
+    BrightnessService.monitors.forEach((monitor) => {
+      const monitorId = monitor.modelData.name
+      const savedBrightness = originalBrightnesses[monitorId]
       if (savedBrightness !== undefined) {
+        Logger.d("IdleManagement", `Restoring brightness for ${monitorId}: ${savedBrightness}`)
         monitor.setBrightness(savedBrightness)
+      } else {
+        Logger.w("IdleManagement", `No saved brightness for ${monitorId}, skipping`)
       }
     })
 
@@ -377,8 +383,10 @@ Singleton {
         // Fallback: try to use BrightnessService to set brightness to 0
         if (BrightnessService && BrightnessService.monitors.length > 0) {
           originalBrightnesses = {}
-          BrightnessService.monitors.forEach((monitor, index) => {
-            originalBrightnesses[index] = monitor.brightness
+          BrightnessService.monitors.forEach((monitor) => {
+            const monitorId = monitor.modelData.name
+            originalBrightnesses[monitorId] = monitor.brightness
+            Logger.d("IdleManagement", `Fallback: Saving brightness for ${monitorId}: ${monitor.brightness}`)
             monitor.setBrightness(0)
           })
         }
@@ -404,10 +412,14 @@ Singleton {
         Logger.w("IdleManagement", "DPMS not supported for compositor:", compositor)
         // Fallback: restore brightness
         if (BrightnessService && BrightnessService.monitors.length > 0) {
-          BrightnessService.monitors.forEach((monitor, index) => {
-            const savedBrightness = originalBrightnesses[index]
+          BrightnessService.monitors.forEach((monitor) => {
+            const monitorId = monitor.modelData.name
+            const savedBrightness = originalBrightnesses[monitorId]
             if (savedBrightness !== undefined && savedBrightness > 0) {
+              Logger.d("IdleManagement", `Fallback: Restoring brightness for ${monitorId}: ${savedBrightness}`)
               monitor.setBrightness(savedBrightness)
+            } else {
+              Logger.w("IdleManagement", `Fallback: No saved brightness for ${monitorId}`)
             }
           })
         }
@@ -500,5 +512,36 @@ Singleton {
         }
       }
     }
+  }
+
+  // ===== Monitor Configuration Change Handling =====
+  Connections {
+    target: BrightnessService
+    function onMonitorsChanged() {
+      Logger.i("IdleManagement", "Monitor configuration changed, resetting state")
+      handleMonitorConfigurationChange()
+    }
+  }
+
+  function handleMonitorConfigurationChange() {
+    const currentMonitorCount = BrightnessService.monitors.length
+    Logger.i("IdleManagement", "Monitor configuration changed - new count:", currentMonitorCount)
+
+    // Reset state to known-good if monitors changed while in modified state
+    if (isDimmed) {
+      Logger.w("IdleManagement", "Monitors changed while dimmed, clearing brightness data")
+      originalBrightnesses = {}
+      isDimmed = false
+    }
+
+    if (isScreenOff) {
+      Logger.w("IdleManagement", "Monitors changed while screen off, resetting screen state")
+      isScreenOff = false
+    }
+
+    // Note: Don't reset isLocked - lock screen should persist across monitor changes
+    // User must unlock manually
+
+    Logger.d("IdleManagement", "Monitor configuration change handled successfully")
   }
 }
