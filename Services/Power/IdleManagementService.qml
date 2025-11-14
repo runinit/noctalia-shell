@@ -131,10 +131,17 @@ Singleton {
     timeout: currentMode.lockTimeout
     respectInhibitors: true
 
+    onEnabledChanged: {
+      Logger.d("IdleManagement", "Lock monitor enabled changed:", enabled, "timeout:", timeout, "sec")
+    }
+
     onIsIdleChanged: {
+      Logger.d("IdleManagement", "Lock monitor isIdle changed:", isIdle, "enabled:", enabled)
       if (isIdle) {
+        Logger.i("IdleManagement", "Lock monitor triggered - calling handleLock()")
         handleLock()
       } else {
+        Logger.d("IdleManagement", "Lock monitor: user became active")
         // Note: We don't auto-unlock
         lastWakeTime = Date.now()
       }
@@ -232,14 +239,20 @@ Singleton {
   }
 
   function handleLock() {
-    if (isLocked) return
+    Logger.d("IdleManagement", "handleLock() called, isLocked:", isLocked)
+    if (isLocked) {
+      Logger.d("IdleManagement", "Already locked, skipping")
+      return
+    }
 
     // Check inhibitor apps before locking
     if (hasInhibitorApps()) {
+      Logger.d("IdleManagement", "Has inhibitor apps configured, checking if any are running")
       checkInhibitorsAndRun(function() {
         doLock()
       })
     } else {
+      Logger.d("IdleManagement", "No inhibitor apps configured, proceeding with lock")
       doLock()
     }
   }
