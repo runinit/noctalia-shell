@@ -328,9 +328,9 @@
     "debounceSeconds": 5,
     "inhibitApps": [],
     "acMode": {
-      "dimTimeout": 0,
+      "dimTimeout": 300,
       "dimBrightness": 30,
-      "screenOffTimeout": 0,
+      "screenOffTimeout": 600,
       "lockTimeout": 300,
       "suspendTimeout": 0
     },

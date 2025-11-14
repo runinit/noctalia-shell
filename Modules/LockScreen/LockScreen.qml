@@ -69,10 +69,30 @@ Loader {
           // SECURITY: Execute pending action after successful authentication (VULN-001)
           if (lockContainer.waitingForActionAuth && lockContainer.pendingActionCallback) {
             Logger.i("LockScreen", "Authentication successful, executing pending action:", lockContainer.pendingAction)
-            lockContainer.pendingActionCallback()
+
+            // Store callback before clearing state (prevents losing reference)
+            var callback = lockContainer.pendingActionCallback
+
+            // Clear pending action FIRST
             lockContainer.clearPendingAction()
-            // Don't unlock the screen, just execute the action
+
+            // Clear password field and reset all authentication state
             lockContext.currentText = ""
+            lockContext.showFailure = false
+            lockContext.errorMessage = ""
+            lockContext.unlockInProgress = false
+
+            // Execute callback AFTER clearing state
+            callback()
+
+            // Don't unlock the screen, just execute the action
+
+            // Ensure password input regains focus for next authentication
+            Qt.callLater(function() {
+              if (passwordInput) {
+                passwordInput.forceActiveFocus()
+              }
+            })
           } else {
             // Normal unlock
             lockSession.locked = false
@@ -87,6 +107,13 @@ Loader {
             lockContainer.clearPendingAction()
           }
           lockContext.currentText = ""
+
+          // Ensure password input regains focus after failed attempt
+          Qt.callLater(function() {
+            if (passwordInput) {
+              passwordInput.forceActiveFocus()
+            }
+          })
         }
       }
 
@@ -720,9 +747,8 @@ Loader {
                   }
 
                   // Current weather
-                  // SECURITY: Hidden to prevent location disclosure (VULN-003)
                   RowLayout {
-                    visible: false  // Security: Don't show weather/location while locked
+                    visible: Settings.data.location.weatherEnabled && LocationService.data.weather !== null
                     Layout.preferredWidth: 180
                     spacing: 8
 
@@ -794,9 +820,8 @@ Loader {
                   }
 
                   // 3-day forecast
-                  // SECURITY: Hidden to prevent information disclosure (VULN-003)
                   RowLayout {
-                    visible: false  // Security: Don't show forecast while locked
+                    visible: Settings.data.location.weatherEnabled && LocationService.data.weather !== null
                     Layout.preferredWidth: 260
                     Layout.rightMargin: 8
                     spacing: 4
