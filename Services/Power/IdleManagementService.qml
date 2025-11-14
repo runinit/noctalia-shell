@@ -305,6 +305,29 @@ Singleton {
   }
 
   // ===== Inhibitor Apps Checking =====
+
+  // SECURITY: Validate process names to prevent command injection (VULN-002)
+  function isValidProcessName(name) {
+    if (!name || typeof name !== 'string') return false
+
+    // Process names should only contain alphanumeric, dash, underscore, dot
+    const validPattern = /^[a-zA-Z0-9._-]+$/
+
+    // Limit length to prevent abuse
+    if (name.length > 255) {
+      Logger.w("IdleManagement", "Process name too long (>255 chars), rejected:", name.substring(0, 50) + "...")
+      return false
+    }
+
+    // Check pattern
+    if (!validPattern.test(name)) {
+      Logger.w("IdleManagement", "Invalid process name rejected (invalid characters):", name)
+      return false
+    }
+
+    return true
+  }
+
   function hasInhibitorApps() {
     const apps = Settings.data.idleManagement.inhibitApps
     return apps && apps.length > 0
@@ -318,9 +341,26 @@ Singleton {
 
     inhibitorCheckRunning = true
     inhibitorCheckProcess.callback = callback
-    const apps = Settings.data.idleManagement.inhibitApps.join(",")
 
-    Logger.d("IdleManagement", "Checking for inhibitor apps:", apps)
+    // SECURITY: Validate and filter app names (VULN-002)
+    const apps = Settings.data.idleManagement.inhibitApps
+    const validatedApps = apps.filter(app => isValidProcessName(app))
+
+    if (validatedApps.length === 0) {
+      Logger.d("IdleManagement", "No valid inhibitor apps configured")
+      inhibitorCheckRunning = false
+      if (callback) callback()
+      return
+    }
+
+    // SECURITY: Pass apps as separate arguments instead of comma-joined string
+    inhibitorCheckProcess.command = [
+      "bash",
+      Quickshell.shellDir + "/Bin/idle-management/check-inhibitors.sh",
+      ...validatedApps  // Spread as separate arguments
+    ]
+
+    Logger.d("IdleManagement", "Checking for inhibitor apps:", validatedApps.join(", "))
     inhibitorCheckProcess.running = true
   }
 
@@ -329,8 +369,7 @@ Singleton {
     property var callback: null
 
     running: false
-    command: ["bash", Quickshell.shellDir + "/Bin/idle-management/check-inhibitors.sh",
-              Settings.data.idleManagement.inhibitApps.join(",")]
+    command: []  // Will be set dynamically in checkInhibitorsAndRun()
 
     onExited: function(exitCode, exitStatus) {
       root.inhibitorCheckRunning = false

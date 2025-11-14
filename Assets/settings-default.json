@@ -323,7 +323,7 @@
     "chargingMode": 0
   },
   "idleManagement": {
-    "enabled": false,
+    "enabled": true,
     "respectKeepAwake": true,
     "debounceSeconds": 5,
     "inhibitApps": [],

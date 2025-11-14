@@ -44,14 +44,48 @@ Loader {
     Item {
       id: lockContainer
 
+      // SECURITY: State management for system control authentication (VULN-001)
+      property string pendingAction: ""  // logout, suspend, hibernate, reboot, shutdown
+      property var pendingActionCallback: null
+      property bool waitingForActionAuth: false
+
+      function requestAuthForAction(actionName, actionCallback) {
+        Logger.i("LockScreen", "System control requested:", actionName, "- prompting for authentication")
+        pendingAction = actionName
+        pendingActionCallback = actionCallback
+        waitingForActionAuth = true
+        // Password input will be shown, user must authenticate
+      }
+
+      function clearPendingAction() {
+        pendingAction = ""
+        pendingActionCallback = null
+        waitingForActionAuth = false
+      }
+
       LockContext {
         id: lockContext
         onUnlocked: {
-          lockSession.locked = false
-          lockScreen.scheduleUnloadAfterUnlock()
-          lockContext.currentText = ""
+          // SECURITY: Execute pending action after successful authentication (VULN-001)
+          if (lockContainer.waitingForActionAuth && lockContainer.pendingActionCallback) {
+            Logger.i("LockScreen", "Authentication successful, executing pending action:", lockContainer.pendingAction)
+            lockContainer.pendingActionCallback()
+            lockContainer.clearPendingAction()
+            // Don't unlock the screen, just execute the action
+            lockContext.currentText = ""
+          } else {
+            // Normal unlock
+            lockSession.locked = false
+            lockScreen.scheduleUnloadAfterUnlock()
+            lockContext.currentText = ""
+          }
         }
         onFailed: {
+          // SECURITY: Clear pending action on failed authentication (VULN-001)
+          if (lockContainer.waitingForActionAuth) {
+            Logger.w("LockScreen", "Authentication failed for system control:", lockContainer.pendingAction)
+            lockContainer.clearPendingAction()
+          }
           lockContext.currentText = ""
         }
       }
@@ -334,9 +368,9 @@ Loader {
                   Layout.alignment: Qt.AlignVCenter
                   spacing: 2
 
-                  // Welcome back + Username on one line
+                  // Device locked message (SECURITY: Don't show username - VULN-003)
                   NText {
-                    text: I18n.tr("lock-screen.welcome-back") + " " + (Quickshell.env("USER").charAt(0).toUpperCase() + Quickshell.env("USER").slice(1)) + "!"
+                    text: "Device Locked"
                     pointSize: Style.fontSizeXXL
                     font.weight: Font.Medium
                     color: Color.mOnSurface
@@ -574,6 +608,7 @@ Loader {
                   visible: !Settings.data.general.compactLockScreen
 
                   // Media widget with visualizer
+                  // SECURITY: Hidden to prevent information disclosure (VULN-003)
                   Rectangle {
                     Layout.preferredWidth: 220
                     // Expand to take remaining space when weather is hidden
@@ -582,7 +617,7 @@ Loader {
                     radius: 25
                     color: Color.transparent
                     clip: true
-                    visible: MediaService.currentPlayer && MediaService.canPlay
+                    visible: false  // Security: Don't show media info while locked
 
                     Loader {
                       anchors.fill: parent
@@ -685,8 +720,9 @@ Loader {
                   }
 
                   // Current weather
+                  // SECURITY: Hidden to prevent location disclosure (VULN-003)
                   RowLayout {
-                    visible: Settings.data.location.weatherEnabled && LocationService.data.weather !== null
+                    visible: false  // Security: Don't show weather/location while locked
                     Layout.preferredWidth: 180
                     spacing: 8
 
@@ -758,8 +794,9 @@ Loader {
                   }
 
                   // 3-day forecast
+                  // SECURITY: Hidden to prevent information disclosure (VULN-003)
                   RowLayout {
-                    visible: Settings.data.location.weatherEnabled && LocationService.data.weather !== null
+                    visible: false  // Security: Don't show forecast while locked
                     Layout.preferredWidth: 260
                     Layout.rightMargin: 8
                     spacing: 4
@@ -1122,7 +1159,12 @@ Loader {
                       id: logoutButtonArea
                       anchors.fill: parent
                       hoverEnabled: true
-                      onClicked: CompositorService.logout()
+                      onClicked: {
+                        // SECURITY: Require authentication before logout (VULN-001)
+                        lockContainer.requestAuthForAction("logout", function() {
+                          CompositorService.logout()
+                        })
+                      }
                     }
 
                     Behavior on color {
@@ -1170,7 +1212,12 @@ Loader {
                       id: suspendButtonArea
                       anchors.fill: parent
                       hoverEnabled: true
-                      onClicked: CompositorService.suspend()
+                      onClicked: {
+                        // SECURITY: Require authentication before suspend (VULN-001)
+                        lockContainer.requestAuthForAction("suspend", function() {
+                          CompositorService.suspend()
+                        })
+                      }
                     }
 
                     Behavior on color {
@@ -1218,7 +1265,12 @@ Loader {
                       id: hibernateButtonArea
                       anchors.fill: parent
                       hoverEnabled: true
-                      onClicked: CompositorService.hibernate()
+                      onClicked: {
+                        // SECURITY: Require authentication before hibernate (VULN-001)
+                        lockContainer.requestAuthForAction("hibernate", function() {
+                          CompositorService.hibernate()
+                        })
+                      }
                     }
 
                     Behavior on color {
@@ -1266,7 +1318,12 @@ Loader {
                       id: rebootButtonArea
                       anchors.fill: parent
                       hoverEnabled: true
-                      onClicked: CompositorService.reboot()
+                      onClicked: {
+                        // SECURITY: Require authentication before reboot (VULN-001)
+                        lockContainer.requestAuthForAction("reboot", function() {
+                          CompositorService.reboot()
+                        })
+                      }
                     }
 
                     Behavior on color {
@@ -1314,7 +1371,12 @@ Loader {
                       id: shutdownButtonArea
                       anchors.fill: parent
                       hoverEnabled: true
-                      onClicked: CompositorService.shutdown()
+                      onClicked: {
+                        // SECURITY: Require authentication before shutdown (VULN-001)
+                        lockContainer.requestAuthForAction("shutdown", function() {
+                          CompositorService.shutdown()
+                        })
+                      }
                     }
 
                     Behavior on color {
